@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[Estudiantes] (
+    [id]                  INT             IDENTITY (1, 1) NOT NULL,
+    [cedula]              VARCHAR (20)    NOT NULL,
+    [nombre]              VARCHAR (255)   NOT NULL,
+    [apellido_1]          VARCHAR (255)   NOT NULL,
+    [apellido_2]          VARCHAR (255)   NOT NULL,
+    [fecha_nacimiento]    DATE            NOT NULL,
+    [genero]              VARCHAR (10)    NOT NULL,
+    [grado_actual]        VARCHAR (20)    NOT NULL,
+    [repitiendo]          BIT             DEFAULT ((0)) NULL,
+    [historial_academico] TEXT            NULL,
+    [discapacidades]      TEXT            NULL,
+    [uso_lentes]          BIT             DEFAULT ((0)) NULL,
+    [enfermedades]        TEXT            NULL,
+    [alergias]            TEXT            NULL,
+    [fotografia]          VARBINARY (MAX) NULL,
+    [direccion]           TEXT            NULL,
+    [contacto]            VARCHAR (50)    NULL,
+    [estado]              BIT             DEFAULT ((1)) NULL,
+    [id_seccion]          INT             NOT NULL,
+    [id_usuario]          INT             NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    FOREIGN KEY ([id_seccion]) REFERENCES [dbo].[Secciones] ([id]) ON DELETE CASCADE,
+    FOREIGN KEY ([id_usuario]) REFERENCES [dbo].[Usuarios] ([id]),
+    UNIQUE NONCLUSTERED ([cedula] ASC)
+);
+
