@@ -1,10 +1,98 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner" style="height: 90vh;">
+        <div class="carousel-item active">
+            <img src="~/static/images/_a5a8241+(1024x683).jpg" class="d-block w-100 h-100 object-fit-cover" alt="...">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                <h1 class="display-3 fw-bold text-white">Bienvenido al Sistema Escolar</h1>
+                <p class="lead text-white">Explora nuestros servicios educativos de manera sencilla.</p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="~/static/images/foto01-sf-scaled.jpg" class="d-block w-100 h-100 object-fit-cover" alt="...">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                <h1 class="display-3 fw-bold text-white">Gestión eficiente</h1>
+                <p class="lead text-white">Organiza estudiantes, docentes y más desde un solo lugar.</p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="~/static/images/ed698ac3-a8a2-4258-88d3-f3aae2ed54c8.jpg" class="d-block w-100 h-100 object-fit-cover" alt="...">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                <h1 class="display-3 fw-bold text-white">Gestión eficiente</h1>
+                <p class="lead text-white">Organiza estudiantes, docentes y más desde un solo lugar.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<section class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" data-aos="fade-up">¿Qué puedes hacer?</h2>
+        <p class="text-muted" data-aos="fade-up" data-aos-delay="100">Funciones destacadas de nuestra plataforma.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Gestión Académica</h5>
+                    <p class="card-text">Administra notas, materias y docentes con facilidad.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Portal Estudiantil</h5>
+                    <p class="card-text">Los alumnos pueden acceder a sus calificaciones y tareas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Reportes en Tiempo Real</h5>
+                    <p class="card-text">Obtén estadísticas académicas al instante.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-primary text-white py-5" data-aos="zoom-in">
+    <div class="container text-center">
+        <h2 class="mb-3">¿Listo para comenzar?</h2>
+        <p class="mb-4">Regístrate y mejora la gestión educativa hoy mismo.</p>
+        <a href="/Login" class="btn btn-light btn-lg px-4">Iniciar Sesión</a>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" data-aos="fade-up">Lo que dicen nuestros usuarios</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-right">
+            <blockquote class="blockquote bg-light p-4 rounded shadow-sm">
+                <p>"Una plataforma intuitiva y muy útil para nuestros profesores."</p>
+                <footer class="blockquote-footer">Directora, Escuela Central</footer>
+            </blockquote>
+        </div>
+        <div class="col-md-4" data-aos="fade-up">
+            <blockquote class="blockquote bg-light p-4 rounded shadow-sm">
+                <p>"Ahora puedo ver mis notas y tareas desde casa. Me encanta."</p>
+                <footer class="blockquote-footer">Alumno, 3° Secundaria</footer>
+            </blockquote>
+        </div>
+        <div class="col-md-4" data-aos="fade-left">
+            <blockquote class="blockquote bg-light p-4 rounded shadow-sm">
+                <p>"La generación de reportes ha mejorado la toma de decisiones."</p>
+                <footer class="blockquote-footer">Coordinador Académico</footer>
+            </blockquote>
+        </div>
+    </div>
+</section>

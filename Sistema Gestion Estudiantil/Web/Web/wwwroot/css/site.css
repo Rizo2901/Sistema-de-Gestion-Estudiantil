@@ -1,22 +1,124 @@
-html {
-  font-size: 14px;
-}
-
+/* Base HTML font size for responsive scaling */
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Enfocados accesibles (botones, enlaces, inputs) */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* Altura completa del viewport */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
+/* Flex layout para empujar el footer al fondo */
 body {
-  margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin-bottom: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease-in;
+}
+
+    body.page-enter {
+        opacity: 1;
+    }
+
+main[role="main"] {
+    flex: 1 0 auto;
+}
+
+
+
+/* Carrusel a pantalla completa si es necesario */
+#heroCarousel,
+.carousel-inner,
+.carousel-item,
+.carousel-item img {
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+}
+
+/* Animación de entrada */
+.fade-in {
+    animation: fadeIn 0.5s ease-in forwards;
+    opacity: 0;
+}
+
+/* Animación de salida */
+.fade-out {
+    animation: fadeOut 0.4s ease-out forwards;
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* WOW.js + Animate.css efectos */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+
+.wow {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.animate__animated {
+    opacity: 1 !important;
+}
+
+.bg-gradient-red {
+    background: linear-gradient(90deg, #e57373 0%, #b02a37 100%);
+    /* fallback for old browsers */
+    background-color: #e57373;
+}
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1040;
+    display: none;
+}
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+#sidebarMenu {
+    z-index: 1050 !important;
+}
+.bg-soft-red-sidebar {
+    background-color: #fff0f0 !important;
 }
