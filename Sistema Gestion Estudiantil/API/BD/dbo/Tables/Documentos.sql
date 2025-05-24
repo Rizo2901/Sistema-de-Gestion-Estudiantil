@@ -1,10 +1,10 @@
 ﻿CREATE TABLE [dbo].[Documentos] (
-    [id]             INT             IDENTITY (1, 1) NOT NULL,
-    [id_estudiante]  INT             NOT NULL,
-    [tipo_documento] VARCHAR (10)    NOT NULL,
-    [descripcion]    TEXT            NULL,
-    [archivo]        VARBINARY (MAX) NULL,
-    PRIMARY KEY CLUSTERED ([id] ASC),
-    FOREIGN KEY ([id_estudiante]) REFERENCES [dbo].[Estudiantes] ([id]) ON DELETE CASCADE
+    [IdDocumento]   UNIQUEIDENTIFIER DEFAULT (newid()) NOT NULL,
+    [IdEstudiante]  UNIQUEIDENTIFIER NOT NULL,
+    [TipoDocumento] VARCHAR (10)     NOT NULL,
+    [Descripcion]   TEXT             NULL,
+    [Archivo]       VARBINARY (MAX)  NULL,
+    PRIMARY KEY CLUSTERED ([IdDocumento] ASC),
+    FOREIGN KEY ([IdEstudiante]) REFERENCES [dbo].[Estudiantes] ([IdEstudiante]) ON DELETE CASCADE
 );
 

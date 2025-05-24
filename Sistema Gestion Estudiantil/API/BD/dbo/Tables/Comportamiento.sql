@@ -1,10 +1,10 @@
 ﻿CREATE TABLE [dbo].[Comportamiento] (
-    [id]            INT  IDENTITY (1, 1) NOT NULL,
-    [id_estudiante] INT  NOT NULL,
-    [fecha]         DATE NOT NULL,
-    [observacion]   TEXT NULL,
-    [accion_tomada] TEXT NULL,
-    PRIMARY KEY CLUSTERED ([id] ASC),
-    FOREIGN KEY ([id_estudiante]) REFERENCES [dbo].[Estudiantes] ([id]) ON DELETE CASCADE
+    [IdComportamiento] UNIQUEIDENTIFIER DEFAULT (newid()) NOT NULL,
+    [IdEstudiante]     UNIQUEIDENTIFIER NOT NULL,
+    [Fecha]            DATE             NOT NULL,
+    [Observacion]      TEXT             NULL,
+    [AccionTomada]     TEXT             NULL,
+    PRIMARY KEY CLUSTERED ([IdComportamiento] ASC),
+    FOREIGN KEY ([IdEstudiante]) REFERENCES [dbo].[Estudiantes] ([IdEstudiante]) ON DELETE CASCADE
 );
 

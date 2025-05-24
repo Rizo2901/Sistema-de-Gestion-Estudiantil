@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[Notificaciones] (
-    [id]            INT      IDENTITY (1, 1) NOT NULL,
-    [id_estudiante] INT      NOT NULL,
-    [mensaje]       TEXT     NOT NULL,
-    [fecha]         DATETIME DEFAULT (getdate()) NULL,
-    PRIMARY KEY CLUSTERED ([id] ASC),
-    FOREIGN KEY ([id_estudiante]) REFERENCES [dbo].[Estudiantes] ([id]) ON DELETE CASCADE
+    [IdNotificacion] UNIQUEIDENTIFIER DEFAULT (newid()) NOT NULL,
+    [IdEstudiante]   UNIQUEIDENTIFIER NOT NULL,
+    [Mensaje]        TEXT             NOT NULL,
+    [Fecha]          DATETIME         DEFAULT (getdate()) NULL,
+    PRIMARY KEY CLUSTERED ([IdNotificacion] ASC),
+    FOREIGN KEY ([IdEstudiante]) REFERENCES [dbo].[Estudiantes] ([IdEstudiante]) ON DELETE CASCADE
 );
 

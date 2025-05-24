@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[Asistencia] (
-    [id]            INT          IDENTITY (1, 1) NOT NULL,
-    [id_estudiante] INT          NOT NULL,
-    [fecha]         DATE         NOT NULL,
-    [estado]        VARCHAR (15) NOT NULL,
-    PRIMARY KEY CLUSTERED ([id] ASC),
-    FOREIGN KEY ([id_estudiante]) REFERENCES [dbo].[Estudiantes] ([id]) ON DELETE CASCADE
+    [IdAsistencia] UNIQUEIDENTIFIER DEFAULT (newid()) NOT NULL,
+    [IdEstudiante] UNIQUEIDENTIFIER NOT NULL,
+    [Fecha]        DATE             NOT NULL,
+    [Estado]       VARCHAR (15)     NOT NULL,
+    PRIMARY KEY CLUSTERED ([IdAsistencia] ASC),
+    FOREIGN KEY ([IdEstudiante]) REFERENCES [dbo].[Estudiantes] ([IdEstudiante]) ON DELETE CASCADE
 );
 

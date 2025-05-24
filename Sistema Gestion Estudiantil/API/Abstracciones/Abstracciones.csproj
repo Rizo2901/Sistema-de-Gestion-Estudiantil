@@ -7,10 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\API\" />
-    <Folder Include="Interfaces\DA\" />
-    <Folder Include="Interfaces\Flujo\" />
-    <Folder Include="Interfaces\Reglas\" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
   </ItemGroup>
 
 </Project>

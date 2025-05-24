@@ -58,15 +58,14 @@
     <Folder Include="Properties" />
     <Folder Include="dbo\" />
     <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Usuarios.sql" />
     <Build Include="dbo\Tables\Secciones.sql" />
     <Build Include="dbo\Tables\Roles.sql" />
     <Build Include="dbo\Tables\Reuniones.sql" />
-    <Build Include="dbo\Tables\Recuperacion_Contraseña.sql" />
     <Build Include="dbo\Tables\Promedios.sql" />
-    <Build Include="dbo\Tables\Profesores_Secciones.sql" />
     <Build Include="dbo\Tables\Profesores.sql" />
     <Build Include="dbo\Tables\Notificaciones.sql" />
     <Build Include="dbo\Tables\Materias.sql" />
@@ -78,9 +77,18 @@
     <Build Include="dbo\Tables\Estudiantes.sql" />
     <Build Include="dbo\Tables\Documentos.sql" />
     <Build Include="dbo\Tables\Comportamiento.sql" />
-    <Build Include="dbo\Tables\Atenciones_Medicas.sql" />
-    <Build Include="dbo\Tables\Asistencia_Profesores.sql" />
     <Build Include="dbo\Tables\Asistencia.sql" />
     <Build Include="dbo\Tables\Actividades.sql" />
+    <Build Include="dbo\Tables\RecuperacionContrasena.sql" />
+    <Build Include="dbo\Tables\ProfesoresSecciones.sql" />
+    <Build Include="dbo\Tables\AtencionesMedicas.sql" />
+    <Build Include="dbo\Tables\AsistenciaProfesores.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerTodosLosEstudiantes.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerEstudiantePorId.sql" />
+    <Build Include="dbo\Stored Procedures\SP_InsertarEstudiante.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarEstudiante.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ActualizarEstudiante.sql" />
+    <Build Include="dbo\Tables\ReunionesAdministrativas.sql" />
+    <Build Include="dbo\Tables\ParticipantesReunionAdmin.sql" />
   </ItemGroup>
 </Project>

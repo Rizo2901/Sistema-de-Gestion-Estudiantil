@@ -1,11 +1,11 @@
 ﻿CREATE TABLE [dbo].[Evaluaciones] (
-    [id]            INT            IDENTITY (1, 1) NOT NULL,
-    [id_estudiante] INT            NOT NULL,
-    [id_materia]    INT            NOT NULL,
-    [calificacion]  DECIMAL (5, 2) NOT NULL,
-    [fecha]         DATE           NOT NULL,
-    PRIMARY KEY CLUSTERED ([id] ASC),
-    FOREIGN KEY ([id_estudiante]) REFERENCES [dbo].[Estudiantes] ([id]) ON DELETE CASCADE,
-    FOREIGN KEY ([id_materia]) REFERENCES [dbo].[Materias] ([id]) ON DELETE CASCADE
+    [IdEvaluacion] UNIQUEIDENTIFIER DEFAULT (newid()) NOT NULL,
+    [IdEstudiante] UNIQUEIDENTIFIER NOT NULL,
+    [IdMateria]    UNIQUEIDENTIFIER NOT NULL,
+    [Calificacion] DECIMAL (5, 2)   NOT NULL,
+    [Fecha]        DATE             NOT NULL,
+    PRIMARY KEY CLUSTERED ([IdEvaluacion] ASC),
+    FOREIGN KEY ([IdEstudiante]) REFERENCES [dbo].[Estudiantes] ([IdEstudiante]) ON DELETE CASCADE,
+    FOREIGN KEY ([IdMateria]) REFERENCES [dbo].[Materias] ([IdMateria]) ON DELETE CASCADE
 );
 

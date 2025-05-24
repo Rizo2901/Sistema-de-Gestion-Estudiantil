@@ -1,8 +1,8 @@
 ﻿CREATE TABLE [dbo].[Roles] (
-    [id]          INT           IDENTITY (1, 1) NOT NULL,
-    [nombre]      VARCHAR (50)  NOT NULL,
-    [descripcion] VARCHAR (255) NULL,
-    PRIMARY KEY CLUSTERED ([id] ASC),
-    UNIQUE NONCLUSTERED ([nombre] ASC)
+    [IdRol]       UNIQUEIDENTIFIER DEFAULT (newid()) NOT NULL,
+    [Nombre]      VARCHAR (50)     NOT NULL,
+    [Descripcion] VARCHAR (255)    NULL,
+    PRIMARY KEY CLUSTERED ([IdRol] ASC),
+    UNIQUE NONCLUSTERED ([Nombre] ASC)
 );
 
