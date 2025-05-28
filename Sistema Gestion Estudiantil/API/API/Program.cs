@@ -16,14 +16,27 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IEstudianteFlujo, EstudianteFlujo>();
 builder.Services.AddScoped<IEstudianteDA, EstudianteDA>();
-builder.Services.AddScoped<IEstudianteFlujo, EstudianteFlujo>();
+
+builder.Services.AddScoped<ISeccionDA, SeccionDA>();
+builder.Services.AddScoped<ISeccionFlujo, SeccionFlujo>();
+
 
 
 
 builder.Services.AddScoped<IRepositorioDapper, RepositorioDapper>();
 
 
-
+// Configuración de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMyOrigin",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7079") // Especifica el origen del proyecto frontend
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,6 +47,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowMyOrigin"); // Aplica la política de CORS
 
 app.UseAuthorization();
 

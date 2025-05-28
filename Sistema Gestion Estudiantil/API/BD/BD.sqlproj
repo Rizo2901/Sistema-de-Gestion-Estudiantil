@@ -90,5 +90,10 @@
     <Build Include="dbo\Stored Procedures\SP_ActualizarEstudiante.sql" />
     <Build Include="dbo\Tables\ReunionesAdministrativas.sql" />
     <Build Include="dbo\Tables\ParticipantesReunionAdmin.sql" />
+    <Build Include="dbo\Stored Procedures\SP_Obtener_Secciones.sql" />
+    <Build Include="dbo\Stored Procedures\SP_Obtener_Seccion_Por_Id.sql" />
+    <Build Include="dbo\Stored Procedures\SP_Eliminar_Seccion.sql" />
+    <Build Include="dbo\Stored Procedures\SP_Crear_Seccion.sql" />
+    <Build Include="dbo\Stored Procedures\SP_Actualizar_Seccion.sql" />
   </ItemGroup>
 </Project>

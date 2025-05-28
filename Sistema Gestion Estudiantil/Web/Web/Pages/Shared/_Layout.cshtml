@@ -1,5 +1,10 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString()?.ToLower();
+    bool mostrarMenuDashboard = paginaActual != null && paginaActual.StartsWith("/dashboard");
+}
+
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,19 +13,19 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true" />
-
-    <!-- AOS Animations -->
-    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 </head>
 <body class="d-flex flex-column min-vh-100">
+
     <!-- Navbar -->
     <nav class="navbar navbar-light bg-gradient-red text-white px-3 shadow-sm">
-
-
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <img src="~/static/images/icons8-colegio-100.svg" alt="Logo" width="40" height="40" class="me-2">
-                <a class="navbar-brand" href="#">Sistema Escolar</a>
+                <a class="navbar-brand" asp-area="" asp-page="/Index">
+                    <img src="~/static/images/icons8-colegio-100.svg" alt="Logo" width="40" height="40" class="me-2" />
+                    S.G.E
+                </a>
             </div>
             <div class="d-none d-md-flex">
                 <a class="nav-link text-white" href="/Nosotros">Nosotros</a>
@@ -32,56 +37,170 @@
         </div>
     </nav>
 
-    <!-- Sidebar -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-    <div id="sidebarMenu" class="position-fixed top-0 end-0 bg-white shadow vh-100 p-4 d-flex flex-column bg-soft-red-sidebar justify-content-between"
+    <!-- Sidebar móvil -->
+    <div id="sidebarOverlay" style="display: none;"></div>
+    <div id="sidebarMenu" class="position-fixed top-0 end-0 bg-white shadow vh-100 p-4 d-flex flex-column justify-content-between"
          style="width: 250px; transform: translateX(100%); transition: transform 0.3s; z-index: 1050;">
-
         <div>
             <button class="btn-close float-end" id="menuClose"></button>
             <h5 class="mt-5">Menú</h5>
             <ul class="nav flex-column mt-3">
-                <li class="nav-item"><a class="nav-link" href="/Nosotros">Nosotros</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Contacto">Contacto</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Login">Iniciar sesión</a></li>
+                <li class="nav-item">
+                    <a class="nav-link text-black @(paginaActual == "/nosotros" ? "active" : "")" asp-page="/Nosotros">
+                        <i class="bi bi-people-fill me-2"></i>Nosotros
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black @(paginaActual == "/contacto" ? "active" : "")" asp-page="/Contacto">
+                        <i class="bi bi-envelope-fill me-2"></i>Contacto
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black @(paginaActual == "/login" ? "active" : "")" asp-page="/Login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black @(paginaActual == "/dashboard/dashboard" ? "active" : "")" asp-page="/Dashboard/Dashboard">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
             </ul>
         </div>
-        <div class="border-top pt-3 d-flex align-items-center gap-2">
-            <img src="/img/avatar.png" alt="Usuario" class="rounded-circle" width="60" height="60" style="object-fit: cover;">
-            <div class="d-flex flex-column">
-                <span class="fw-semibold">Juan Pérez</span>
-                <small class="text-muted">juanperez@email.com</small>
+        <div style="border-top: 1px solid #ddd; padding-top: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <img src="/img/avatar.png" alt="Usuario" class="rounded-circle" width="60" height="60" style="object-fit: cover;" />
+            <div>
+                <span style="font-weight: 600;">Juan Pérez</span><br />
+                <small style="color: gray;">juanperez@email.com</small>
             </div>
         </div>
     </div>
+
+    <!-- Contenido principal -->
     <div class="flex-grow-1">
-        <main role="main" class="pb-3">
-            @RenderBody()
+        <main role="main" class="pb-3" style="min-height: 80vh;">
+            @if (mostrarMenuDashboard)
+            {
+                <div style="display: flex; gap: 1rem; padding: 1rem; position: relative;">
+
+                    <!-- Botón flotante al borde izquierdo -->
+                    <button id="toggleSidebarBtn" onclick="toggleSubmenu()" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background-color: #343a40; border: none; color: white; border-radius: 0.25rem; padding: 0.5rem; z-index: 10;">
+                        <i id="toggleIcon" class="bi bi-chevron-left"></i>
+                    </button>
+
+                    <!-- Submenú Dashboard -->
+                    <nav id="submenuDashboard" style="background-color: #343a40; border-radius: 0.25rem; padding: 1rem; width: 220px; height: fit-content;">
+                        <h5 style="margin-bottom: 1rem; color: white;">Panel</h5>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard" ? "fw-bold" : "")" asp-page="/Dashboard/Dashboard">
+                                    <i class="bi bi-house me-2"></i>Inicio
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Estudiantes/Index" ? "fw-bold" : "")" asp-page="/Dashboard/Estudiantes/Index">
+                                    <i class="bi bi-person-lines-fill me-2"></i>Estudiantes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/calificaciones" ? "fw-bold" : "")" asp-page="/Dashboard/Calificaciones">
+                                    <i class="bi bi-clipboard-data me-2"></i>Calificaciones
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/profesores" ? "fw-bold" : "")" asp-page="/Dashboard/Profesores">
+                                    <i class="bi bi-person-lines-fill me-2"></i>Profesores
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/misnotas" ? "fw-bold" : "")" asp-page="/Dashboard/MisNotas">
+                                    <i class="bi bi-journal-check me-2"></i>Mis notas
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "Dashboard/Secciones/Index" ? "fw-bold" : "")" asp-page="/Dashboard/Secciones/Index">
+                                    <i class="bi bi-diagram-3 me-2"></i>Secciones
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/missecciones" ? "fw-bold" : "")" asp-page="/Dashboard/MisSecciones">
+                                    <i class="bi bi-person-badge me-2"></i>Mis secciones
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/horarios" ? "fw-bold" : "")" asp-page="/Dashboard/Horarios">
+                                    <i class="bi bi-calendar-week me-2"></i>Horarios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/mishorarios" ? "fw-bold" : "")" asp-page="/Dashboard/MisHorarios">
+                                    <i class="bi bi-clock-history me-2"></i>Mis horarios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesfamiliares" ? "fw-bold" : "")" asp-page="/Dashboard/ReunionesFamiliares">
+                                    <i class="bi bi-people me-2"></i>Reuniones familiares
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesadministrativas" ? "fw-bold" : "")" asp-page="/Dashboard/ReunionesAdministrativas">
+                                    <i class="bi bi-building me-2"></i>Reuniones administrativas
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/actividades" ? "fw-bold" : "")" asp-page="/Dashboard/Actividades">
+                                    <i class="bi bi-kanban me-2"></i>Actividades
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <!-- Contenido de la página -->
+                    <section class="flex-grow-1">
+                        @RenderBody()
+                    </section>
+                </div>
+            }
+            else
+            {
+                @RenderBody()
+            }
         </main>
     </div>
 
-
-<footer class="bg-dark text-white py-3 my-4 w-100">
-    <div class="container">
-        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-white">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-white">Features</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-white">Pricing</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-white">About</a></li>
-        </ul>
-        <p class="text-center text-white mb-0">© 2025 Company, Inc</p>
-    </div>
-</footer>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 my-4 w-100">
+        <div class="container">
+            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                <li class="nav-item"><a asp-area="" asp-page="/Index" class="nav-link px-2 text-white">Inicio</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-white">Contacto</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-white">Nosotros</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-white">About</a></li>
+            </ul>
+            <p class="text-center text-white mb-0">© 2025 Sistema de Gestión Estudiantil (S.G.E), Inc</p>
+        </div>
+    </footer>
 
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <!-- AOS Script and Init -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
         AOS.init();
+
+        function toggleSubmenu() {
+            const submenu = document.getElementById("submenuDashboard");
+            const icon = document.getElementById("toggleIcon");
+            if (submenu.style.display === "none") {
+                submenu.style.display = "block";
+                icon.className = "bi bi-chevron-left";
+            } else {
+                submenu.style.display = "none";
+                icon.className = "bi bi-chevron-right";
+            }
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

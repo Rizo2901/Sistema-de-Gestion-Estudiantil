@@ -1,0 +1,59 @@
+﻿@page
+@model DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row h-100">
+
+        <!-- Contenido principal (a la derecha del menú lateral) -->
+        <div class="col-md-9 col-lg-10 p-4 bg-light overflow-auto">
+            <h2 class="mb-4">Resumen</h2>
+
+            <div class="row g-3">
+                <!-- Card 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow rounded-4 h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Estudiantes</h5>
+                            <p class="card-text display-6">120</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow rounded-4 h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Profesores Activos</h5>
+                            <p class="card-text display-6">35</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="col-md-12 col-lg-4">
+                    <div class="card shadow rounded-4 h-100 bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Promedio General</h5>
+                            <p class="card-text display-6">8.7</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 (más grande) -->
+                <div class="col-12">
+                    <div class="card shadow rounded-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Notas recientes</h5>
+                            <p class="card-text">Últimas evaluaciones registradas...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

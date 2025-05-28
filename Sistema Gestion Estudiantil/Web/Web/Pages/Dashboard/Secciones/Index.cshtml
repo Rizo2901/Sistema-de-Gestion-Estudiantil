@@ -1,0 +1,49 @@
+﻿@page
+@model Web.Pages.Dashboard.Secciones.IndexModel
+@{
+    ViewData["Title"] = "Secciones";
+    Layout = "_Layout";
+}
+
+@if (Model.Secciones == null || !Model.Secciones.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay secciones registradas.
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <a href="/Dashboard/Secciones/Crear" class="btn btn-success w-100 w-md-auto">
+                    <i class="bi bi-plus-lg"></i> Crear Sección
+                </a>
+            </div>
+        </div>
+
+        <h2 class="mb-4 text-center text-md-start">Listado de Secciones</h2>
+        <div class="row g-3">
+            @foreach (var seccion in Model.Secciones)
+            {
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="card shadow h-100" style="border-radius: 0 0 1rem 1rem;">
+                        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center flex-wrap">
+                            <div class="mb-3 mb-md-0">
+                                <h5 class="card-title mb-1">
+                                    Sección: @seccion.Nombre
+                                </h5>
+                                <p class="card-text mb-0">ID: @seccion.IdSeccion</p>
+                            </div>
+                            <div class="btn-group mt-2 mt-md-0 w-100 w-md-auto">
+                                <a href="#" class="btn btn-sm btn-primary w-100 w-md-auto mb-2 mb-md-0">Editar</a>
+                                <a href="#" class="btn btn-sm btn-danger w-100 w-md-auto mb-2 mb-md-0">Eliminar</a>
+                                <a href="#" class="btn btn-sm btn-secondary w-100 w-md-auto">Ver Detalles</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

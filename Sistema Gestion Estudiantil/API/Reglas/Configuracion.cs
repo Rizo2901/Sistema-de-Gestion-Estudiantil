@@ -16,13 +16,12 @@ namespace Reglas
 
         public string ObtenerMetodo(string seccion, string nombre)
         {
-            string? UrlBase = ObtenerUrlBase(seccion);
-
-            var Metodo = _configuration.GetSection(seccion).Get<APIEndPoint>().
-                Metodos.Where(m => m.Nombre == nombre).FirstOrDefault().Valor;
-
-            return $"{UrlBase}/{Metodo}";
+            string? urlBase = ObtenerUrlBase(seccion)?.TrimEnd('/');
+            var metodo = _configuration.GetSection(seccion).Get<APIEndPoint>()?
+                .Metodos.FirstOrDefault(m => m.Nombre == nombre)?.Valor?.TrimStart('/');
+            return $"{urlBase}/{metodo}";
         }
+
 
         private string? ObtenerUrlBase(string seccion)
         {
