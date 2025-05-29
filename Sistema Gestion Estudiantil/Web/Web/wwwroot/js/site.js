@@ -1,28 +1,21 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
-    // Aplica una clase para la animación de entrada inicial del body
-    document.body.classList.add("page-enter");
-
-    // Obtener elementos del menú lateral
     const menuToggle = document.getElementById("menuToggle");
     const menuClose = document.getElementById("menuClose");
     const sidebarMenu = document.getElementById("sidebarMenu");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
 
-    // Función para abrir el sidebar
     function openSidebar() {
-        sidebarMenu.style.transform = "translateX(0)"; // Muestra el sidebar
-        if (sidebarOverlay) sidebarOverlay.classList.add("active"); // Muestra fondo oscuro
+        sidebarMenu.style.transform = "translateX(0)";
+        if (sidebarOverlay) sidebarOverlay.classList.add("active");
         sidebarMenu.setAttribute("tabindex", "-1");
-        sidebarMenu.focus(); // Da foco al sidebar para accesibilidad
+        sidebarMenu.focus();
     }
 
-    // Función para cerrar el sidebar
     function closeSidebar() {
-        sidebarMenu.style.transform = "translateX(100%)"; // Oculta el sidebar
-        if (sidebarOverlay) sidebarOverlay.classList.remove("active"); // Oculta fondo oscuro
+        sidebarMenu.style.transform = "translateX(100%)";
+        if (sidebarOverlay) sidebarOverlay.classList.remove("active");
     }
 
-    // Solo agregar eventos si todos los elementos existen
     if (menuToggle && menuClose && sidebarMenu) {
         menuToggle.addEventListener("click", openSidebar);
         menuClose.addEventListener("click", closeSidebar);
@@ -30,6 +23,7 @@
             sidebarOverlay.addEventListener("click", closeSidebar);
         }
     }
+
 
     // Animaciones "WOW" con IntersectionObserver
     const observer = new IntersectionObserver(entries => {

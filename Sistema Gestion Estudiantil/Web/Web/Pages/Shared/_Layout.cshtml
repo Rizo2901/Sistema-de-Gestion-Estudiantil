@@ -1,15 +1,12 @@
 ﻿@{
-    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString()?.ToLower();
-    bool mostrarMenuDashboard = paginaActual != null && paginaActual.StartsWith("/dashboard");
+    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString()?.ToLower(); bool mostrarMenuDashboard = paginaActual != null && paginaActual.StartsWith("/dashboard");
 }
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Web</title>
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true" />
@@ -17,7 +14,6 @@
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 </head>
 <body class="d-flex flex-column min-vh-100">
-
     <!-- Navbar -->
     <nav class="navbar navbar-light bg-gradient-red text-white px-3 shadow-sm">
         <div class="container-fluid d-flex justify-content-between align-items-center">
@@ -38,7 +34,8 @@
     </nav>
 
     <!-- Sidebar móvil -->
-    <div id="sidebarOverlay" style="display: none;"></div>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
     <div id="sidebarMenu" class="position-fixed top-0 end-0 bg-white shadow vh-100 p-4 d-flex flex-column justify-content-between"
          style="width: 250px; transform: translateX(100%); transition: transform 0.3s; z-index: 1050;">
         <div>
@@ -118,7 +115,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "Dashboard/Secciones/Index" ? "fw-bold" : "")" asp-page="/Dashboard/Secciones/Index">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Secciones" ? "fw-bold" : "")" asp-page="/Dashboard/Secciones/Index">
                                     <i class="bi bi-diagram-3 me-2"></i>Secciones
                                 </a>
                             </li>
@@ -205,3 +202,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+
