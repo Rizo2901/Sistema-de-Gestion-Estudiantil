@@ -44,7 +44,8 @@ namespace Abstracciones.Modelos
 
         public string? Alergias { get; set; }
 
-        public byte[]? Fotografia { get; set; }
+        public string? Fotografia { get; set; }
+
 
         public string? Direccion { get; set; }
 
@@ -70,7 +71,7 @@ namespace Abstracciones.Modelos
         public Guid IdEstudiante { get; set; }
 
         public string? Seccion { get; set; }
-
+        public Guid IdSeccion { get; set; }
         public string? NombreUsuario { get; set; }
     }
 }

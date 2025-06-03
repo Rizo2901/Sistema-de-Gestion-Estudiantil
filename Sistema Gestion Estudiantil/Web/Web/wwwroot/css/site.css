@@ -140,3 +140,81 @@ main[role="main"] {
         font-weight: bold;
         color: #000 !important;
     }
+
+/* Limita el alto del modal para que nunca sobrepase el 90% del viewport */
+.modal-dialog-scrollable {
+    max-height: 90vh;
+}
+
+.modal-content {
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.modal-body {
+    overflow-y: auto;
+    max-height: 60vh;
+}
+/* Solo para cards de estudiantes */
+.estudiante-card {
+    border-radius: 1rem;
+    flex-direction: row;
+    align-items: center;
+    display: flex;
+}
+
+@media (max-width: 576px) {
+    .estudiante-card {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+        .estudiante-card .card-body {
+            text-align: center;
+        }
+
+    .estudiante-action-btn {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+/* Botones de acción de estudiantes */
+.estudiante-action-btn {
+    transition: background 0.2s, color 0.2s;
+    overflow: hidden;
+    position: relative;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-right: 0.75rem;
+}
+
+    .estudiante-action-btn .action-text {
+        opacity: 0;
+        max-width: 0;
+        margin-left: 0.5rem;
+        transition: opacity 0.3s, max-width 0.3s;
+        white-space: nowrap;
+        overflow: hidden;
+        color: inherit;
+        font-weight: 500;
+    }
+
+    .estudiante-action-btn:hover .action-text,
+    .estudiante-action-btn:focus .action-text {
+        opacity: 1;
+        max-width: 200px;
+    }
+
+    .estudiante-action-btn i {
+        transition: transform 0.3s;
+        font-size: 1.2rem;
+    }
+
+    .estudiante-action-btn:hover i,
+    .estudiante-action-btn:focus i {
+        transform: scale(1.2) rotate(-10deg);
+    }

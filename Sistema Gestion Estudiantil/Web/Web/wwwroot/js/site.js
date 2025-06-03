@@ -53,3 +53,5 @@ if (carouselElement) {
         ride: 'carousel' // Inicia automáticamente
     });
 }
+
+

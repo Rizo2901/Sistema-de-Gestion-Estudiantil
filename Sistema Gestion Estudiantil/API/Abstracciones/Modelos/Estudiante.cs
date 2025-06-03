@@ -46,6 +46,7 @@ namespace Abstracciones.Modelos
 
         public byte[]? Fotografia { get; set; }
 
+
         public string? Direccion { get; set; }
 
         [MaxLength(20)]

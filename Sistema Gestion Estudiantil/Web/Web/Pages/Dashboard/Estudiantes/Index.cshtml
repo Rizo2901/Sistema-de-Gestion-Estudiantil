@@ -15,30 +15,248 @@ else
 {
     <div class="container-fluid px-0">
         <div class="row mb-3">
-            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
-                <a href="/Dashboard/Estudiantes/Crear" class="btn btn-success w-100 w-md-auto">
+            <div class="col-12 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
                     <i class="bi bi-plus-lg"></i> Crear Estudiante
-                </a>
+                </button>
             </div>
         </div>
 
         <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
-        <div class="row g-3">
+        <div class="row g-3 flex-column">
             @foreach (var estudiante in Model.Estudiantes)
             {
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="card shadow h-100" style="border-radius: 0 0 1rem 1rem;">
-                        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center flex-wrap">
-                            <div class="mb-3 mb-md-0">
-                                <h5 class="card-title mb-1">
-                                    Estudiante: @estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2
-                                </h5>
-                                <p class="card-text mb-0">Correo: @estudiante.CorreoElectronico</p>
+                <div class="col-12">
+                    <div class="card estudiante-card shadow h-100">
+                        <div class="p-3 d-flex align-items-center" style="min-width: 120px;">
+                            <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : $"data:image/jpeg;base64,{estudiante.Fotografia}")"
+                                 alt="Foto"
+                                 class="rounded-circle"
+                                 style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ccc;" />
+                        </div>
+                        <div class="card-body flex-grow-1">
+                            <h5 class="card-title mb-1">
+                                @estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2
+                            </h5>
+                            <p class="mb-1"><i class="bi bi-envelope"></i> @estudiante.CorreoElectronico</p>
+                            <p class="mb-1">
+                                <i class="bi bi-eyeglasses"></i>
+                                Usa lentes: <span class="fw-bold">@((estudiante.UsoLentes) ? "Sí" : "No")</span>
+                            </p>
+                            <p class="mb-1">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Alergias: <span class="fw-bold">@(!string.IsNullOrWhiteSpace(estudiante.Alergias) ? estudiante.Alergias : "Ninguna")</span>
+                            </p>
+                            <div class="form-check form-switch d-inline-block align-middle me-2">
+                                <input class="form-check-input" type="checkbox"
+                                       id="estadoSwitch_@estudiante.IdEstudiante"
+                                @(estudiante.Estado ? "checked" : "")
+                                       onchange="cambiarEstado('@estudiante.IdEstudiante', this.checked)" />
+                                <label class="form-check-label" for="estadoSwitch_@estudiante.IdEstudiante">
+                                    <i class="bi bi-person-check"></i> Activo
+                                </label>
                             </div>
-                            <div class="btn-group mt-2 mt-md-0 w-100 w-md-auto">
-                                <a href="#" class="btn btn-sm btn-primary w-100 w-md-auto mb-2 mb-md-0">Editar</a>
-                                <a href="#" class="btn btn-sm btn-danger w-100 w-md-auto mb-2 mb-md-0">Eliminar</a>
-                                <a href="#" class="btn btn-sm btn-secondary w-100 w-md-auto">Ver Detalles</a>
+                        </div>
+                        <div class="d-flex flex-column align-items-end p-3 gap-2">
+                            <button class="btn btn-secondary btn-sm estudiante-action-btn" data-bs-toggle="modal" data-bs-target="#detalleModal_@estudiante.IdEstudiante" title="Ver Detalles">
+                                <i class="bi bi-info-circle"></i>
+                                <span class="action-text">Ver Detalles</span>
+                            </button>
+                            <button class="btn btn-primary btn-sm estudiante-action-btn" data-bs-toggle="modal" data-bs-target="#editarModal_@estudiante.IdEstudiante" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                                <span class="action-text">Editar</span>
+                            </button>
+                            <button class="btn btn-danger btn-sm estudiante-action-btn" data-bs-toggle="modal" data-bs-target="#eliminarModal_@estudiante.IdEstudiante" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                                <span class="action-text">Eliminar</span>
+                            </button>
+                            <button class="btn btn-success btn-sm estudiante-action-btn" title="Crear Documento">
+                                <i class="bi bi-file-earmark-plus"></i>
+                                <span class="action-text">Crear Documento</span>
+                            </button>
+                            <button class="btn btn-warning btn-sm estudiante-action-btn" title="Crear Usuario">
+                                <i class="bi bi-person-plus"></i>
+                                <span class="action-text">Crear Usuario</span>
+                            </button>
+                            <button class="btn btn-info btn-sm estudiante-action-btn" title="Condición Especial">
+                                <i class="bi bi-exclamation-diamond"></i>
+                                <span class="action-text">Condición Especial</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Editar Estudiante -->
+                <div class="modal fade" id="editarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="editarLabel_@estudiante.IdEstudiante" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editarLabel_@estudiante.IdEstudiante">Editar Estudiante</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <form method="post" asp-page-handler="Editar" enctype="multipart/form-data">
+                                <div class="modal-body">
+                                    <input type="hidden" name="idEstudiante" value="@estudiante.IdEstudiante" />
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Cédula</label>
+                                            <input name="estudiante.Cedula" class="form-control" value="@estudiante.Cedula" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nombre</label>
+                                            <input name="estudiante.Nombre" class="form-control" value="@estudiante.Nombre" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Apellido 1</label>
+                                            <input name="estudiante.Apellido1" class="form-control" value="@estudiante.Apellido1" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Apellido 2</label>
+                                            <input name="estudiante.Apellido2" class="form-control" value="@estudiante.Apellido2" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Fecha de Nacimiento</label>
+                                            <input name="estudiante.FechaNacimiento" type="date" class="form-control" value="@(estudiante.FechaNacimiento.ToString("yyyy-MM-dd"))" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Género</label>
+                                            <select name="estudiante.Genero" class="form-select">
+                                                <option value="M" selected="@(estudiante.Genero == "M")">Masculino</option>
+                                                <option value="F" selected="@(estudiante.Genero == "F")">Femenino</option>
+                                                <option value="O" selected="@(estudiante.Genero == "O")">Otro</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Grado Actual</label>
+                                            <input name="estudiante.GradoActual" class="form-control" value="@estudiante.GradoActual" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Repitiendo</label>
+                                            <select name="estudiante.Repitiendo" class="form-select">
+                                                <option value="true" selected="@(estudiante.Repitiendo)">Sí</option>
+                                                <option value="false" selected="@(!estudiante.Repitiendo)">No</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Historial Académico</label>
+                                            <textarea name="estudiante.HistorialAcademico" class="form-control">@estudiante.HistorialAcademico</textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Discapacidades</label>
+                                            <input name="estudiante.Discapacidades" class="form-control" value="@estudiante.Discapacidades" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Uso de Lentes</label>
+                                            <select name="estudiante.UsoLentes" class="form-select">
+                                                <option value="true" selected="@(estudiante.UsoLentes)">Sí</option>
+                                                <option value="false" selected="@(!estudiante.UsoLentes)">No</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Enfermedades</label>
+                                            <input name="estudiante.Enfermedades" class="form-control" value="@estudiante.Enfermedades" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Alergias</label>
+                                            <input name="estudiante.Alergias" class="form-control" value="@estudiante.Alergias" />
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Fotografía</label>
+                                            <div class="mb-2">
+                                                <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : $"data:image/jpeg;base64,{estudiante.Fotografia}")"
+                                                     alt="Foto actual"
+                                                     class="rounded-circle"
+                                                     style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ccc;" />
+                                            </div>
+                                            <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo" />
+                                            <input type="hidden" name="estudiante.Fotografia" value="@estudiante.Fotografia" />
+                                            <small class="text-muted">Si seleccionas un archivo, reemplazará la foto actual.</small>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Dirección</label>
+                                            <textarea name="estudiante.Direccion" class="form-control">@estudiante.Direccion</textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Teléfono Celular</label>
+                                            <input name="estudiante.TelefonoCelular" class="form-control" value="@estudiante.TelefonoCelular" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Correo Electrónico</label>
+                                            <input name="estudiante.CorreoElectronico" class="form-control" value="@estudiante.CorreoElectronico" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Estado</label>
+                                            <select name="estudiante.Estado" class="form-select">
+                                                <option value="true" selected="@(estudiante.Estado)">Activo</option>
+                                                <option value="false" selected="@(!estudiante.Estado)">Inactivo</option>
+                                            </select>
+                                        </div>
+                                      <div class="col-md-6">
+    <label class="form-label">Sección</label>
+    <select name="estudiante.IdSeccion" class="form-select">
+        <option value="">Seleccione una sección</option>
+        @foreach (var seccion in Model.Secciones)
+        {
+@:          <option value="@seccion.Value" @(estudiante.IdSeccion != Guid.Empty && estudiante.IdSeccion.ToString() == seccion.Value ? "selected" : "")>
+@:              @seccion.Text
+@:          </option>
+        }
+    </select>
+</div>
+
+
+
+
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal Eliminar Estudiante -->
+                <div class="modal fade" id="eliminarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="eliminarLabel_@estudiante.IdEstudiante" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 shadow">
+                            <form method="post" asp-page-handler="Eliminar">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title" id="eliminarLabel_@estudiante.IdEstudiante">Eliminar Estudiante</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar a <strong>@estudiante.Nombre @estudiante.Apellido1</strong>?</p>
+                                    <input type="hidden" name="idEstudiante" value="@estudiante.IdEstudiante" />
+                                </div>
+                                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal Ver Detalles -->
+                <div class="modal fade" id="detalleModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="detalleLabel_@estudiante.IdEstudiante" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="detalleLabel_@estudiante.IdEstudiante">Detalles del Estudiante</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Nombre:</strong> @estudiante.Nombre</p>
+                                <p><strong>Apellido 1:</strong> @estudiante.Apellido1</p>
+                                <p><strong>Apellido 2:</strong> @estudiante.Apellido2</p>
+                                <p><strong>Correo Electrónico:</strong> @estudiante.CorreoElectronico</p>
+                                <!-- Agrega más campos si lo deseas -->
                             </div>
                         </div>
                     </div>
@@ -47,3 +265,129 @@ else
         </div>
     </div>
 }
+<!-- Modal Agregar Estudiante -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarLabel">Agregar Estudiante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="post" asp-page-handler="Crear" enctype="multipart/form-data">
+
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Cédula</label>
+                            <input asp-for="Estudiante.Cedula" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input asp-for="Estudiante.Nombre" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 1</label>
+                            <input asp-for="Estudiante.Apellido1" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 2</label>
+                            <input asp-for="Estudiante.Apellido2" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input asp-for="Estudiante.FechaNacimiento" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Género</label>
+                            <select asp-for="Estudiante.Genero" class="form-select">
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                                <option value="O">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Grado Actual</label>
+                            <input asp-for="Estudiante.GradoActual" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Repitiendo</label>
+                            <select asp-for="Estudiante.Repitiendo" class="form-select">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Historial Académico</label>
+                            <textarea asp-for="Estudiante.HistorialAcademico" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Discapacidades</label>
+                            <input asp-for="Estudiante.Discapacidades" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Uso de Lentes</label>
+                            <select asp-for="Estudiante.UsoLentes" class="form-select">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Enfermedades</label>
+                            <input asp-for="Estudiante.Enfermedades" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Alergias</label>
+                            <input asp-for="Estudiante.Alergias" class="form-control" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Fotografía</label>
+                            <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo" />
+
+                            <input type="hidden" asp-for="Estudiante.Fotografia" id="fotoBase64" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Dirección</label>
+                            <textarea asp-for="Estudiante.Direccion" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono Celular</label>
+                            <input asp-for="Estudiante.TelefonoCelular" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input asp-for="Estudiante.CorreoElectronico" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <div class="col-md-6">
+                                <label class="form-label">Estado</label>
+                                <select asp-for="Estudiante.Estado" class="form-select">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sección</label>
+                            <select asp-for="seccionseleccionada" asp-items="Model.Secciones" class="form-control">
+                                <option value="">Seleccione una sección</option>
+                            </select>
+                            <span asp-validation-for="seccionseleccionada" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear Estudiante</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+
