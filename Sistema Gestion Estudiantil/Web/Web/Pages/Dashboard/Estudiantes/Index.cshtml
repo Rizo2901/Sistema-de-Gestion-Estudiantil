@@ -22,6 +22,28 @@ else
             </div>
         </div>
 
+<form method="get" class="row mb-4 justify-content-center">
+    <div class="col-md-3 mb-2">
+        <input type="text" name="FiltroNombre" class="form-control" placeholder="Buscar por Nombre" value="@Model.FiltroNombre" />
+    </div>
+    <div class="col-md-3 mb-2">
+      <input type="text" name="FiltroCedula" class="form-control" placeholder="Buscar por Cédula" value="@Model.FiltroCedula" />
+
+    </div>
+    <div class="col-md-3 mb-2">
+        <input type="text" name="FiltroGrado" class="form-control" placeholder="Buscar por Grado" value="@Model.FiltroGrado" />
+    </div>
+    <div class="col-md-3 mb-2">
+        <input type="text" name="FiltroSeccion" class="form-control" placeholder="Buscar por Sección" value="@Model.FiltroSeccion" />
+    </div>
+
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </div>
+</form>
+
+
+
         <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
         <div class="row g-3 flex-column">
             @foreach (var estudiante in Model.Estudiantes)
@@ -39,14 +61,7 @@ else
                                 @estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2
                             </h5>
                             <p class="mb-1"><i class="bi bi-envelope"></i> @estudiante.CorreoElectronico</p>
-                            <p class="mb-1">
-                                <i class="bi bi-eyeglasses"></i>
-                                Usa lentes: <span class="fw-bold">@((estudiante.UsoLentes) ? "Sí" : "No")</span>
-                            </p>
-                            <p class="mb-1">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                Alergias: <span class="fw-bold">@(!string.IsNullOrWhiteSpace(estudiante.Alergias) ? estudiante.Alergias : "Ninguna")</span>
-                            </p>
+                          
                             <div class="form-check form-switch d-inline-block align-middle me-2">
                                 <input class="form-check-input" type="checkbox"
                                        id="estadoSwitch_@estudiante.IdEstudiante"
@@ -70,7 +85,7 @@ else
                                 <i class="bi bi-trash"></i>
                                 <span class="action-text">Eliminar</span>
                             </button>
-                            <button class="btn btn-success btn-sm estudiante-action-btn" title="Crear Documento">
+                            <button class="btn btn-success btn-sm estudiante-action-btn" title="Crear Documento" data-bs-toggle="modal" data-bs-target="#agregarModalDocumento-@estudiante.IdEstudiante">
                                 <i class="bi bi-file-earmark-plus"></i>
                                 <span class="action-text">Crear Documento</span>
                             </button>
@@ -78,10 +93,12 @@ else
                                 <i class="bi bi-person-plus"></i>
                                 <span class="action-text">Crear Usuario</span>
                             </button>
-                            <button class="btn btn-info btn-sm estudiante-action-btn" title="Condición Especial">
-                                <i class="bi bi-exclamation-diamond"></i>
-                                <span class="action-text">Condición Especial</span>
-                            </button>
+                         <button class="btn btn-info btn-sm estudiante-action-btn" 
+        title="Condición Especial" 
+        data-bs-toggle="modal" data-bs-target="#modalCondicionEspecial-@estudiante.IdEstudiante">
+    <i class="bi bi-exclamation-diamond"></i>
+    <span class="action-text">Condición Especial</span>
+</button>
                         </div>
                     </div>
                 </div>
@@ -140,25 +157,6 @@ else
                                         <div class="col-md-12">
                                             <label class="form-label">Historial Académico</label>
                                             <textarea name="estudiante.HistorialAcademico" class="form-control">@estudiante.HistorialAcademico</textarea>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Discapacidades</label>
-                                            <input name="estudiante.Discapacidades" class="form-control" value="@estudiante.Discapacidades" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Uso de Lentes</label>
-                                            <select name="estudiante.UsoLentes" class="form-select">
-                                                <option value="true" selected="@(estudiante.UsoLentes)">Sí</option>
-                                                <option value="false" selected="@(!estudiante.UsoLentes)">No</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Enfermedades</label>
-                                            <input name="estudiante.Enfermedades" class="form-control" value="@estudiante.Enfermedades" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Alergias</label>
-                                            <input name="estudiante.Alergias" class="form-control" value="@estudiante.Alergias" />
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Fotografía</label>
@@ -256,11 +254,101 @@ else
                                 <p><strong>Apellido 1:</strong> @estudiante.Apellido1</p>
                                 <p><strong>Apellido 2:</strong> @estudiante.Apellido2</p>
                                 <p><strong>Correo Electrónico:</strong> @estudiante.CorreoElectronico</p>
-                                <!-- Agrega más campos si lo deseas -->
+                               
                             </div>
                         </div>
                     </div>
                 </div>
+
+
+<!-- Modal: Crear Documento a Estudiante -->
+<div class="modal fade" id="agregarModalDocumento-@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="agregarLabel-@estudiante.IdEstudiante" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarLabel-@estudiante.IdEstudiante">
+                    Crear Documento a: @estudiante.Nombre @estudiante.Apellido1
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <form method="post" asp-page-handler="CrearDocumento" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="documento.IdEstudiante" value="@estudiante.IdEstudiante" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Archivo del Documento</label>
+                        <input type="file" name="ArchivoDocumento" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Documento</label>
+                        <input type="text" name="documento.TipoDocumento" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="documento.Descripcion" class="form-control" required></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar Documento</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Crear Condición Especial a Estudiante -->
+<div class="modal fade" id="modalCondicionEspecial-@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="modalCondicionLabel-@estudiante.IdEstudiante" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content text-black">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="modalCondicionLabel-@estudiante.IdEstudiante">
+                    Crear Condición Especial a: @estudiante.Nombre @estudiante.Apellido1
+                </h5>
+                <button type="button" class="btn-close btn-close-black" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="post" asp-page-handler="CrearCondicion">
+                <div class="modal-body">
+                    <!-- Campo oculto para enviar el ID del estudiante -->
+                    <input type="hidden" name="condicion.IdEstudiante" value="@estudiante.IdEstudiante" />
+                    
+                    <p><strong>ID Estudiante:</strong> @estudiante.IdEstudiante</p>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Condición</label>
+                        <input type="text" name="condicion.TipoCondicion" class="form-control bg-white text-black border-dark" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Condición</label>
+                        <input type="text" name="condicion.NombreCondicion" class="form-control bg-white text-black border-dark" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fecha Diagnóstico</label>
+                        <input type="date" name="condicion.FechaDiagnostico" class="form-control bg-white text-black border-dark" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea name="condicion.Observaciones" class="form-control bg-white text-black border-dark"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar Condición</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
             }
         </div>
     </div>
@@ -321,25 +409,7 @@ else
                             <label class="form-label">Historial Académico</label>
                             <textarea asp-for="Estudiante.HistorialAcademico" class="form-control"></textarea>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Discapacidades</label>
-                            <input asp-for="Estudiante.Discapacidades" class="form-control" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Uso de Lentes</label>
-                            <select asp-for="Estudiante.UsoLentes" class="form-select">
-                                <option value="true">Sí</option>
-                                <option value="false">No</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Enfermedades</label>
-                            <input asp-for="Estudiante.Enfermedades" class="form-control" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Alergias</label>
-                            <input asp-for="Estudiante.Alergias" class="form-control" />
-                        </div>
+                       
                         <div class="col-md-12">
                             <label class="form-label">Fotografía</label>
                             <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo" />
@@ -359,16 +429,13 @@ else
                             <input asp-for="Estudiante.CorreoElectronico" class="form-control" />
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Estado</label>
-                            <div class="col-md-6">
-                                <label class="form-label">Estado</label>
-                                <select asp-for="Estudiante.Estado" class="form-select">
-                                    <option value="true">Activo</option>
-                                    <option value="false">Inactivo</option>
-                                </select>
-                            </div>
+    <label class="form-label">Estado</label>
+    <select asp-for="Estudiante.Estado" class="form-select">
+        <option value="true">Activo</option>
+        <option value="false">Inactivo</option>
+    </select>
+</div>
 
-                        </div>
                         <div class="col-md-6">
                             <label class="form-label">Sección</label>
                             <select asp-for="seccionseleccionada" asp-items="Model.Secciones" class="form-control">
@@ -387,6 +454,8 @@ else
         </div>
     </div>
 </div>
+
+
 
 
 

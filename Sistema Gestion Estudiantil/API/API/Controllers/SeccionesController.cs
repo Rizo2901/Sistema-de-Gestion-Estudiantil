@@ -1,4 +1,5 @@
-﻿using Abstracciones.Interfaces.Flujo;
+﻿using Abstracciones.Interfaces.API;
+using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
 using Flujo;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SeccionesController : ControllerBase
+    public class SeccionesController : ControllerBase , ISeccionController
     {
         private ISeccionFlujo _seccionFlujo;
         private ILogger<SeccionesController> _logg;
@@ -41,7 +42,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{Id}")]
-        public async Task<IActionResult> ObtenerSeccionPorId([FromRoute] Guid Id)
+        public async Task<IActionResult> ObtenerSeccion([FromRoute] Guid Id)
         {
             var result = await _seccionFlujo.ObtenerSeccionPorId(Id);
             if(result == null)

@@ -9,10 +9,6 @@ CREATE PROCEDURE SP_InsertarEstudiante (
     @GradoActual VARCHAR(20),
     @Repitiendo BIT = 0,
     @HistorialAcademico TEXT = NULL,
-    @Discapacidades TEXT = NULL,
-    @UsoLentes BIT = 0,
-    @Enfermedades TEXT = NULL,
-    @Alergias TEXT = NULL,
     @Fotografia VARBINARY(MAX) = NULL,
     @Direccion TEXT = NULL,
     @TelefonoCelular VARCHAR(20) = NULL,
@@ -33,16 +29,14 @@ BEGIN
         IdEstudiante,
         Cedula, Nombre, Apellido1, Apellido2, FechaNacimiento,
         Genero, GradoActual, Repitiendo, HistorialAcademico,
-        Discapacidades, UsoLentes, Enfermedades, Alergias, Fotografia,
-        Direccion, TelefonoCelular, CorreoElectronico, Estado,
+        Fotografia, Direccion, TelefonoCelular, CorreoElectronico, Estado,
         IdSeccion, IdUsuario
     )
     VALUES (
         @IdEstudiante,
         @Cedula, @Nombre, @Apellido1, @Apellido2, @FechaNacimiento,
         @Genero, @GradoActual, @Repitiendo, @HistorialAcademico,
-        @Discapacidades, @UsoLentes, @Enfermedades, @Alergias, @Fotografia,
-        @Direccion, @TelefonoCelular, @CorreoElectronico, @Estado,
+        @Fotografia, @Direccion, @TelefonoCelular, @CorreoElectronico, @Estado,
         @IdSeccion, @IdUsuario
     );
 

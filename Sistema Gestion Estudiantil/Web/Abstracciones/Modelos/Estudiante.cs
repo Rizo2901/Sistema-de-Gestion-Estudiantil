@@ -36,13 +36,6 @@ namespace Abstracciones.Modelos
 
         public string? HistorialAcademico { get; set; }
 
-        public string? Discapacidades { get; set; }
-
-        public bool UsoLentes { get; set; }
-
-        public string? Enfermedades { get; set; }
-
-        public string? Alergias { get; set; }
 
         public string? Fotografia { get; set; }
 
@@ -60,18 +53,21 @@ namespace Abstracciones.Modelos
 
     public class EstudiantesRequest : EstudiantesBase
     {
-    
-        public Guid IdSeccion { get; set; }
+        public Guid IdEstudiante { get; set; } 
 
+        public Guid IdSeccion { get; set; }
         public Guid? IdUsuario { get; set; }
     }
+
 
     public class EstudiantesResponse : EstudiantesBase
     {
         public Guid IdEstudiante { get; set; }
+        public Guid IdSeccion { get; set; }
+
 
         public string? Seccion { get; set; }
-        public Guid IdSeccion { get; set; }
+
         public string? NombreUsuario { get; set; }
     }
 }

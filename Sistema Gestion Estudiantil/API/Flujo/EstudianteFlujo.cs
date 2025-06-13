@@ -14,6 +14,11 @@ namespace Flujo
             _estudianteDA = estudianteDA;
         }
 
+        public async Task<IEnumerable<EstudiantesResponse>> BuscarEstudiantes(string? nombre = null, string? cedula = null, string? grado = null, string? seccionNombre = null)
+        {
+            return await _estudianteDA.BuscarEstudiantes(nombre, cedula, grado, seccionNombre);
+        }
+
         public async Task<Guid> CrearEstudiante(EstudiantesRequest estudiante)
         {
            return await _estudianteDA.CrearEstudiante(estudiante);

@@ -1,4 +1,5 @@
-﻿using Abstracciones.Interfaces.Flujo;
+﻿using Abstracciones.Interfaces.API;
+using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EstudianteController : ControllerBase
+    public class EstudianteController : ControllerBase, IEstudianteController
     {
         private IEstudianteFlujo _estudianteFlujo;
         private ILogger<EstudianteController> _logg;
@@ -75,6 +76,18 @@ namespace API.Controllers
             return Ok(resultado);
         }
 
+        [HttpGet("buscar")]
+        public async Task<IActionResult> BuscarEstudiantes(
+    [FromQuery] string? nombre = null,
+    [FromQuery] string? cedula = null,
+    [FromQuery] string? grado = null,
+    [FromQuery] string? seccionNombre = null)
+        {
+            var resultados = await _estudianteFlujo.BuscarEstudiantes(nombre, cedula, grado, seccionNombre);
+            return Ok(resultados);
+        }
+
+
         #region Helpers
         private async Task<bool> VerificarEstudianteExiste(Guid Id)
         {
@@ -84,6 +97,8 @@ namespace API.Controllers
                 resultadoValidacion = true;
             return resultadoValidacion;
         }
+
+        
         #endregion
     }
 }

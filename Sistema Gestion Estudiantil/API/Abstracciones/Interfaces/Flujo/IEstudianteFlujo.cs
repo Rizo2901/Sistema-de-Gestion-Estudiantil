@@ -10,6 +10,9 @@ namespace Abstracciones.Interfaces.Flujo
     public interface IEstudianteFlujo
     {
         Task<IEnumerable<EstudiantesResponse>> ObtenerEstudiantes();
+
+        Task<IEnumerable<EstudiantesResponse>> BuscarEstudiantes(string? nombre = null, string? cedula = null, string? grado = null, string? seccionNombre = null);
+
         Task<EstudiantesResponse> ObtenerEstudiantePorId(Guid Id);
         Task<Guid> CrearEstudiante(EstudiantesRequest estudiante);
         Task<Guid> EditarEstudiante(Guid Id, EstudiantesRequest estudiante);

@@ -21,6 +21,17 @@ builder.Services.AddScoped<ISeccionDA, SeccionDA>();
 builder.Services.AddScoped<ISeccionFlujo, SeccionFlujo>();
 
 
+builder.Services.AddScoped<IMateriaDA, MateriaDA>();
+builder.Services.AddScoped<IMateriaFlujo, MateriaFlujo>();
+
+builder.Services.AddScoped<ICondicionEspecialDA, CondicionEspecialDA>();
+builder.Services.AddScoped<ICondicionEspecialFlujo, CondicionEspecialFlujo>();
+
+
+builder.Services.AddScoped<IDocumentoDA, DocumentoDA>();
+builder.Services.AddScoped<IDocumentoFlujo, DocumentoFlujo>();
+
+
 
 
 builder.Services.AddScoped<IRepositorioDapper, RepositorioDapper>();

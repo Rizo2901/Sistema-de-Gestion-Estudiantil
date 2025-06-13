@@ -9,10 +9,6 @@
     @GradoActual VARCHAR(20),
     @Repitiendo BIT = 0,
     @HistorialAcademico TEXT = NULL,
-    @Discapacidades TEXT = NULL,
-    @UsoLentes BIT = 0,
-    @Enfermedades TEXT = NULL,
-    @Alergias TEXT = NULL,
     @Fotografia VARBINARY(MAX) = NULL,
     @Direccion TEXT = NULL,
     @TelefonoCelular VARCHAR(20) = NULL,
@@ -23,6 +19,8 @@
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     UPDATE Estudiantes
     SET
         Cedula = @Cedula,
@@ -34,28 +32,12 @@ BEGIN
         GradoActual = @GradoActual,
         Repitiendo = @Repitiendo,
         HistorialAcademico = @HistorialAcademico,
-        Discapacidades = @Discapacidades,
-        UsoLentes = @UsoLentes,
-        Enfermedades = @Enfermedades,
-        Alergias = @Alergias,
         Fotografia = @Fotografia,
         Direccion = @Direccion,
         TelefonoCelular = @TelefonoCelular,
         CorreoElectronico = @CorreoElectronico,
-        Estado = @Estado
+        Estado = @Estado,
+        IdSeccion = @IdSeccion,
+        IdUsuario = @IdUsuario
     WHERE IdEstudiante = @IdEstudiante;
-
-    IF @IdSeccion IS NOT NULL
-    BEGIN
-        UPDATE Estudiantes
-        SET IdSeccion = @IdSeccion
-        WHERE IdEstudiante = @IdEstudiante;
-    END
-
-    IF @IdUsuario IS NOT NULL
-    BEGIN
-        UPDATE Estudiantes
-        SET IdUsuario = @IdUsuario
-        WHERE IdEstudiante = @IdEstudiante;
-    END
 END;

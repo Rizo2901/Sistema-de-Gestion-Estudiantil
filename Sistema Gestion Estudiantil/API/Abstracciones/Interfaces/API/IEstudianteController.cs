@@ -11,9 +11,13 @@ namespace Abstracciones.Interfaces.API
     public interface IEstudianteController
     {
         Task<IActionResult> ObtenerEstudiantes();
-        Task<IActionResult> ObtenerEstudiantePorId(Guid Id);
-        Task<IActionResult> CrearEstudiante(EstudiantesResponse estudiante);
-        Task<IActionResult> EditarEstudiante(Guid Id, EstudiantesResponse estudiante);
+
+        Task<IActionResult> BuscarEstudiantes(string? nombre = null, string? cedula = null, string? grado = null, string? seccionNombre = null);
+
+
+        Task<IActionResult> ObtenerEstudiante(Guid Id);
+        Task<IActionResult> CrearEstudiante(EstudiantesRequest estudiante);
+        Task<IActionResult> EditarEstudiante(Guid Id, EstudiantesRequest estudiante);
         Task<IActionResult> EliminarEstudiante(Guid Id);
 
     }

@@ -95,5 +95,34 @@
     <Build Include="dbo\Stored Procedures\SP_Eliminar_Seccion.sql" />
     <Build Include="dbo\Stored Procedures\SP_Crear_Seccion.sql" />
     <Build Include="dbo\Stored Procedures\SP_Actualizar_Seccion.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerMaterias.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerMateriaPorId.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarMateria.sql" />
+    <Build Include="dbo\Stored Procedures\SP_CrearMateria.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ActualizarMateria.sql" />
+    <Build Include="dbo\Tables\ProfesoresMateriasSecciones.sql" />
+    <Build Include="dbo\Tables\CondicionesEspeciales.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerDocumentosPorEstudiante.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerDocumentos.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerDocumentoPorId.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarDocumento.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerCondicionEspecialPorId.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerCondicionesEspecialesPorEstudiante.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerCondicionesEspeciales.sql" />
+    <Build Include="dbo\Stored Procedures\SP_InsertarCondicionEspecial.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarCondicionEspecial.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ActualizarCondicionEspecial.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerProfesoresMateriasSeccionesPorId.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerProfesoresMateriasSecciones.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarProfesoresMateriasSecciones.sql" />
+    <Build Include="dbo\Stored Procedures\SP_CrearProfesoresMateriasSecciones.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ActualizarProfesoresMateriasSecciones.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerProfesoresPorMateria.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerMateriasPorProfesor.sql" />
+    <Build Include="dbo\Stored Procedures\SP_BuscarEstudiantes.sql" />
+    <Build Include="dbo\Stored Procedures\SP_Obtener_Documentos_Por_Estudiante.sql" />
+    <Build Include="dbo\Stored Procedures\SP_InsertarDocumento.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EditarDocumento.sql" />
+    <Build Include="dbo\Stored Procedures\ObtenerEstudiantesConCondiciones.sql" />
   </ItemGroup>
 </Project>

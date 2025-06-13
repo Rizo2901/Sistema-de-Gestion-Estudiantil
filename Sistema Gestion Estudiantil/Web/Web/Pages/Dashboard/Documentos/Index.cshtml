@@ -1,0 +1,346 @@
+﻿@page
+@model Web.Pages.Dashboard.Documentos.IndexModel
+@{
+    ViewData["Title"] = "Documentos";
+    Layout = "_Layout";
+}
+
+
+
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <!-- Botón que abre el modal de creación -->
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Documento
+                </button>
+            </div>
+        </div>
+        <!-- Dropdown alineado a la derecha -->
+        <div class="text-end mt-2">
+            <div class="dropdown">
+                <button class="btn btn-dark btn-sm dropdown-toggle" type="button" id="dropdownCondiciones" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                    Filtrar
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end p-3 rounded">
+                    <li><a class="dropdown-item text-white" href="#" onclick="cambiarVista('General')">Ver Documentos Generales</a></li>
+                    <li><a class="dropdown-item text-white" href="#" onclick="cambiarVista('ConLista')">Ver Estudiantes con Documentos</a></li>
+                    <li class="px-3 py-2">
+                        <label class="text-white fw-bold mb-1">Seleccionar Estudiante</label>
+                        <select id="seleccionarEstudiante" class="form-select form-select-sm bg-dark text-white border-light" onchange="cambiarVista('PorEstudiante', this.value)">
+                            <option value="">Seleccionar...</option>
+                            @foreach (var estudiante in Model.Estudiantes)
+                            {
+                                <option value="@estudiante.IdEstudiante">@estudiante.Nombre @estudiante.Apellido1</option>
+                            }
+                        </select>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+
+    @if (ViewData["Filtro"]?.ToString() == "PorEstudiante" && !string.IsNullOrEmpty(ViewData["IdEstudiante"]?.ToString()))
+    {
+        <h2>Documentos del Estudiante</h2>
+        <p><strong>Estudiante:</strong> @ViewData["Nombre"] @ViewData["Apellido1"] @ViewData["Apellido2"]</p>
+        <p><strong>Total Documentos Cargados:</strong> @Model.Documentos.Count</p> <!-- Verificar si hay datos -->
+
+        <div class="row g-3">
+            @if (Model.Documentos != null && Model.Documentos.Any())
+            {
+                @foreach (var documento in Model.Documentos)
+                {
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card shadow-lg" style="border-color:#343a40;">
+                            <div class="card-header text-white" style="background-color:#343a40;">
+                                <h5 class="card-title">Tipo: <strong>@documento.TipoDocumento</strong></h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="fw-bold">Tipo de archivo: @documento.TipoArchivo</p>
+                                <p>Descripción: @documento.Descripcion</p>
+                            </div>
+                            <div class="card-footer text-end">
+                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerDetalles_@documento.IdDocumento">
+                                    <i class="bi bi-eye"></i> Ver Detalles
+                                </button>
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@documento.IdDocumento">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@documento.IdDocumento">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning">⚠️ No hay documentos registrados para este estudiante.</div>
+            }
+        </div>
+
+    }
+
+    <!-- Mostrar Condiciones Generales -->
+    @if (ViewData["Filtro"]?.ToString() == "General")
+    {
+        <h2>Listado de Documentos General</h2>
+        <div class="row g-3">
+            @if (Model.Documentos != null && Model.Documentos.Any())
+            {
+                @foreach (var documento in Model.Documentos)
+                {
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card shadow-lg" style="border-color:#343a40;">
+                            <div class="card-header text-white" style="background-color:#343a40;">
+                                <h5 class="card-title">Tipo: <strong>@documento.TipoDocumento</strong></h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="fw-bold">Tipo de archivo: @documento.TipoArchivo</p>
+                                <p>Descripción: @documento.Descripcion</p>
+                                <p>ID Estudiante: @documento.IdEstudiante</p>
+                            </div>
+                            <div class="card-footer text-end">
+                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerDetalles_@documento.IdDocumento">
+                                    <i class="bi bi-eye"></i> Ver Detalles
+                                </button>
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@documento.IdDocumento">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@documento.IdDocumento">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning">⚠️ No hay documentos registrados.</div>
+            }
+        </div>
+    }
+
+    <!-- Estudiantes con Condiciones Asociadas -->
+    @if (ViewData["Filtro"]?.ToString() == "ConLista")
+    {
+        <h2>Listado de Estudiantes con Condiciones</h2>
+        <div class="row g-3">
+            @foreach (var estudiante in Model.EstudiantesConDocumentos)
+            {
+                <div class="col-12">
+                    <div class="card shadow-lg ">
+                        <div class="card-header text-white" style="background-color:#343a40 ">
+                            <h5 class="card-title">Estudiante: @estudiante.Nombre @estudiante.Apellido1</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Documentos Asociados:</h6>
+                            <div class="row g-3">
+                                @foreach (var documento in estudiante.Documentos)
+                                {
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <div class="card shadow-lg" style="border-color:#343a40;">
+                                            <div class="card-header text-white" style="background-color:#343a40;">
+                                                <h5 class="card-title">Tipo: <strong>@documento.TipoDocumento</strong></h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="fw-bold">Tipo de archivo: @documento.TipoArchivo</p>
+                                                <p>Descripción: @documento.Descripcion</p>
+                                            </div>
+                                            <div class="card-footer text-end">
+                                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerDetalles_@documento.IdDocumento">
+                                                    <i class="bi bi-eye"></i> Ver Detalles
+                                                </button>
+                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@documento.IdDocumento">
+                                                    <i class="bi bi-pencil"></i> Editar
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@documento.IdDocumento">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Modal: Crear Documento -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarLabel">
+                    Crear Documento para un Estudiante
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <form method="post" asp-page-handler="CrearDocumento" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Dropdown para seleccionar el estudiante -->
+                    <div class="mb-3">
+                        <label class="form-label">Seleccionar Estudiante</label>
+                        <select name="documento.IdEstudiante" class="form-select" required>
+                            <option value="">Seleccione un estudiante...</option>
+                            @foreach (var estudiante in Model.Estudiantes)
+                            {
+                                <option value="@estudiante.IdEstudiante">@estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Archivo del Documento</label>
+                        <input type="file" name="ArchivoDocumento" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Documento</label>
+                        <input type="text" name="documento.TipoDocumento" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="documento.Descripcion" class="form-control" required></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar Documento</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    @foreach (var documento in Model.Documentos)
+    {
+        <div class="modal fade" id="modalEditar_@documento.IdDocumento" tabindex="-1" aria-labelledby="modalEditarLabel_@documento.IdDocumento" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-4 shadow" style="background-color: #343a40; color: white;">
+                    <form method="post" asp-page-handler="EditarDocumento" asp-route-idDocumento="@documento.IdDocumento" enctype="multipart/form-data">
+                        <div class="modal-header border-bottom-0">
+                            <h5 class="modal-title" id="modalEditarLabel_@documento.IdDocumento">Editar Documento</h5>
+                            <p>@documento.IdEstudiante</p>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="documento.IdEstudiante" value="@documento.IdEstudiante" />
+
+                            <!-- Campos ocultos para mantener el archivo y tipo de archivo -->
+                            <input type="hidden" name="documento.Archivo" value="@documento.Archivo" />
+                            <input type="hidden" name="documento.TipoArchivo" value="@documento.TipoArchivo" />
+
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de Documento</label>
+                                <input type="text" name="documento.TipoDocumento" class="form-control" value="@documento.TipoDocumento" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea name="documento.Descripcion" class="form-control" required>@documento.Descripcion</textarea>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(documento.TipoArchivo))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label">Archivo actual:</label>
+                                    <p class="text-info">📄 @documento.TipoDocumento (@documento.TipoArchivo)</p>
+                                </div>
+                            }
+
+                            <div class="mb-3">
+                                <label class="form-label">Actualizar Archivo</label>
+                                <input type="file" name="ArchivoDocumento" class="form-control" />
+                                <small class="text-info">Si no selecciona un nuevo archivo, se mantendrá el actual.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0 d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal Ver Detalles -->
+        <div class="modal fade" id="modalVerDetalles_@documento.IdDocumento" tabindex="-1" aria-labelledby="modalVerDetallesLabel_@documento.IdDocumento" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-4 shadow" style="background-color: #343a40; color: white;">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title" id="modalVerDetallesLabel_@documento.IdDocumento">Detalles del Documento</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Tipo:</strong> @documento.TipoDocumento</p>
+                        <p><strong>Tipo de Archivo:</strong> @documento.TipoArchivo</p>
+                        <p><strong>Descripción:</strong> @documento.Descripcion</p>
+
+                        <!-- Mostrar archivo según su tipo -->
+                        @if (documento.TipoArchivo == "application/pdf")
+                        {
+                            <iframe src="data:application/pdf;base64,@documento.Archivo" width="100%" height="500px"></iframe>
+                        }
+                        else if (documento.TipoArchivo.StartsWith("image/"))
+                        {
+                            <img src="data:@documento.TipoArchivo;base64,@documento.Archivo" class="img-fluid rounded" alt="Vista previa del documento" />
+                        }
+                        else
+                        {
+                            <p class="text-warning">⚠ No se puede mostrar el archivo. Descárguelo para verlo.</p>
+                            <a href="data:@documento.TipoArchivo;base64,@documento.Archivo" download="documento_@documento.IdDocumento" class="btn btn-primary">Descargar Archivo</a>
+                        }
+                    </div>
+                    <div class="modal-footer border-top-0 d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Eliminar Documento -->
+<div class="modal fade" id="modalEliminar_@documento.IdDocumento" tabindex="-1" aria-labelledby="modalEliminarLabel_@documento.IdDocumento" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow" style="background-color: #343a40; color: white;">
+            <form method="post" asp-page-handler="Eliminar">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title" id="modalEliminarLabel_@documento.IdDocumento">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro que deseas eliminar el documento <strong>@documento.TipoDocumento</strong>?</p>
+                    <input type="hidden" name="IdDocumento" value="@documento.IdDocumento" />
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+     }
+    <script>
+        function cambiarVista(tipoFiltro, idEstudiante = "") {
+            let url = `/Dashboard/Documentos?filtro=` + tipoFiltro;
+            if (tipoFiltro === "PorEstudiante" && idEstudiante) {
+                url += `&IdEstudiante=` + idEstudiante;
+            }
+            window.location.replace(url);
+        }
+    </script>

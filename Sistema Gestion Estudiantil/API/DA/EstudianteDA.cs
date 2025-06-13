@@ -2,11 +2,7 @@
 using Abstracciones.Modelos;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DA
 {
@@ -20,9 +16,36 @@ namespace DA
             _repDapp = repDapp;
             _conn = _repDapp.ObtenerRepositorio();
         }
+
+        public async Task<IEnumerable<EstudiantesResponse>> BuscarEstudiantes(string? nombre = null, string? cedula = null, string? grado = null, string? seccionNombre = null)
+        {
+            string query = "SP_BuscarEstudiantes";
+
+            var parametros = new
+            {
+                Nombre = nombre,
+                Cedula = cedula,
+                Grado = grado,
+                SeccionNombre = seccionNombre
+            };
+
+            var resultados = await _conn.QueryAsync<EstudiantesResponse>(
+                query,
+                parametros,
+                commandType: System.Data.CommandType.StoredProcedure
+            );
+
+            return resultados;
+        }
+
+
         public async Task<Guid> CrearEstudiante(EstudiantesRequest estudiante)
         {
             string query = @"SP_InsertarEstudiante";
+            byte[] fotografiaBytes = string.IsNullOrEmpty(estudiante.Fotografia)
+                ? Array.Empty<byte>()
+                : Convert.FromBase64String(estudiante.Fotografia);
+
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdEstudiante = Guid.NewGuid(),
@@ -35,11 +58,7 @@ namespace DA
                 GradoActual = estudiante.GradoActual,
                 Repitiendo = estudiante.Repitiendo,
                 HistorialAcademico = estudiante.HistorialAcademico,
-                Discapacidades = estudiante.Discapacidades,
-                UsoLentes = estudiante.UsoLentes,
-                Enfermedades = estudiante.Enfermedades,
-                Alergias = estudiante.Alergias,
-                Fotografia = estudiante.Fotografia,
+                Fotografia = fotografiaBytes,
                 Direccion = estudiante.Direccion,
                 TelefonoCelular = estudiante.TelefonoCelular,
                 CorreoElectronico = estudiante.CorreoElectronico,
@@ -53,33 +72,38 @@ namespace DA
         public async Task<Guid> EditarEstudiante(Guid Id, EstudiantesRequest estudiante)
         {
             string query = @"SP_ActualizarEstudiante";
-            var result = await _conn.ExecuteScalarAsync<Guid>(query, new
-            {
-                IdEstudiante = Id,
-                Cedula = estudiante.Cedula,
-                Nombre = estudiante.Nombre,
-                Apellido1 = estudiante.Apellido1,
-                Apellido2 = estudiante.Apellido2,
-                FechaNacimiento = estudiante.FechaNacimiento,
-                Genero = estudiante.Genero,
-                GradoActual = estudiante.GradoActual,
-                Repitiendo = estudiante.Repitiendo,
-                HistorialAcademico = estudiante.HistorialAcademico,
-                Discapacidades = estudiante.Discapacidades,
-                UsoLentes = estudiante.UsoLentes,
-                Enfermedades = estudiante.Enfermedades,
-                Alergias = estudiante.Alergias,
-                Fotografia = estudiante.Fotografia,
-                Direccion = estudiante.Direccion,
-                TelefonoCelular = estudiante.TelefonoCelular,
-                CorreoElectronico = estudiante.CorreoElectronico,
-                Estado = estudiante.Estado,
-                IdSeccion = estudiante.IdSeccion == Guid.Empty ? (Guid?)null : estudiante.IdSeccion,
-                IdUsuario = estudiante.IdUsuario == Guid.Empty ? (Guid?)null : estudiante.IdUsuario
-            });
+            byte[] fotografiaBytes = string.IsNullOrEmpty(estudiante.Fotografia)
+                ? Array.Empty<byte>()
+                : Convert.FromBase64String(estudiante.Fotografia);
+
+            var result = await _conn.ExecuteScalarAsync<Guid>(
+                query,
+                new
+                {
+                    IdEstudiante = Id,
+                    Cedula = estudiante.Cedula,
+                    Nombre = estudiante.Nombre,
+                    Apellido1 = estudiante.Apellido1,
+                    Apellido2 = estudiante.Apellido2,
+                    FechaNacimiento = estudiante.FechaNacimiento,
+                    Genero = estudiante.Genero,
+                    GradoActual = estudiante.GradoActual,
+                    Repitiendo = estudiante.Repitiendo,
+                    HistorialAcademico = estudiante.HistorialAcademico,
+                    Fotografia = fotografiaBytes,
+                    Direccion = estudiante.Direccion,
+                    TelefonoCelular = estudiante.TelefonoCelular,
+                    CorreoElectronico = estudiante.CorreoElectronico,
+                    Estado = estudiante.Estado,
+                    IdSeccion = estudiante.IdSeccion == Guid.Empty ? (Guid?)null : estudiante.IdSeccion,
+                    IdUsuario = estudiante.IdUsuario == Guid.Empty ? (Guid?)null : estudiante.IdUsuario
+                },
+                commandType: System.Data.CommandType.StoredProcedure
+            );
 
             return result;
         }
+
 
         public async Task<Guid> EliminarEstudiante(Guid Id)
         {
