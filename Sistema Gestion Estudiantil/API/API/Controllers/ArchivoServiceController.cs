@@ -1,9 +1,8 @@
 ﻿using Abstracciones.Interfaces.API;
 using Abstracciones.Interfaces.Flujo;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using System.Threading.Tasks;
+
 
 namespace API.Controllers
 {
