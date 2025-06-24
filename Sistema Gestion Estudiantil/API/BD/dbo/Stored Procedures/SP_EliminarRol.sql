@@ -1,0 +1,7 @@
+﻿CREATE PROCEDURE SP_EliminarRol
+    @IdRol UNIQUEIDENTIFIER
+AS
+BEGIN
+    DELETE FROM Roles
+    WHERE IdRol = @IdRol;
+END;

@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE SP_ActualizarEstudiante (
+﻿CREATE PROCEDURE [dbo].[SP_ActualizarEstudiante] (
     @IdEstudiante UNIQUEIDENTIFIER,
     @Cedula VARCHAR(20),
     @Nombre VARCHAR(255),
@@ -9,7 +9,7 @@
     @GradoActual VARCHAR(20),
     @Repitiendo BIT = 0,
     @HistorialAcademico TEXT = NULL,
-    @Fotografia VARBINARY(MAX) = NULL,
+    @Fotografia VARCHAR(MAX) = NULL,
     @Direccion TEXT = NULL,
     @TelefonoCelular VARCHAR(20) = NULL,
     @CorreoElectronico VARCHAR(100) = NULL,

@@ -1,7 +1,9 @@
 ﻿using Abstracciones.Interfaces.DA;
+using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Diagnostics;
 
 
 namespace DA
@@ -10,9 +12,10 @@ namespace DA
     {
         private IRepositorioDapper _repDapp;
         private SqlConnection _conn;
-
-        public EstudianteDA(IRepositorioDapper repDapp)
+        private IArchivoServiceFlujo _archivoServiceFlujo;
+        public EstudianteDA(IRepositorioDapper repDapp, IArchivoServiceFlujo archivoServiceFlujo)
         {
+            _archivoServiceFlujo = archivoServiceFlujo;
             _repDapp = repDapp;
             _conn = _repDapp.ObtenerRepositorio();
         }
@@ -42,9 +45,35 @@ namespace DA
         public async Task<Guid> CrearEstudiante(EstudiantesRequest estudiante)
         {
             string query = @"SP_InsertarEstudiante";
-            byte[] fotografiaBytes = string.IsNullOrEmpty(estudiante.Fotografia)
-                ? Array.Empty<byte>()
-                : Convert.FromBase64String(estudiante.Fotografia);
+
+            // Detectar tipo de imagen y extensión
+            string Fotografia = null;
+
+            if (!string.IsNullOrEmpty(estudiante.Fotografia))
+            {
+                string base64 = estudiante.Fotografia;
+                string extension = "jpg"; // valor por defecto
+
+                // Si la cadena contiene encabezado, se procesa
+                if (base64.StartsWith("data:image"))
+                {
+                    if (base64.StartsWith("data:image/png")) extension = "png";
+                    else if (base64.StartsWith("data:image/webp")) extension = "webp";
+                    else if (base64.StartsWith("data:image/gif")) extension = "gif";
+                    else if (base64.StartsWith("data:image/jpeg")) extension = "jpg";
+
+                    // Cortar encabezado ("data:image/...;base64,")
+                    base64 = base64.Substring(base64.IndexOf(",") + 1);
+                }
+
+                var imagenBytes = Convert.FromBase64String(base64);
+                var nombreArchivo = $"{Guid.NewGuid()}.{extension}";
+
+                Fotografia = await _archivoServiceFlujo.SubirImagenFirebaseAsync(
+                    new MemoryStream(imagenBytes),
+                    nombreArchivo
+                );
+            }
 
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
@@ -58,24 +87,50 @@ namespace DA
                 GradoActual = estudiante.GradoActual,
                 Repitiendo = estudiante.Repitiendo,
                 HistorialAcademico = estudiante.HistorialAcademico,
-                Fotografia = fotografiaBytes,
+                Fotografia = Fotografia, // Guarda la URL generada
                 Direccion = estudiante.Direccion,
                 TelefonoCelular = estudiante.TelefonoCelular,
                 CorreoElectronico = estudiante.CorreoElectronico,
                 Estado = estudiante.Estado,
-                IdSeccion = estudiante.IdSeccion,
-                IdUsuario = estudiante.IdUsuario
+                IdSeccion = estudiante.IdSeccion == Guid.Empty ? (Guid?)null : estudiante.IdSeccion,
+                IdUsuario = estudiante.IdUsuario == Guid.Empty ? (Guid?)null : estudiante.IdUsuario
             });
+
             return result;
         }
 
         public async Task<Guid> EditarEstudiante(Guid Id, EstudiantesRequest estudiante)
         {
             string query = @"SP_ActualizarEstudiante";
-            byte[] fotografiaBytes = string.IsNullOrEmpty(estudiante.Fotografia)
-                ? Array.Empty<byte>()
-                : Convert.FromBase64String(estudiante.Fotografia);
+            string Fotografia = estudiante.Fotografia; // Mantener la imagen existente
 
+            // 🔹 Detectar si la imagen enviada es Base64 o ya es una URL pública
+            if (!string.IsNullOrEmpty(estudiante.Fotografia) && estudiante.Fotografia.StartsWith("data:image"))
+            {
+                string base64 = estudiante.Fotografia;
+                string extension = "jpg"; // Valor por defecto
+
+                // 🔹 Determinar la extensión según el tipo MIME
+                if (base64.StartsWith("data:image/png")) extension = "png";
+                else if (base64.StartsWith("data:image/webp")) extension = "webp";
+                else if (base64.StartsWith("data:image/gif")) extension = "gif";
+                else if (base64.StartsWith("data:image/jpeg")) extension = "jpg";
+
+                // 🔹 Extraer solo la parte Base64 y convertirla
+                base64 = base64.Substring(base64.IndexOf(",") + 1);
+                var imagenBytes = Convert.FromBase64String(base64);
+
+                // 🔹 Crear el nombre del archivo sin duplicar la carpeta
+                var nombreArchivo = $"{Guid.NewGuid()}.{extension}";
+
+                // 🔹 Subir la imagen correctamente en `estudiantes_imagenes`
+                Fotografia = await _archivoServiceFlujo.SubirImagenFirebaseAsync(new MemoryStream(imagenBytes), nombreArchivo);
+
+                // 🔹 Imprimir la URL generada para verificar que se guarda correctamente
+                Debug.WriteLine($"URL de imagen guardada en BD: {Fotografia}");
+            }
+
+            // 🔹 Ejecutar la actualización en la base de datos con la URL generada correctamente
             var result = await _conn.ExecuteScalarAsync<Guid>(
                 query,
                 new
@@ -90,7 +145,7 @@ namespace DA
                     GradoActual = estudiante.GradoActual,
                     Repitiendo = estudiante.Repitiendo,
                     HistorialAcademico = estudiante.HistorialAcademico,
-                    Fotografia = fotografiaBytes,
+                    Fotografia = Fotografia, // ✅ Guarda la URL correcta generada por Firebase
                     Direccion = estudiante.Direccion,
                     TelefonoCelular = estudiante.TelefonoCelular,
                     CorreoElectronico = estudiante.CorreoElectronico,
@@ -103,7 +158,6 @@ namespace DA
 
             return result;
         }
-
 
         public async Task<Guid> EliminarEstudiante(Guid Id)
         {

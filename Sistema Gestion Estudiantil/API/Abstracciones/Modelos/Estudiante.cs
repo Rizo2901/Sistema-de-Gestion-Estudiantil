@@ -36,7 +36,7 @@ namespace Abstracciones.Modelos
 
         public string? HistorialAcademico { get; set; }
 
-
+        [Required]
         public string? Fotografia { get; set; }
 
 
@@ -63,9 +63,6 @@ namespace Abstracciones.Modelos
     {
         public Guid IdEstudiante { get; set; }
         public Guid IdSeccion { get; set; }
-
-        public new byte[]? Fotografia { get; set; } 
-
         public string? Seccion { get; set; }
 
         public string? NombreUsuario { get; set; }

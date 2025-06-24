@@ -2,7 +2,7 @@
     @IdDocumento UNIQUEIDENTIFIER,
     @TipoDocumento VARCHAR(50),
     @Descripcion TEXT,
-    @Archivo VARBINARY(MAX),
+    @Archivo VARCHAR(MAX),
     @TipoArchivo VARCHAR(100)
 AS
 BEGIN

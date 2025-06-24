@@ -16,8 +16,10 @@ namespace DA.Repositorios
             _cnfg = cnfg;
             _conn = new SqlConnection(_cnfg.GetConnectionString("BD"));
         }
+        
         public SqlConnection ObtenerRepositorio()
         {
+
             return _conn;
         }
 

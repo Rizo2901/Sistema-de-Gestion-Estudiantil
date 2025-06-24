@@ -1,0 +1,7 @@
+﻿CREATE PROCEDURE SP_ObtenerRolPorId
+    @IdRol UNIQUEIDENTIFIER
+AS
+BEGIN
+    SELECT * FROM Roles
+    WHERE IdRol = @IdRol;
+END;

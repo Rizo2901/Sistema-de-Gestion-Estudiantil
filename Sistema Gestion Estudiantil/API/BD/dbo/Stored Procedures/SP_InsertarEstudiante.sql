@@ -1,5 +1,5 @@
 ﻿
-CREATE PROCEDURE SP_InsertarEstudiante (
+CREATE PROCEDURE [dbo].[SP_InsertarEstudiante] (
     @Cedula VARCHAR(20),
     @Nombre VARCHAR(255),
     @Apellido1 VARCHAR(255),
@@ -9,7 +9,7 @@ CREATE PROCEDURE SP_InsertarEstudiante (
     @GradoActual VARCHAR(20),
     @Repitiendo BIT = 0,
     @HistorialAcademico TEXT = NULL,
-    @Fotografia VARBINARY(MAX) = NULL,
+    @Fotografia VARCHAR(MAX) = NULL,
     @Direccion TEXT = NULL,
     @TelefonoCelular VARCHAR(20) = NULL,
     @CorreoElectronico VARCHAR(100) = NULL,

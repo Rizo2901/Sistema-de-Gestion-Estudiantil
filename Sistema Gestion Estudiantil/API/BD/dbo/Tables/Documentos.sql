@@ -3,7 +3,7 @@
     [IdEstudiante]  UNIQUEIDENTIFIER NOT NULL,
     [TipoDocumento] VARCHAR (50)     NOT NULL,
     [Descripcion]   TEXT             NULL,
-    [Archivo]       VARBINARY (MAX)  NULL,
+    [Archivo]       VARCHAR (MAX)    NULL,
     [TipoArchivo]   VARCHAR (100)    NULL,
     PRIMARY KEY CLUSTERED ([IdDocumento] ASC)
 );

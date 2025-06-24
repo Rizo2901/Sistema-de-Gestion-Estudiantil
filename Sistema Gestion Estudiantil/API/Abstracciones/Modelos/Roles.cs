@@ -17,7 +17,10 @@ namespace Abstracciones.Modelos
         public string? Descripcion { get; set; }
     }
 
-  
+  public class RolesRequest : RolesBase
+    {
+        public Guid IdRol { get; set; }
+    }
 
     public class RolesResponse : RolesBase
     {

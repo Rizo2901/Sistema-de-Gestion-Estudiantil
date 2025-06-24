@@ -9,7 +9,7 @@
     [GradoActual]        VARCHAR (20)     NOT NULL,
     [Repitiendo]         BIT              DEFAULT ((0)) NULL,
     [HistorialAcademico] TEXT             NULL,
-    [Fotografia]         VARBINARY (MAX)  NULL,
+    [Fotografia]         VARCHAR (MAX)    NULL,
     [Direccion]          TEXT             NULL,
     [TelefonoCelular]    VARCHAR (20)     NULL,
     [CorreoElectronico]  VARCHAR (100)    NULL,

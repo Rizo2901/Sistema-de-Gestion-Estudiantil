@@ -1,11 +1,11 @@
 ﻿using Abstracciones.Interfaces.DA;
+using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
 using DA.Repositorios;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using System.Data;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DA
 {
@@ -13,27 +13,56 @@ namespace DA
     {
         private readonly SqlConnection _conn;
         private readonly IRepositorioDapper _repDapp;
+        private IArchivoService _archivoService;
 
-        public DocumentoDA(IRepositorioDapper repDapp)
+        public DocumentoDA(IRepositorioDapper repDapp, IArchivoService archivoService)
         {
             _repDapp = repDapp;
             _conn = _repDapp.ObtenerRepositorio();
+            _archivoService = archivoService;
         }
 
         public async Task<Guid> CrearDocumento(DocumentosRequest documento)
         {
-            // Convertir base64 a byte[]
-            byte[] archivoBytes = string.IsNullOrEmpty(documento.Archivo)
-                ? Array.Empty<byte>()
-                : Convert.FromBase64String(documento.Archivo);
-
             string query = "SP_InsertarDocumento";
+            string archivoUrl = string.Empty;
+
+            if (!string.IsNullOrEmpty(documento.Archivo))
+            {
+                string base64 = documento.Archivo;
+
+                //  Elimina cualquier encabezado MIME (dinámicamente)
+                int index = base64.IndexOf("base64,");
+                if (index >= 0)
+                    base64 = base64.Substring(index + 7);
+
+                byte[] archivoBytes = Convert.FromBase64String(base64);
+                using var stream = new MemoryStream(archivoBytes);
+
+                //  Usa extensión según tipo MIME, opcional pero elegante
+                string extension = documento.TipoArchivo switch
+                {
+                    "application/pdf" => "pdf",
+                    "image/jpeg" => "jpg",
+                    "image/png" => "png",
+                    "application/msword" => "doc",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "docx",
+                    "application/vnd.ms-excel" => "xls",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "xlsx",
+                    _ => "bin"
+                };
+
+                string nombreArchivo = $"documento_{Guid.NewGuid()}.{extension}";
+
+                archivoUrl = await _archivoService.SubirDocumentoDriveAsync(stream, nombreArchivo);
+            }
+
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdEstudiante = documento.IdEstudiante,
                 TipoDocumento = documento.TipoDocumento,
                 Descripcion = documento.Descripcion,
-                Archivo = archivoBytes, // <-- Aquí va el byte[]
+                Archivo = archivoUrl,
                 TipoArchivo = documento.TipoArchivo
             });
 
@@ -44,24 +73,30 @@ namespace DA
         public async Task<Guid> EditarDocumento(Guid id, DocumentosRequest documento)
         {
             string query = "SP_EditarDocumento";
+            string archivoUrl = documento.Archivo;
 
-            // ✅ Convertir Base64 a byte[] si el archivo no es null
-            byte[] archivoBytes = string.IsNullOrEmpty(documento.Archivo)
-                ? Array.Empty<byte>()
-                : Convert.FromBase64String(documento.Archivo);
+            // 🔹 Si contiene Base64 con encabezado, subir nuevo archivo
+            if (!string.IsNullOrEmpty(documento.Archivo) &&
+                documento.Archivo.StartsWith("data:application/pdf;base64,"))
+            {
+                string base64 = documento.Archivo.Substring(documento.Archivo.IndexOf(",") + 1);
+                byte[] archivoBytes = Convert.FromBase64String(base64);
+                using var stream = new MemoryStream(archivoBytes);
+
+                archivoUrl = await _archivoService.SubirDocumentoDriveAsync(stream, $"documento_{Guid.NewGuid()}.pdf");
+            }
 
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
-                IdDocumento = id,  
+                IdDocumento = id,
                 TipoDocumento = documento.TipoDocumento,
                 Descripcion = documento.Descripcion,
-                Archivo = archivoBytes,
+                Archivo = archivoUrl,
                 TipoArchivo = documento.TipoArchivo
             });
 
             return result;
         }
-
         public async Task<Guid> EliminarDocumento(Guid id)
         {
             string query = "SP_EliminarDocumento";

@@ -1,0 +1,5 @@
+﻿CREATE PROCEDURE SP_ObtenerRoles
+AS
+BEGIN
+    SELECT * FROM Roles;
+END;
