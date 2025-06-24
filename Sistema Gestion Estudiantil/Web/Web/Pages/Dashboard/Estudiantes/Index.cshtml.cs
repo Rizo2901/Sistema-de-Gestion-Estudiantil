@@ -87,7 +87,6 @@ namespace Web.Pages.Dashboard.Estudiantes
 
         public async Task<IActionResult> OnPostCrearAsync()
         {
-            // Elimina errores de ModelState que no sean de Estudiante, FotografiaArchivo o seccionseleccionada
             var keysToRemove = ModelState.Keys
                 .Where(k => !k.StartsWith("Estudiante.") && k != nameof(FotografiaArchivo) && k != nameof(seccionseleccionada))
                 .ToList();
@@ -104,11 +103,12 @@ namespace Web.Pages.Dashboard.Estudiantes
                         Debug.WriteLine($"ModelState error for '{key}': {error.ErrorMessage}");
                     }
                 }
+
                 await ObtenerSecciones();
                 return Page();
             }
 
-            // Validar que se haya seleccionado una sección válida
+            // Validar sección
             if (!Guid.TryParse(seccionseleccionada, out var idSeccion))
             {
                 ModelState.AddModelError("seccionseleccionada", "Debe seleccionar una sección válida.");
@@ -118,14 +118,19 @@ namespace Web.Pages.Dashboard.Estudiantes
 
             Estudiante.IdSeccion = idSeccion;
 
-            // Procesar la fotografía si se subió
+            // Convertir imagen a Base64 dentro del método si el usuario subió una
             if (FotografiaArchivo != null && FotografiaArchivo.Length > 0)
             {
-                using var ms = new MemoryStream();
-                await FotografiaArchivo.CopyToAsync(ms);
-                Estudiante.Fotografia = Convert.ToBase64String(ms.ToArray());
+                using var memoryStream = new MemoryStream();
+                await FotografiaArchivo.CopyToAsync(memoryStream);
+                Estudiante.Fotografia = Convert.ToBase64String(memoryStream.ToArray());
+            }
+            else
+            {
+                Estudiante.Fotografia = null; // Si no hay imagen, enviamos null
             }
 
+            // Enviar al API
             string endpoint = _configuracion.ObtenerMetodo("ApiEndPoints", "CrearEstudiante");
             var contenido = new StringContent(JsonSerializer.Serialize(Estudiante), Encoding.UTF8, "application/json");
 
@@ -137,63 +142,96 @@ namespace Web.Pages.Dashboard.Estudiantes
         }
 
 
-
-
         public async Task<IActionResult> OnPostCrearDocumentoAsync()
         {
-            Debug.WriteLine("Entró al handler OnPostCrearDocumentoAsync");
+            Console.WriteLine("===> Entró a OnPostCrearDocumentoAsync");
 
-            // Elimina errores de ModelState que no sean de documento o ArchivoDocumento
+            // Mostrar valores recibidos para depuración
+            Console.WriteLine($"ArchivoDocumento: {(ArchivoDocumento != null ? ArchivoDocumento.FileName : "null")}");
+            Console.WriteLine($"documento.IdEstudiante: {documento?.IdEstudiante}");
+            Console.WriteLine($"documento.TipoDocumento: {documento?.TipoDocumento}");
+            Console.WriteLine($"documento.Descripcion: {documento?.Descripcion}");
+
+            // Conversión base64 igual que en OnPostCrearAsync (fotografía)
+            if (ArchivoDocumento != null && ArchivoDocumento.Length > 0)
+            {
+                using var memoryStream = new MemoryStream();
+                await ArchivoDocumento.CopyToAsync(memoryStream);
+                var base64 = Convert.ToBase64String(memoryStream.ToArray());
+                documento.Archivo = $"data:{ArchivoDocumento.ContentType};base64,{base64}";
+                documento.TipoArchivo = ArchivoDocumento.ContentType;
+                Console.WriteLine($"Base64 inicio: {base64.Substring(0, Math.Min(30, base64.Length))}...");
+                Console.WriteLine($"Base64 fin: ...{base64.Substring(Math.Max(0, base64.Length - 30))}");
+                Console.WriteLine($"Tamaño base64: {base64.Length}");
+            }
+            else
+            {
+                Console.WriteLine("ArchivoDocumento es null o vacío");
+                ModelState.AddModelError("ArchivoDocumento", "Debe subir un archivo.");
+            }
+
+            // LIMPIA ModelState de TODO lo que no sea documento o ArchivoDocumento
             var keysToRemove = ModelState.Keys
                 .Where(k => !k.StartsWith("documento.") && k != nameof(ArchivoDocumento))
                 .ToList();
             foreach (var key in keysToRemove)
                 ModelState.Remove(key);
 
-            if (!ModelState.IsValid)
+            // LIMPIA el error de ModelState para documento.Archivo si existe
+            if (ModelState.ContainsKey("documento.Archivo"))
+                ModelState["documento.Archivo"].Errors.Clear();
+
+          
+
+            // Construir el JSON
+            var datos = new
             {
-                foreach (var key in ModelState.Keys)
+                tipoDocumento = documento.TipoDocumento,
+                descripcion = documento.Descripcion,
+                archivo = documento.Archivo,
+                tipoArchivo = documento.TipoArchivo,
+                idEstudiante = documento.IdEstudiante
+            };
+            var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+            // Log para depuración
+            Console.WriteLine("JSON enviado a la API:");
+            Console.WriteLine(json);
+
+            // Endpoint
+            var endpoint = _configuracion.ObtenerMetodo("ApiEndPoints", "CrearDocumento");
+            Console.WriteLine($"Endpoint: {endpoint}");
+
+            // Enviar a la API con manejo de timeout y excepciones
+            try
+            {
+                using var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(10); // Timeout corto para depuración
+                Console.WriteLine("Enviando POST a la API...");
+                var response = await client.PostAsync(endpoint, new StringContent(json, Encoding.UTF8, "application/json"));
+                Console.WriteLine("POST enviado, esperando respuesta...");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Código de respuesta: {response.StatusCode}");
+                Console.WriteLine($"Respuesta: {responseContent}");
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    var errors = ModelState[key].Errors;
-                    foreach (var error in errors)
-                    {
-                        Debug.WriteLine($"ModelState error for '{key}': {error.ErrorMessage}");
-                    }
+                    ModelState.AddModelError("", $"Error al crear documento: {response.StatusCode}");
+                    await ObtenerSecciones();
+                    return Page();
                 }
-                await ObtenerSecciones();
-                return Page();
             }
-
-            if (ArchivoDocumento == null || ArchivoDocumento.Length == 0)
+            catch (Exception ex)
             {
-                Debug.WriteLine("ArchivoDocumento es null o vacío");
-                ModelState.AddModelError("ArchivoDocumento", "Debe subir un archivo.");
+                Console.WriteLine($"Excepción: {ex.GetType().Name} - {ex.Message}");
+                ModelState.AddModelError("", $"Excepción al conectar con la API: {ex.Message}");
                 await ObtenerSecciones();
                 return Page();
             }
 
-            using var ms = new MemoryStream();
-            await ArchivoDocumento.CopyToAsync(ms);
-            var archivoBytes = ms.ToArray();
-
-            documento.Archivo = Convert.ToBase64String(archivoBytes);
-            documento.TipoArchivo = ArchivoDocumento.ContentType;
-
-            Debug.WriteLine("Documento JSON: " + JsonSerializer.Serialize(documento));
-
-            string endpoint = _configuracion.ObtenerMetodo("ApiEndPoints", "CrearDocumento");
-            var contenido = new StringContent(JsonSerializer.Serialize(documento), Encoding.UTF8, "application/json");
-
-            using var client = new HttpClient();
-            var respuesta = await client.PostAsync(endpoint, contenido);
-            var responseContent = await respuesta.Content.ReadAsStringAsync();
-            Debug.WriteLine("Respuesta API: " + responseContent);
-
-            respuesta.EnsureSuccessStatusCode();
-
+            Console.WriteLine("Documento creado correctamente.");
             return RedirectToPage();
         }
-
 
 
 
@@ -202,35 +240,81 @@ namespace Web.Pages.Dashboard.Estudiantes
         {
             Debug.WriteLine("Entró al handler OnPostEditarAsync");
 
-            // Limpieza de ModelState omitida por brevedad...
-
-            if (estudiante.IdSeccion == Guid.Empty && !string.IsNullOrEmpty(seccionseleccionada) && Guid.TryParse(seccionseleccionada, out var idSeccion))
-                estudiante.IdSeccion = idSeccion;
-
-            if (FotografiaArchivo != null && FotografiaArchivo.Length > 0)
+            try
             {
-                using var ms = new MemoryStream();
-                await FotografiaArchivo.CopyToAsync(ms);
-                estudiante.Fotografia = Convert.ToBase64String(ms.ToArray());
+                //  Limpiar ModelState para evitar validaciones innecesarias
+                ModelState.Remove(nameof(FotografiaArchivo));
+                ModelState.Remove(nameof(seccionseleccionada));
+
+                var keysToRemove = ModelState.Keys
+                    .Where(k => !k.StartsWith("Estudiante.") && k != nameof(FotografiaArchivo) && k != nameof(seccionseleccionada))
+                    .ToList();
+
+                foreach (var key in keysToRemove)
+                    ModelState.Remove(key);
+
+                //  Validar ModelState antes de continuar
+                if (!ModelState.IsValid)
+                {
+                    foreach (var key in ModelState.Keys)
+                    {
+                        foreach (var error in ModelState[key].Errors)
+                        {
+                            Debug.WriteLine($"ModelState error for '{key}': {error.ErrorMessage}");
+                        }
+                    }
+                    await ObtenerSecciones();
+                    return Page();
+                }
+
+                estudiante.IdEstudiante = idEstudiante;
+
+                // Mantener la sección actual si no se selecciona una nueva
+                if (estudiante.IdSeccion == Guid.Empty && !string.IsNullOrEmpty(seccionseleccionada) && Guid.TryParse(seccionseleccionada, out var idSeccion))
+                {
+                    estudiante.IdSeccion = idSeccion;
+                }
+                else if (estudiante.IdSeccion == Guid.Empty)
+                {
+                    estudiante.IdSeccion = await ObtenerSeccionActual(idEstudiante);
+                }
+
+                // Si el usuario sube una nueva imagen, convertirla a Base64
+                if (FotografiaArchivo != null && FotografiaArchivo.Length > 0)
+                {
+                    using var ms = new MemoryStream();
+                    await FotografiaArchivo.CopyToAsync(ms);
+                    estudiante.Fotografia = $"data:image/jpeg;base64,{Convert.ToBase64String(ms.ToArray())}"; // Asegurar formato correcto
+                }
+                else
+                {
+                    //  Si no se sube una nueva imagen, mantener la URL actual
+                    estudiante.Fotografia = await ObtenerImagenActual(idEstudiante);
+                }
+
+                // Imprimir la imagen enviada a la API para depuración
+                Debug.WriteLine($"Imagen enviada a la API: {estudiante.Fotografia}");
+
+                string endpoint = string.Format(_configuracion.ObtenerMetodo("ApiEndPoints", "EditarEstudiante"), idEstudiante);
+                Debug.WriteLine($"Endpoint de edición: {endpoint}");
+                Debug.WriteLine($"Datos enviados a la API: {JsonSerializer.Serialize(estudiante)}");
+
+                var contenido = new StringContent(JsonSerializer.Serialize(estudiante), Encoding.UTF8, "application/json");
+
+                using var client = new HttpClient();
+                var respuesta = await client.PutAsync(endpoint, contenido);
+                var responseContent = await respuesta.Content.ReadAsStringAsync();
+                Debug.WriteLine($"Respuesta de la API: {responseContent}");
+
+                respuesta.EnsureSuccessStatusCode();
+                return RedirectToPage();
             }
-
-            estudiante.IdEstudiante = idEstudiante;
-
-            // Corrige el endpoint para que tenga el id real
-            string endpoint = string.Format(_configuracion.ObtenerMetodo("ApiEndPoints", "EditarEstudiante"), idEstudiante);
-            Debug.WriteLine($"Endpoint de edición: {endpoint}");
-
-            var contenido = new StringContent(JsonSerializer.Serialize(estudiante), Encoding.UTF8, "application/json");
-
-            using var client = new HttpClient();
-            var respuesta = await client.PutAsync(endpoint, contenido);
-            var responseContent = await respuesta.Content.ReadAsStringAsync();
-            Debug.WriteLine($"Respuesta de la API: {responseContent}");
-            respuesta.EnsureSuccessStatusCode();
-            return RedirectToPage();
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en OnPostEditarAsync: {ex.Message}");
+                return Page();
+            }
         }
-
-
 
 
         public async Task<IActionResult> OnPostEliminarAsync(Guid idEstudiante)
@@ -365,8 +449,35 @@ namespace Web.Pages.Dashboard.Estudiantes
             }
         }
 
+        #region Helpers
+        private async Task<string> ObtenerImagenActual(Guid idEstudiante)
+        {
+            string endpoint = string.Format(_configuracion.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiante"), idEstudiante);
 
+            using var client = new HttpClient();
+            var respuesta = await client.GetAsync(endpoint);
+            respuesta.EnsureSuccessStatusCode();
 
+            var resultado = await respuesta.Content.ReadAsStringAsync();
+            var estudiante = JsonSerializer.Deserialize<EstudiantesResponse>(resultado, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return estudiante?.Fotografia ?? "/img/user-default.png"; // Si no tiene imagen, usar una por defecto
+        }
+
+        private async Task<Guid> ObtenerSeccionActual(Guid idEstudiante)
+        {
+            string endpoint = string.Format(_configuracion.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiante"), idEstudiante);
+
+            using var client = new HttpClient();
+            var respuesta = await client.GetAsync(endpoint);
+            respuesta.EnsureSuccessStatusCode();
+
+            var resultado = await respuesta.Content.ReadAsStringAsync();
+            var estudiante = JsonSerializer.Deserialize<EstudiantesResponse>(resultado, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return estudiante?.IdSeccion ?? Guid.Empty;
+        }
+        #endregion
 
     }
 }

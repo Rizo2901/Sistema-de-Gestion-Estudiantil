@@ -86,6 +86,145 @@ main[role="main"] {
         transform: translateY(-10px);
     }
 }
+/* Estilo base del submenu */
+#submenuDashboard {
+    width: 200px;
+    padding: 1rem;
+    transition: width 0.3s ease, padding 0.3s ease;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+    #submenuDashboard h5 {
+        font-size: 1.25rem;
+        transition: font-size 0.3s ease;
+    }
+
+    #submenuDashboard ul.nav li a {
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: font-size 0.3s ease;
+    }
+
+        #submenuDashboard ul.nav li a i {
+            font-size: 1.3rem;
+            margin-right: 0.5rem;
+            transition: font-size 0.3s ease, margin-right 0.3s ease;
+        }
+
+#toggleSidebarBtn, #toggleSidebarBtnFixed {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    transition: padding 0.3s ease, font-size 0.3s ease;
+}
+
+/* Pantallas ? 990px */
+@media (max-width: 990px) {
+    #submenuDashboard {
+        width: 180px;
+        padding: 0.8rem;
+    }
+
+        #submenuDashboard h5 {
+            font-size: 1.1rem;
+        }
+
+        #submenuDashboard ul.nav li a {
+            font-size: 0.9rem;
+        }
+
+            #submenuDashboard ul.nav li a i {
+                font-size: 1.1rem;
+                margin-right: 0.4rem;
+            }
+
+    #toggleSidebarBtn, #toggleSidebarBtnFixed {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Pantallas ? 690px */
+@media (max-width: 690px) {
+    #submenuDashboard {
+        width: 140px;
+        padding: 0.6rem;
+    }
+
+        #submenuDashboard h5 {
+            font-size: 1rem;
+        }
+
+        #submenuDashboard ul.nav li a {
+            font-size: 0.8rem;
+        }
+
+            #submenuDashboard ul.nav li a i {
+                font-size: 1rem;
+                margin-right: 0.3rem;
+            }
+
+    #toggleSidebarBtn, #toggleSidebarBtnFixed {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Pantallas ? 480px */
+@media (max-width: 480px) {
+    #submenuDashboard {
+        width: 110px;
+        padding: 0.4rem;
+    }
+
+        #submenuDashboard h5 {
+            font-size: 0.9rem;
+        }
+
+        #submenuDashboard ul.nav li a {
+            font-size: 0.7rem;
+        }
+
+            #submenuDashboard ul.nav li a i {
+                font-size: 0.9rem;
+                margin-right: 0.25rem;
+            }
+
+    #toggleSidebarBtn, #toggleSidebarBtnFixed {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Pantallas ? 360px */
+@media (max-width: 360px) {
+    #submenuDashboard {
+        width: 90px;
+        padding: 0.3rem;
+    }
+
+        #submenuDashboard h5 {
+            font-size: 0.8rem;
+        }
+
+        #submenuDashboard ul.nav li a {
+            font-size: 0.6rem;
+        }
+
+            #submenuDashboard ul.nav li a i {
+                font-size: 0.8rem;
+                margin-right: 0.2rem;
+            }
+
+    #toggleSidebarBtn, #toggleSidebarBtnFixed {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.6rem;
+    }
+}
+
 
 /* WOW.js + Animate.css efectos */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');

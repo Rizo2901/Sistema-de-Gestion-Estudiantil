@@ -14,8 +14,7 @@ namespace Abstracciones.Modelos
         public string TipoDocumento { get; set; }
 
         public string? Descripcion { get; set; }
-
-        [Required]
+         
         public string Archivo { get; set; }
 
         public string? TipoArchivo { get; set; }
@@ -31,8 +30,6 @@ namespace Abstracciones.Modelos
     public class DocumentosResponse : DocumentosBase
     {
         public Guid IdDocumento { get; set; }
-        public Guid IdEstudiante { get; set; }
-        public new string? Archivo { get; set; }// <-- byte[] para lecturas
     }
 
     public class EstudianteConDocumentosResponse

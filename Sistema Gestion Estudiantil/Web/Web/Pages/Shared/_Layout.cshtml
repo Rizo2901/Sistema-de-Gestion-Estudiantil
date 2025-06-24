@@ -75,92 +75,134 @@
 
     <!-- Contenido principal -->
     <div class="flex-grow-1">
-        <main role="main" class="pb-3" style="min-height: 80vh;">
+        <main role="main" style="min-height: 80vh;">
             @if (mostrarMenuDashboard)
             {
-                <div style="display: flex; gap: 1rem; padding: 1rem; position: relative;">
+                <div style="display: flex; gap: 1rem; position: relative;">
 
-                    <!-- Botón flotante al borde izquierdo -->
-                    <button id="toggleSidebarBtn" onclick="toggleSubmenu()" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background-color: #343a40; border: none; color: white; border-radius: 0.25rem; padding: 0.5rem; z-index: 10;">
-                        <i id="toggleIcon" class="bi bi-chevron-left"></i>
+                    <!-- Botón visible solo cuando el submenú está oculto -->
+                    <button id="toggleSidebarBtnFixed" class="btn btn-sm btn-light text-dark"
+                            style="margin: 1rem; display: none;">
+                        <i class="bi bi-chevron-right"></i>
                     </button>
 
                     <!-- Submenú Dashboard -->
-                    <nav id="submenuDashboard" style="background-color: #343a40; border-radius: 0.25rem; padding: 1rem; width: 220px; height: fit-content;">
-                        <h5 style="margin-bottom: 1rem; color: white;">Panel</h5>
+                    <nav id="submenuDashboard"
+                         style="background-color: #343a40; padding: 1rem; width: 220px;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="text-white mb-0">Panel</h5>
+                            <!-- Botón junto al título -->
+                            <button id="toggleSidebarBtn" class="btn btn-sm btn-light text-dark">
+                                <i id="toggleIcon" class="bi bi-chevron-left"></i>
+                            </button>
+                        </div>
                         <ul class="nav flex-column">
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard" ? "fw-bold" : "")" asp-page="/Dashboard/Dashboard">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Dashboard">
                                     <i class="bi bi-house me-2"></i>Inicio
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Estudiantes/Index" ? "fw-bold" : "")" asp-page="/Dashboard/Estudiantes/Index">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Estudiantes/Index" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Estudiantes/Index">
                                     <i class="bi bi-person-lines-fill me-2"></i>Estudiantes
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/calificaciones" ? "fw-bold" : "")" asp-page="/Dashboard/Calificaciones">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/calificaciones" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Calificaciones">
                                     <i class="bi bi-clipboard-data me-2"></i>Calificaciones
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/profesores" ? "fw-bold" : "")" asp-page="/Dashboard/Profesores">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Profesores/Index" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Profesores/Index">
                                     <i class="bi bi-person-lines-fill me-2"></i>Profesores
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/misnotas" ? "fw-bold" : "")" asp-page="/Dashboard/MisNotas">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/roles" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Roles">
+                                    <i class="bi bi-person-gear me-2"></i>Roles
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/usuarios" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Usuarios">
+                                    <i class="bi bi-people-fill me-2"></i>Usuarios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/atencionesmedicas" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/AtencionesMedicas">
+                                    <i class="bi bi-heart-pulse me-2"></i>Atenciones médicas
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/misnotas" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/MisNotas">
                                     <i class="bi bi-journal-check me-2"></i>Mis notas
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Secciones" ? "fw-bold" : "")" asp-page="/Dashboard/Secciones/Index">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Secciones" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Secciones/Index">
                                     <i class="bi bi-diagram-3 me-2"></i>Secciones
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Materias" ? "fw-bold" : "")" asp-page="/Dashboard/Materias/Index">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Materias" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Materias/Index">
                                     <i class="bi bi-card-list me-2"></i>Materias
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Documentos" ? "fw-bold" : "")" asp-page="/Dashboard/Documentos/Index">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Documentos" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Documentos/Index">
                                     <i class="bi bi-file-earmark me-2"></i>Documentos
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/CondicionesEspeciales" ? "fw-bold" : "")" asp-page="/Dashboard/CondicionesEspeciales/Index">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/CondicionesEspeciales" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/CondicionesEspeciales/Index">
                                     <i class="bi bi-person-lines-fill me-2"></i>Condiciones Especiales
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/missecciones" ? "fw-bold" : "")" asp-page="/Dashboard/MisSecciones">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/missecciones" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/MisSecciones">
                                     <i class="bi bi-person-badge me-2"></i>Mis secciones
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/horarios" ? "fw-bold" : "")" asp-page="/Dashboard/Horarios">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/horarios" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Horarios">
                                     <i class="bi bi-calendar-week me-2"></i>Horarios
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/mishorarios" ? "fw-bold" : "")" asp-page="/Dashboard/MisHorarios">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/mishorarios" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/MisHorarios">
                                     <i class="bi bi-clock-history me-2"></i>Mis horarios
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesfamiliares" ? "fw-bold" : "")" asp-page="/Dashboard/ReunionesFamiliares">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesfamiliares" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/ReunionesFamiliares">
                                     <i class="bi bi-people me-2"></i>Reuniones familiares
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesadministrativas" ? "fw-bold" : "")" asp-page="/Dashboard/ReunionesAdministrativas">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesadministrativas" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/ReunionesAdministrativas">
                                     <i class="bi bi-building me-2"></i>Reuniones administrativas
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/actividades" ? "fw-bold" : "")" asp-page="/Dashboard/Actividades">
+                                <a class="nav-link text-white @(paginaActual == "/dashboard/actividades" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Actividades">
                                     <i class="bi bi-kanban me-2"></i>Actividades
                                 </a>
                             </li>
@@ -168,20 +210,22 @@
                     </nav>
 
                     <!-- Contenido de la página -->
-                    <section class="flex-grow-1">
+                    <section class="flex-grow-1" style="padding: 1rem">
                         @RenderBody()
                     </section>
+
                 </div>
             }
             else
             {
                 @RenderBody()
             }
+
         </main>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-3 my-4 w-100">
+    <footer class="bg-dark text-white py-3 w-100">
         <div class="container">
             <ul class="nav justify-content-center border-bottom pb-3 mb-3">
                 <li class="nav-item"><a asp-area="" asp-page="/Index" class="nav-link px-2 text-white">Inicio</a></li>

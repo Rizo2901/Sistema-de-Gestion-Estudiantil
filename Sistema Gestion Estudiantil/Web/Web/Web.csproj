@@ -11,4 +11,9 @@
     <ProjectReference Include="..\Reglas\Reglas.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Dashboard\Actividades\" />
+    <Folder Include="Pages\Dashboard\ReunionesFamiliares\" />
+  </ItemGroup>
+
 </Project>

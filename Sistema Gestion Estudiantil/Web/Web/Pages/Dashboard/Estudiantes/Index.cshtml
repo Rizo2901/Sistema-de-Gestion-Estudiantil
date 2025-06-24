@@ -10,10 +10,18 @@
     <div class="alert alert-warning" role="alert">
         ⚠️ No hay estudiantes registrados.
     </div>
+    <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Estudiante
+                </button>
+            </div>
+        </div>
+
 }
 else
 {
-    <div class="container-fluid px-0">
+    <div class="container-fluid d-flex flex-column vh-100 px-0">
         <div class="row mb-3">
             <div class="col-12 d-flex justify-content-center justify-content-md-end">
                 <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
@@ -44,17 +52,19 @@ else
 
 
 
+    
         <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
-        <div class="row g-3 flex-column">
+        <div class="overflow-auto" style="max-height: calc(100vh - 250px);"> 
+        <div class="row g-3 flex-column" style="margin-bottom: 10px;">
             @foreach (var estudiante in Model.Estudiantes)
             {
-                <div class="col-12">
+                <div class="col-12" style="padding: 2rem;">
                     <div class="card estudiante-card shadow h-100">
                         <div class="p-3 d-flex align-items-center" style="min-width: 120px;">
-                            <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : $"data:image/jpeg;base64,{estudiante.Fotografia}")"
-                                 alt="Foto"
-                                 class="rounded-circle"
-                                 style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ccc;" />
+                            <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : estudiante.Fotografia)"
+     alt="Foto"
+     class="rounded-circle"
+     style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ccc;" />
                         </div>
                         <div class="card-body flex-grow-1">
                             <h5 class="card-title mb-1">
@@ -103,121 +113,118 @@ else
                     </div>
                 </div>
 
-                <!-- Modal Editar Estudiante -->
-                <div class="modal fade" id="editarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="editarLabel_@estudiante.IdEstudiante" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-scrollable modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editarLabel_@estudiante.IdEstudiante">Editar Estudiante</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              <!-- Modal Editar Estudiante -->
+<div class="modal fade" id="editarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="editarLabel_@estudiante.IdEstudiante" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarLabel_@estudiante.IdEstudiante">Editar Estudiante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="post" asp-page-handler="Editar" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="idEstudiante" value="@estudiante.IdEstudiante" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Cédula</label>
+                            <input name="estudiante.Cedula" class="form-control" value="@estudiante.Cedula" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input name="estudiante.Nombre" class="form-control" value="@estudiante.Nombre" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 1</label>
+                            <input name="estudiante.Apellido1" class="form-control" value="@estudiante.Apellido1" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 2</label>
+                            <input name="estudiante.Apellido2" class="form-control" value="@estudiante.Apellido2" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input name="estudiante.FechaNacimiento" type="date" class="form-control" value="@(estudiante.FechaNacimiento.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Género</label>
+                            <select name="estudiante.Genero" class="form-select">
+                                <option value="M" selected="@(estudiante.Genero == "M")">Masculino</option>
+                                <option value="F" selected="@(estudiante.Genero == "F")">Femenino</option>
+                                <option value="O" selected="@(estudiante.Genero == "O")">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Grado Actual</label>
+                            <input name="estudiante.GradoActual" class="form-control" value="@estudiante.GradoActual" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Repitiendo</label>
+                            <select name="estudiante.Repitiendo" class="form-select">
+                                <option value="true" selected="@(estudiante.Repitiendo)">Sí</option>
+                                <option value="false" selected="@(!estudiante.Repitiendo)">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Historial Académico</label>
+                            <textarea name="estudiante.HistorialAcademico" class="form-control">@estudiante.HistorialAcademico</textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Fotografía</label>
+                            <div class="mb-2">
+                                <img id="fotoPreview_@estudiante.IdEstudiante"
+                                     src="@(estudiante.Fotografia.StartsWith("http") ? estudiante.Fotografia : $"data:image/jpeg;base64,{estudiante.Fotografia}")"
+                                     alt="Foto actual"
+                                     class="rounded-circle"
+                                     style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #ccc;" />
                             </div>
-                            <form method="post" asp-page-handler="Editar" enctype="multipart/form-data">
-                                <div class="modal-body">
-                                    <input type="hidden" name="idEstudiante" value="@estudiante.IdEstudiante" />
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Cédula</label>
-                                            <input name="estudiante.Cedula" class="form-control" value="@estudiante.Cedula" required />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Nombre</label>
-                                            <input name="estudiante.Nombre" class="form-control" value="@estudiante.Nombre" required />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Apellido 1</label>
-                                            <input name="estudiante.Apellido1" class="form-control" value="@estudiante.Apellido1" required />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Apellido 2</label>
-                                            <input name="estudiante.Apellido2" class="form-control" value="@estudiante.Apellido2" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Fecha de Nacimiento</label>
-                                            <input name="estudiante.FechaNacimiento" type="date" class="form-control" value="@(estudiante.FechaNacimiento.ToString("yyyy-MM-dd"))" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Género</label>
-                                            <select name="estudiante.Genero" class="form-select">
-                                                <option value="M" selected="@(estudiante.Genero == "M")">Masculino</option>
-                                                <option value="F" selected="@(estudiante.Genero == "F")">Femenino</option>
-                                                <option value="O" selected="@(estudiante.Genero == "O")">Otro</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Grado Actual</label>
-                                            <input name="estudiante.GradoActual" class="form-control" value="@estudiante.GradoActual" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Repitiendo</label>
-                                            <select name="estudiante.Repitiendo" class="form-select">
-                                                <option value="true" selected="@(estudiante.Repitiendo)">Sí</option>
-                                                <option value="false" selected="@(!estudiante.Repitiendo)">No</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Historial Académico</label>
-                                            <textarea name="estudiante.HistorialAcademico" class="form-control">@estudiante.HistorialAcademico</textarea>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Fotografía</label>
-                                            <div class="mb-2">
-                                                <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : $"data:image/jpeg;base64,{estudiante.Fotografia}")"
-                                                     alt="Foto actual"
-                                                     class="rounded-circle"
-                                                     style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ccc;" />
-                                            </div>
-                                            <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo" />
-                                            <input type="hidden" name="estudiante.Fotografia" value="@estudiante.Fotografia" />
-                                            <small class="text-muted">Si seleccionas un archivo, reemplazará la foto actual.</small>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Dirección</label>
-                                            <textarea name="estudiante.Direccion" class="form-control">@estudiante.Direccion</textarea>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Teléfono Celular</label>
-                                            <input name="estudiante.TelefonoCelular" class="form-control" value="@estudiante.TelefonoCelular" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Correo Electrónico</label>
-                                            <input name="estudiante.CorreoElectronico" class="form-control" value="@estudiante.CorreoElectronico" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Estado</label>
-                                            <select name="estudiante.Estado" class="form-select">
-                                                <option value="true" selected="@(estudiante.Estado)">Activo</option>
-                                                <option value="false" selected="@(!estudiante.Estado)">Inactivo</option>
-                                            </select>
-                                        </div>
-                                      <div class="col-md-6">
-    <label class="form-label">Sección</label>
-    <select name="estudiante.IdSeccion" class="form-select">
-        <option value="">Seleccione una sección</option>
-        @foreach (var seccion in Model.Secciones)
+                            <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo"
+                                   onchange="mostrarVistaPrevia(this, 'fotoPreview_@estudiante.IdEstudiante')" />
+                            <input type="hidden" name="estudiante.Fotografia" value="@estudiante.Fotografia" />
+                            <small class="text-muted">Si seleccionas un archivo, reemplazará la foto actual.</small>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Dirección</label>
+                            <textarea name="estudiante.Direccion" class="form-control">@estudiante.Direccion</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono Celular</label>
+                            <input name="estudiante.TelefonoCelular" class="form-control" value="@estudiante.TelefonoCelular" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input name="estudiante.CorreoElectronico" class="form-control" value="@estudiante.CorreoElectronico" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select name="estudiante.Estado" class="form-select">
+                                <option value="true" selected="@(estudiante.Estado)">Activo</option>
+                                <option value="false" selected="@(!estudiante.Estado)">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sección</label>
+                            <select name="estudiante.IdSeccion" class="form-select">
+                                <option value="">Seleccione una sección</option>
+                                @foreach (var seccion in Model.Secciones)
         {
 @:          <option value="@seccion.Value" @(estudiante.IdSeccion != Guid.Empty && estudiante.IdSeccion.ToString() == seccion.Value ? "selected" : "")>
 @:              @seccion.Text
 @:          </option>
         }
-    </select>
-</div>
-
-
-
-
-
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                </div>
-                            </form>
+                            </select>
                         </div>
                     </div>
                 </div>
-
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Actualizar Estudiante</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
                 <!-- Modal Eliminar Estudiante -->
                 <div class="modal fade" id="eliminarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="eliminarLabel_@estudiante.IdEstudiante" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -271,27 +278,22 @@ else
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-
             <form method="post" asp-page-handler="CrearDocumento" enctype="multipart/form-data">
                 <div class="modal-body">
-                    <input type="hidden" name="documento.IdEstudiante" value="@estudiante.IdEstudiante" />
-
+                    <input type="hidden" asp-for="documento.IdEstudiante" value="@estudiante.IdEstudiante" />
                     <div class="mb-3">
                         <label class="form-label">Archivo del Documento</label>
-                        <input type="file" name="ArchivoDocumento" class="form-control" required />
+                        <input type="file" asp-for="ArchivoDocumento" class="form-control" required />
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Tipo de Documento</label>
-                        <input type="text" name="documento.TipoDocumento" class="form-control" required />
+                        <input type="text" asp-for="documento.TipoDocumento" class="form-control" required />
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Descripción</label>
-                        <textarea name="documento.Descripcion" class="form-control" required></textarea>
+                        <textarea asp-for="documento.Descripcion" class="form-control" required></textarea>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Guardar Documento</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -351,6 +353,7 @@ else
 
             }
         </div>
+    </div> 
     </div>
 }
 <!-- Modal Agregar Estudiante -->
@@ -455,6 +458,17 @@ else
     </div>
 </div>
 
+<script>
+function mostrarVistaPrevia(input, previewId) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById(previewId).src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
 
 
 

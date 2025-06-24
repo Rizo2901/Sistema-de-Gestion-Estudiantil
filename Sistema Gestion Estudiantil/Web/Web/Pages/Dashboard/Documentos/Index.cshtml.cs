@@ -167,194 +167,193 @@ namespace Web.Pages.Dashboard.Documentos
 
         public async Task<IActionResult> OnPostCrearDocumentoAsync()
         {
-            Debug.WriteLine("Entró al handler OnPostCrearDocumentoAsync");
+            Console.WriteLine("===> Entró a OnPostCrearDocumentoAsync (Documentos)");
 
-            // Procesar el archivo antes de validar ModelState
+            Console.WriteLine($"ArchivoDocumento: {(ArchivoDocumento != null ? ArchivoDocumento.FileName : "null")}");
+            Console.WriteLine($"documento.IdEstudiante: {documento?.IdEstudiante}");
+            Console.WriteLine($"documento.TipoDocumento: {documento?.TipoDocumento}");
+            Console.WriteLine($"documento.Descripcion: {documento?.Descripcion}");
+
+            // Convertir archivo a base64 con prefijo 'data:'
             if (ArchivoDocumento != null && ArchivoDocumento.Length > 0)
             {
-                using var ms = new MemoryStream();
-                await ArchivoDocumento.CopyToAsync(ms);
-                var archivoBytes = ms.ToArray();
-
-                //  Asignar el archivo en formato Base64 antes de enviar a la API
-                documento.Archivo = Convert.ToBase64String(archivoBytes);
+                using var memoryStream = new MemoryStream();
+                await ArchivoDocumento.CopyToAsync(memoryStream);
+                var base64 = Convert.ToBase64String(memoryStream.ToArray());
+                documento.Archivo = $"data:{ArchivoDocumento.ContentType};base64,{base64}";
                 documento.TipoArchivo = ArchivoDocumento.ContentType;
+
+                Console.WriteLine($"Base64 inicio: {base64.Substring(0, Math.Min(30, base64.Length))}...");
+                Console.WriteLine($"Base64 fin: ...{base64.Substring(Math.Max(0, base64.Length - 30))}");
+                Console.WriteLine($"Tamaño base64: {base64.Length}");
             }
             else
             {
-                Debug.WriteLine("ArchivoDocumento es null o vacío");
+                Console.WriteLine("ArchivoDocumento es null o vacío");
                 ModelState.AddModelError("ArchivoDocumento", "Debe subir un archivo.");
                 await OnGetAsync();
                 return Page();
             }
 
-            Debug.WriteLine("Documento JSON antes de envío: " + JsonSerializer.Serialize(documento));
+            // Limpiar ModelState
+            var keysToRemove = ModelState.Keys
+                .Where(k => !k.StartsWith("documento.") && k != nameof(ArchivoDocumento))
+                .ToList();
+            foreach (var key in keysToRemove)
+                ModelState.Remove(key);
 
-            string endpoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearDocumento");
-            var contenido = new StringContent(JsonSerializer.Serialize(documento), Encoding.UTF8, "application/json");
+            if (ModelState.ContainsKey("documento.Archivo"))
+                ModelState["documento.Archivo"].Errors.Clear();
 
-            using var client = new HttpClient();
-            var respuesta = await client.PostAsync(endpoint, contenido);
-            var responseContent = await respuesta.Content.ReadAsStringAsync();
-            Debug.WriteLine("Respuesta API: " + responseContent);
-
-            respuesta.EnsureSuccessStatusCode();
-
-            return RedirectToPage("Index", new { filtro = "General" });
-        }
-
-        public async Task<IActionResult> OnGetEditarDocumentoAsync(Guid idDocumento)
-        {
-            Debug.WriteLine("Entró al handler OnGetEditarDocumentoAsync");
-
-            // Consumir el endpoint para obtener el documento por ID
-            string endpoint = string.Format(_confg.ObtenerMetodo("ApiEndPoints", "ObtenerDocumentosPorId"), idDocumento);
-            using var client = new HttpClient();
-            var respuesta = await client.GetAsync(endpoint);
-            respuesta.EnsureSuccessStatusCode();
-            var resultado = await respuesta.Content.ReadAsStringAsync();
-
-            // Deserializar el documento (asume que es una lista con un solo elemento)
-            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var documentos = JsonSerializer.Deserialize<List<DocumentosResponse>>(resultado, opciones);
-            var doc = documentos?.FirstOrDefault();
-
-            if (doc == null)
+            // Construir JSON
+            var datos = new
             {
-                ModelState.AddModelError("", "No se encontró el documento.");
-                return Page();
-            }
-
-            // Asignar el archivo directamente (ya es string base64)
-            documento = new DocumentosRequest
-            {
-                IdEstudiante = doc.IdEstudiante,
-                TipoDocumento = doc.TipoDocumento,
-                Descripcion = doc.Descripcion,
-                Archivo = doc.Archivo ?? string.Empty,
-                TipoArchivo = doc.TipoArchivo
+                tipoDocumento = documento.TipoDocumento,
+                descripcion = documento.Descripcion,
+                archivo = documento.Archivo,
+                tipoArchivo = documento.TipoArchivo,
+                idEstudiante = documento.IdEstudiante
             };
+            var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-            // Aquí puedes cargar otros datos necesarios para la vista
+            Console.WriteLine("JSON enviado a la API:");
+            Console.WriteLine(json);
 
-            Debug.WriteLine("Documento preparado para edición.");
-            return Page();
-        }
+            // Enviar POST a la API
+            var endpoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearDocumento");
+            Console.WriteLine($"Endpoint: {endpoint}");
 
-        public async Task<IActionResult> OnPostEditarDocumentoAsync(Guid idDocumento)
-        {
             try
             {
-                Debug.WriteLine("Entró al handler OnPostEditarDocumentoAsync");
-
-                if (idDocumento == Guid.Empty)
-                {
-                    Debug.WriteLine("? [ERROR] IdDocumento recibido es inválido.");
-                    ModelState.AddModelError("", "El Id del documento es inválido.");
-                    return Page();
-                }
-
-                var idEstudiante = documento.IdEstudiante;
-                if (idEstudiante == Guid.Empty)
-                {
-                    Debug.WriteLine("? [ERROR] IdEstudiante recibido es inválido.");
-                    ModelState.AddModelError("", "El Id del estudiante es obligatorio.");
-                    return Page();
-                }
-                Debug.WriteLine($"? [DEBUG] IdEstudiante recibido correctamente: {idEstudiante}");
-
-                // Procesar el archivo solo si se sube uno nuevo
-                if (ArchivoDocumento != null && ArchivoDocumento.Length > 0)
-                {
-                    using var ms = new MemoryStream();
-                    await ArchivoDocumento.CopyToAsync(ms);
-                    var archivoBytes = ms.ToArray();
-                    documento.Archivo = Convert.ToBase64String(archivoBytes);
-                    documento.TipoArchivo = ArchivoDocumento.ContentType;
-                    Debug.WriteLine($"? [DEBUG] Archivo procesado correctamente. Tipo: {documento.TipoArchivo}");
-                }
-                // Si no se sube archivo nuevo, se mantiene el archivo actual (debe venir ya en documento.Archivo)
-
-                // Limpiar ModelState de campos no relevantes y de los campos de archivo
-                ModelState.Remove(nameof(ArchivoDocumento));
-                ModelState.Remove("documento.Archivo");
-                var keysToRemove = ModelState.Keys
-                    .Where(k => !k.StartsWith("documento.", StringComparison.OrdinalIgnoreCase) && k != nameof(ArchivoDocumento))
-                    .ToList();
-                foreach (var key in keysToRemove)
-                    ModelState.Remove(key);
-
-                // Validar ModelState después de procesar el archivo
-                if (!ModelState.IsValid)
-                {
-                    Debug.WriteLine("? [ERROR] ModelState tiene errores:");
-                    foreach (var kvp in ModelState)
-                    {
-                        foreach (var error in kvp.Value.Errors)
-                            Debug.WriteLine($"- ? {kvp.Key}: {error.ErrorMessage}");
-                    }
-                    await OnGetAsync();
-                    return Page();
-                }
-
-                // Validar que el archivo exista antes de enviar a la API
-                if (string.IsNullOrEmpty(documento.Archivo))
-                {
-                    Debug.WriteLine("? [ERROR] No hay archivo para enviar a la API.");
-                    ModelState.AddModelError("ArchivoDocumento", "Debe existir un archivo para el documento.");
-                    await OnGetAsync();
-                    return Page();
-                }
-
-                // Construir JSON a enviar en camelCase
-                var datos = new
-                {
-                    tipoDocumento = documento.TipoDocumento,
-                    descripcion = documento.Descripcion,
-                    archivo = documento.Archivo,
-                    tipoArchivo = documento.TipoArchivo,
-                    idEstudiante = idEstudiante
-                };
-
-                var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    WriteIndented = true
-                });
-
-                Debug.WriteLine($"?? [DEBUG] JSON generado:\n{json}");
-
-                string endpoint = string.Format(_confg.ObtenerMetodo("ApiEndPoints", "EditarDocumento"), idDocumento);
                 using var client = new HttpClient();
-                var contenido = new StringContent(json, Encoding.UTF8, "application/json");
+                client.Timeout = TimeSpan.FromSeconds(10);
+                Console.WriteLine("Enviando POST a la API...");
+                var response = await client.PostAsync(endpoint, new StringContent(json, Encoding.UTF8, "application/json"));
+                Console.WriteLine("POST enviado, esperando respuesta...");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Código de respuesta: {response.StatusCode}");
+                Console.WriteLine($"Respuesta: {responseContent}");
 
-                Debug.WriteLine("?? [DEBUG] Enviando solicitud PUT a la API...");
-                var respuesta = await client.PutAsync(endpoint, contenido);
-                var responseBody = await respuesta.Content.ReadAsStringAsync();
-
-                Debug.WriteLine($"?? [DEBUG] Respuesta de la API: {respuesta.StatusCode}");
-                Debug.WriteLine($"?? [DEBUG] Cuerpo de respuesta de la API:\n{responseBody}");
-
-                respuesta.EnsureSuccessStatusCode();
-
-                Debug.WriteLine("? [DEBUG] Documento editado con éxito.");
-
-                return RedirectToPage("Index", new { filtro = "General" });
+                if (!response.IsSuccessStatusCode)
+                {
+                    ModelState.AddModelError("", $"Error al crear documento: {response.StatusCode}");
+                    await OnGetAsync();
+                    return Page();
+                }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"? [ERROR] Fallo al editar documento: {ex.Message}");
-                ModelState.AddModelError("", "Ocurrió un error al editar el documento.");
+                Console.WriteLine($"Excepción: {ex.GetType().Name} - {ex.Message}");
+                ModelState.AddModelError("", $"Excepción al conectar con la API: {ex.Message}");
+                await OnGetAsync();
                 return Page();
             }
+
+            Console.WriteLine("Documento creado correctamente.");
+            return RedirectToPage("Index", new { filtro = "General" });
         }
 
 
+        public async Task<IActionResult> OnPostEditarDocumentoAsync(Guid idDocumento)
+        {
+            Console.WriteLine("===> Entró a OnPostEditarDocumentoAsync (Documentos)");
 
+            if (idDocumento == Guid.Empty)
+            {
+                Console.WriteLine("IdDocumento es inválido.");
+                ModelState.AddModelError("", "El Id del documento es inválido.");
+                return Page();
+            }
 
+            Console.WriteLine($"ArchivoDocumento: {(ArchivoDocumento != null ? ArchivoDocumento.FileName : "null")}");
+            Console.WriteLine($"documento.IdEstudiante: {documento?.IdEstudiante}");
+            Console.WriteLine($"documento.TipoDocumento: {documento?.TipoDocumento}");
+            Console.WriteLine($"documento.Descripcion: {documento?.Descripcion}");
 
+            // Si se subió un nuevo archivo
+            if (ArchivoDocumento != null && ArchivoDocumento.Length > 0)
+            {
+                using var memoryStream = new MemoryStream();
+                await ArchivoDocumento.CopyToAsync(memoryStream);
+                var base64 = Convert.ToBase64String(memoryStream.ToArray());
+                documento.Archivo = $"data:{ArchivoDocumento.ContentType};base64,{base64}";
+                documento.TipoArchivo = ArchivoDocumento.ContentType;
 
+                Console.WriteLine($"Base64 inicio: {base64.Substring(0, Math.Min(30, base64.Length))}...");
+                Console.WriteLine($"Base64 fin: ...{base64.Substring(Math.Max(0, base64.Length - 30))}");
+                Console.WriteLine($"Tamaño base64: {base64.Length}");
+            }
 
+            // Limpiar ModelState de campos no relevantes
+            var keysToRemove = ModelState.Keys
+                .Where(k => !k.StartsWith("documento.") && k != nameof(ArchivoDocumento))
+                .ToList();
+            foreach (var key in keysToRemove)
+                ModelState.Remove(key);
+
+            if (ModelState.ContainsKey("documento.Archivo"))
+                ModelState["documento.Archivo"].Errors.Clear();
+
+            if (string.IsNullOrEmpty(documento.Archivo))
+            {
+                Console.WriteLine("No hay archivo para enviar.");
+                ModelState.AddModelError("ArchivoDocumento", "Debe subir o conservar un archivo.");
+                await OnGetAsync();
+                return Page();
+            }
+
+            // Construir JSON
+            var datos = new
+            {
+                tipoDocumento = documento.TipoDocumento,
+                descripcion = documento.Descripcion,
+                archivo = documento.Archivo,
+                tipoArchivo = documento.TipoArchivo,
+                idEstudiante = documento.IdEstudiante
+            };
+
+            var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            Console.WriteLine("JSON enviado a la API:");
+            Console.WriteLine(json);
+
+            string endpoint = string.Format(_confg.ObtenerMetodo("ApiEndPoints", "EditarDocumento"), idDocumento);
+            Console.WriteLine($"Endpoint: {endpoint}");
+
+            try
+            {
+                using var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(10);
+                Console.WriteLine("Enviando PUT a la API...");
+
+                var contenido = new StringContent(json, Encoding.UTF8, "application/json");
+                var respuesta = await client.PutAsync(endpoint, contenido);
+                var responseContent = await respuesta.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"Código de respuesta: {respuesta.StatusCode}");
+                Console.WriteLine($"Respuesta: {responseContent}");
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    ModelState.AddModelError("", $"Error al editar documento: {respuesta.StatusCode}");
+                    await OnGetAsync();
+                    return Page();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Excepción: {ex.GetType().Name} - {ex.Message}");
+                ModelState.AddModelError("", $"Error al conectar con la API: {ex.Message}");
+                await OnGetAsync();
+                return Page();
+            }
+
+            Console.WriteLine("Documento editado correctamente.");
+            return RedirectToPage("Index", new { filtro = "General" });
+        }
 
     }
 }

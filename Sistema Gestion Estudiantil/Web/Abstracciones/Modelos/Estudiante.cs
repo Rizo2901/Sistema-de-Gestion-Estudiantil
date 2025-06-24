@@ -36,7 +36,7 @@ namespace Abstracciones.Modelos
 
         public string? HistorialAcademico { get; set; }
 
-
+       
         public string? Fotografia { get; set; }
 
 
@@ -53,19 +53,16 @@ namespace Abstracciones.Modelos
 
     public class EstudiantesRequest : EstudiantesBase
     {
-        public Guid IdEstudiante { get; set; } 
-
+        public Guid IdEstudiante { get; set; }
         public Guid IdSeccion { get; set; }
+
         public Guid? IdUsuario { get; set; }
     }
-
 
     public class EstudiantesResponse : EstudiantesBase
     {
         public Guid IdEstudiante { get; set; }
         public Guid IdSeccion { get; set; }
-
-
         public string? Seccion { get; set; }
 
         public string? NombreUsuario { get; set; }
