@@ -62,6 +62,8 @@ builder.Services.AddScoped<ICondicionEspecialFlujo, CondicionEspecialFlujo>();
 
 
 
+builder.Services.AddScoped<IHorarioDA, HorarioDA>();
+builder.Services.AddScoped<IHorarioFlujo, HorarioFlujo>();
 
 
 
