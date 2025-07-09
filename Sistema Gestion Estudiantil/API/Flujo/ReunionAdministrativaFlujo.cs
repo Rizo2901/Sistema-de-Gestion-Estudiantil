@@ -21,19 +21,19 @@ namespace Flujo
             return await _reunionAdministrativaDA.CrearReunionAdministrativa(reunion);
         }
 
-        public async Task<Guid> EditarReunionAdministrativa(Guid IdReunion, ReunionAdministrativaRequest reunion)
+        public async Task<Guid> EditarReunionAdministrativa(Guid IdReunionAdmin, ReunionAdministrativaRequest reunion)
         {
-            return await _reunionAdministrativaDA.EditarReunionAdministrativa(IdReunion, reunion);
+            return await _reunionAdministrativaDA.EditarReunionAdministrativa(IdReunionAdmin, reunion);
         }
 
-        public async Task<Guid> EliminarReunionAdministrativa(Guid IdReunion)
+        public async Task<Guid> EliminarReunionAdministrativa(Guid IdReunionAdmin)
         {
-            return await _reunionAdministrativaDA.EliminarReunionAdministrativa(IdReunion);
+            return await _reunionAdministrativaDA.EliminarReunionAdministrativa(IdReunionAdmin);
         }
 
-        public async Task<ReunionAdministrativaResponse> ObtenerReunionAdministrativa(Guid IdReunion)
+        public async Task<ReunionAdministrativaResponse> ObtenerReunionAdministrativa(Guid IdReunionAdmin)
         {
-            return await _reunionAdministrativaDA.ObtenerReunionAdministrativa(IdReunion);
+            return await _reunionAdministrativaDA.ObtenerReunionAdministrativa(IdReunionAdmin);
         }
 
         public async Task<IEnumerable<ReunionAdministrativaResponse>> ObtenerReunionesAdministrativas()

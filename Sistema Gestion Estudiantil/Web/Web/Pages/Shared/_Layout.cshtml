@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column ">
     <!-- Navbar -->
     <nav class="navbar navbar-light bg-gradient-red text-white px-3 shadow-sm">
         <div class="container-fluid d-flex justify-content-between align-items-center">
@@ -34,7 +34,7 @@
     </nav>
 
     <!-- Sidebar móvil -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+   
 
     <div id="sidebarMenu" class="position-fixed top-0 end-0 bg-white shadow vh-100 p-4 d-flex flex-column justify-content-between"
          style="width: 250px; transform: translateX(100%); transition: transform 0.3s; z-index: 1050;">
@@ -122,8 +122,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/roles" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Roles">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Roles" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Roles/Index">
                                     <i class="bi bi-person-gear me-2"></i>Roles
                                 </a>
                             </li>
@@ -189,20 +189,20 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesfamiliares" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/ReunionesFamiliares">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/ReunionesFamiliares" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/ReunionesFamiliares/Index">
                                     <i class="bi bi-people me-2"></i>Reuniones familiares
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/reunionesadministrativas" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/ReunionesAdministrativas">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/ReunionesAdministrativas" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/ReunionesAdministrativas/Index">
                                     <i class="bi bi-building me-2"></i>Reuniones administrativas
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/actividades" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Actividades">
+                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Actividades" ? "fw-bold" : "")"
+                                   asp-page="/Dashboard/Actividades/Index">
                                     <i class="bi bi-kanban me-2"></i>Actividades
                                 </a>
                             </li>

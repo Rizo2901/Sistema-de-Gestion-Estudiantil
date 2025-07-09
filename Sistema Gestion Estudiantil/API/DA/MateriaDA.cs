@@ -25,7 +25,7 @@ namespace DA
 
         public async Task<Guid> CrearMateria(MateriasRequest materia)
         {
-            string query = "SP_CrearMateria";
+            string query = @"Materia.SP_CrearMateria";
 
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
@@ -38,7 +38,7 @@ namespace DA
 
         public Task<Guid> EditarMateria(Guid Id, MateriasRequest materia)
         {
-            string query = @"SP_ActualizarMateria";
+            string query = @"Materia.SP_EditarMateria";
             var result = _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdMateria = Id,
@@ -51,7 +51,7 @@ namespace DA
 
         public Task<Guid> EliminarMateria(Guid Id)
         {
-            string query = @"SP_EliminarMateria";
+            string query = @"Materia.SP_EliminarMateria";
             var result = _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdMateria = Id
@@ -61,7 +61,7 @@ namespace DA
 
         public async Task<MateriasResponse> ObtenerMateria(Guid Id)
         {
-            string query = @"SP_ObtenerMateriaPorId";
+            string query = @"Materia.SP_ObtenerMateriaPorId";
             var result = await _conn.QueryAsync<MateriasResponse>(query, new
             {
                 IdMateria = Id
@@ -71,7 +71,7 @@ namespace DA
 
         public Task<IEnumerable<MateriasResponse>> ObtenerMaterias()
         {
-            string query = "SP_ObtenerMaterias";
+            string query = "Materia.SP_ObtenerMaterias";
             var result = _conn.QueryAsync<MateriasResponse>(query, commandType: CommandType.StoredProcedure);
             return result;
         }

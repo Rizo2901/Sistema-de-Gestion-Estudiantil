@@ -10,25 +10,30 @@
     <div class="alert alert-warning" role="alert">
         ⚠️ No hay estudiantes registrados.
     </div>
-    <div class="row mb-3">
-            <div class="col-12 d-flex justify-content-center justify-content-md-end">
+   <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
                 <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
                     <i class="bi bi-plus-lg"></i> Crear Estudiante
                 </button>
             </div>
         </div>
+    </div>
 
 }
 else
 {
-    <div class="container-fluid d-flex flex-column vh-100 px-0">
+     <div class="container-fluid px-0">
         <div class="row mb-3">
-            <div class="col-12 d-flex justify-content-center justify-content-md-end">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
                 <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
                     <i class="bi bi-plus-lg"></i> Crear Estudiante
                 </button>
             </div>
         </div>
+    </div>
+
+    
 
 <form method="get" class="row mb-4 justify-content-center">
     <div class="col-md-3 mb-2">
@@ -53,65 +58,94 @@ else
 
 
     
-        <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
-        <div class="overflow-auto" style="max-height: calc(100vh - 250px);"> 
-        <div class="row g-3 flex-column" style="margin-bottom: 10px;">
-            @foreach (var estudiante in Model.Estudiantes)
-            {
-                <div class="col-12" style="padding: 2rem;">
-                    <div class="card estudiante-card shadow h-100">
-                        <div class="p-3 d-flex align-items-center" style="min-width: 120px;">
-                            <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : estudiante.Fotografia)"
-     alt="Foto"
-     class="rounded-circle"
-     style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ccc;" />
-                        </div>
-                        <div class="card-body flex-grow-1">
-                            <h5 class="card-title mb-1">
-                                @estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2
-                            </h5>
-                            <p class="mb-1"><i class="bi bi-envelope"></i> @estudiante.CorreoElectronico</p>
-                          
-                            <div class="form-check form-switch d-inline-block align-middle me-2">
-                                <input class="form-check-input" type="checkbox"
-                                       id="estadoSwitch_@estudiante.IdEstudiante"
-                                @(estudiante.Estado ? "checked" : "")
-                                       onchange="cambiarEstado('@estudiante.IdEstudiante', this.checked)" />
-                                <label class="form-check-label" for="estadoSwitch_@estudiante.IdEstudiante">
-                                    <i class="bi bi-person-check"></i> Activo
-                                </label>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-column align-items-end p-3 gap-2">
-                            <button class="btn btn-secondary btn-sm estudiante-action-btn" data-bs-toggle="modal" data-bs-target="#detalleModal_@estudiante.IdEstudiante" title="Ver Detalles">
-                                <i class="bi bi-info-circle"></i>
-                                <span class="action-text">Ver Detalles</span>
-                            </button>
-                            <button class="btn btn-primary btn-sm estudiante-action-btn" data-bs-toggle="modal" data-bs-target="#editarModal_@estudiante.IdEstudiante" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                                <span class="action-text">Editar</span>
-                            </button>
-                            <button class="btn btn-danger btn-sm estudiante-action-btn" data-bs-toggle="modal" data-bs-target="#eliminarModal_@estudiante.IdEstudiante" title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                                <span class="action-text">Eliminar</span>
-                            </button>
-                            <button class="btn btn-success btn-sm estudiante-action-btn" title="Crear Documento" data-bs-toggle="modal" data-bs-target="#agregarModalDocumento-@estudiante.IdEstudiante">
-                                <i class="bi bi-file-earmark-plus"></i>
-                                <span class="action-text">Crear Documento</span>
-                            </button>
-                            <button class="btn btn-warning btn-sm estudiante-action-btn" title="Crear Usuario">
-                                <i class="bi bi-person-plus"></i>
-                                <span class="action-text">Crear Usuario</span>
-                            </button>
-                         <button class="btn btn-info btn-sm estudiante-action-btn" 
-        title="Condición Especial" 
-        data-bs-toggle="modal" data-bs-target="#modalCondicionEspecial-@estudiante.IdEstudiante">
-    <i class="bi bi-exclamation-diamond"></i>
-    <span class="action-text">Condición Especial</span>
-</button>
-                        </div>
-                    </div>
-                </div>
+    <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-column gap-3">
+        @foreach (var estudiante in Model.Estudiantes)
+        {
+<div class="bg-white shadow-sm rounded-3 p-3 mx-2">
+    <div class="row align-items-center gy-2 gx-3">
+
+        <!-- Foto -->
+        <div class="col-auto">
+            <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : estudiante.Fotografia)"
+                 alt="Foto"
+                 class="rounded-circle"
+                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ccc;" />
+        </div>
+
+        <!-- Nombre, correo y datos -->
+        <div class="col flex-grow-1">
+            <h6 class="mb-1 fw-bold">@estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2</h6>
+            <p class="mb-0 text-muted small">
+                <i class="bi bi-envelope"></i> @estudiante.CorreoElectronico
+            </p>
+            <p class="mb-0 text-muted small mt-1">
+                <i class="bi bi-folder2-open"></i> Documentos: <strong>2</strong> &nbsp; | &nbsp;
+                <i class="bi bi-universal-access"></i> Discapacidades: <strong>1</strong>
+            </p>
+        </div>
+
+        <!-- Estado -->
+        <div class="col-auto text-center">
+            <div class="form-check form-switch d-inline-block">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="estadoSwitch_@estudiante.IdEstudiante"
+                       @(estudiante.Estado ? "checked" : "")
+                       onchange="cambiarEstado('@estudiante.IdEstudiante', this.checked)" />
+            </div>
+            <div class="small mt-1">
+                <span class="badge @(estudiante.Estado ? "bg-success" : "bg-secondary")">
+                    @(estudiante.Estado ? "Activo" : "Inactivo")
+                </span>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="col-12 col-md-auto d-flex flex-wrap justify-content-md-end gap-2 mt-2 mt-md-0">
+
+            <!-- Botones principales visibles -->
+            <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#detalleModal_@estudiante.IdEstudiante" title="Detalles">
+                <i class="bi bi-info-circle"></i>
+            </button>
+            <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#editarModal_@estudiante.IdEstudiante" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#eliminarModal_@estudiante.IdEstudiante" title="Eliminar">
+                <i class="bi bi-trash"></i>
+            </button>
+
+            <!-- Dropdown con acciones menos usadas -->
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle square-btn" type="button" data-bs-toggle="dropdown" title="Más acciones">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#agregarModalDocumento-@estudiante.IdEstudiante">
+                            <i class="bi bi-file-earmark-plus me-1"></i> Crear Documento
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" title="Crear Usuario">
+                            <i class="bi bi-person-plus me-1"></i> Crear Usuario
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCondicionEspecial-@estudiante.IdEstudiante">
+                            <i class="bi bi-exclamation-diamond me-1"></i> Condición Especial
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+        
+       
+         
 
               <!-- Modal Editar Estudiante -->
 <div class="modal fade" id="editarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="editarLabel_@estudiante.IdEstudiante" aria-hidden="true">
@@ -351,10 +385,10 @@ else
     </div>
 </div>
 
-            }
-        </div>
-    </div> 
+           }
     </div>
+</div>
+    
 }
 <!-- Modal Agregar Estudiante -->
 <div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarLabel" aria-hidden="true">

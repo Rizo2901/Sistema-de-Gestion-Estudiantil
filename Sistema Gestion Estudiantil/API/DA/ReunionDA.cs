@@ -22,7 +22,7 @@ namespace DA
 
         public async Task<Guid> CrearReunion(ReunionesRequest reunion)
         {
-            string query = @"Sp_CrearReunion";
+            string query = @"ReunionFamiliar.Sp_CrearReunionConPadre";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdEstudiante = reunion.IdEstudiante,
@@ -34,7 +34,7 @@ namespace DA
 
         public async Task<Guid> EditarReunion(Guid IdReunion, ReunionesRequest reunion)
         {
-            string query = @"SP_EditarReunion";
+            string query = @"ReunionFamiliar.SP_EditarReunionConPadre";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdReunion = IdReunion,
@@ -47,7 +47,7 @@ namespace DA
 
         public async Task<Guid> EliminarReunion(Guid IdReunion)
         {
-           string query = @"SP_EliminarReunion";
+           string query = @"ReunionFamiliar.SP_EliminaReunionConPadre";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdReunion = IdReunion
@@ -57,7 +57,7 @@ namespace DA
 
         public async Task<ReunionesResponse> ObtenerReunion(Guid IdReunion)
         {
-            string query = @"SP_ObtenerReunion";
+            string query = @"ReunionFamiliar.SP_ObtenerReunionConPadre";
             var result = await _conn.QueryAsync<ReunionesResponse>(query, new
             {
                 IdReunion = IdReunion
@@ -67,7 +67,7 @@ namespace DA
 
         public async Task<IEnumerable<ReunionesResponse>> ObtenerReuniones()
         {
-            string query = @"SP_ObtenerReuniones";
+            string query = @"ReunionFamiliar.SP_ObtenerReunionesConPadre";
             var result = await _conn.QueryAsync<ReunionesResponse>(query);
             return result;
         }

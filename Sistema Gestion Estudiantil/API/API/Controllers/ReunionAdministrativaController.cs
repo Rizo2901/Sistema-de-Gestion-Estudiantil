@@ -33,37 +33,46 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("{Id}")]
-        public async Task<IActionResult> EditarReunionAdministrativa([FromRoute]Guid IdReunion, [FromBody]ReunionAdministrativaRequest reunion)
+        [HttpPut("{IdReunionAdmin}")]
+        public async Task<IActionResult> EditarReunionAdministrativa([FromRoute]Guid IdReunionAdmin, [FromBody]ReunionAdministrativaRequest reunion)
         {
-            if (!VerificarReunionAdministrativasExiste(IdReunion).Result)
+            var result = await VerificarReunionAdministrativasExiste(IdReunionAdmin);
+            if (result == false)
             {
                 return NotFound("La reunion administrativa no existe");
             }
-            var result = await _reunionAdministrativaFlujo.EditarReunionAdministrativa(IdReunion, reunion);
-            return Ok(new { mensaje = "Reunion administrativa editada correctamente", id = result });
+            var resultado = await _reunionAdministrativaFlujo.EditarReunionAdministrativa(IdReunionAdmin, reunion);
+            return Ok(resultado);
+
+            
         }
 
-        [HttpDelete("{Id}")]
-        public async Task<IActionResult> EliminarReunionAdministrativa([FromRoute]Guid IdReunion)
+        [HttpDelete("{IdReunionAdmin}")]
+        public async Task<IActionResult> EliminarReunionAdministrativa([FromRoute]Guid IdReunionAdmin)
         {
-            if (!VerificarReunionAdministrativasExiste(IdReunion).Result)
+            var result = await VerificarReunionAdministrativasExiste(IdReunionAdmin);
+            if (result == false)
             {
                 return NotFound("La reunion administrativa no existe");
             }
-            var result = await _reunionAdministrativaFlujo.EliminarReunionAdministrativa(IdReunion);
-            return Ok(new { mensaje = "Reunion administrativa eliminada correctamente", id = result });
+            var resultado = await _reunionAdministrativaFlujo.EliminarReunionAdministrativa(IdReunionAdmin);
+            return Ok(resultado);
+
         }
 
-        [HttpGet("{Id}")]
-        public async Task<IActionResult> ObtenerReunionAdministrativa([FromRoute]Guid IdReunion)
+        [HttpGet("{IdReunionAdmin}")]
+        public async Task<IActionResult> ObtenerReunionAdministrativa([FromRoute]Guid IdReunionAdmin)
         {
-            if (!VerificarReunionAdministrativasExiste(IdReunion).Result)
+            var result = await VerificarReunionAdministrativasExiste(IdReunionAdmin);
+            if (result == false)
             {
                 return NotFound("La reunion administrativa no existe");
             }
-            var result = await _reunionAdministrativaFlujo.ObtenerReunionAdministrativa(IdReunion);
-            return Ok(result);
+            var resultado = await _reunionAdministrativaFlujo.ObtenerReunionAdministrativa(IdReunionAdmin);
+            return Ok(resultado);
+
+
+           
         }
 
         [HttpGet]

@@ -86,10 +86,11 @@ main[role="main"] {
         transform: translateY(-10px);
     }
 }
-/* Estilo base del submenu */
+/* Estilo base (Mobile First) */
 #submenuDashboard {
-    width: 200px;
-    padding: 1rem;
+    width: 120px; /* Más generoso para mejorar legibilidad */
+    padding: 0.4rem;
+    background-color: #343a40;
     transition: width 0.3s ease, padding 0.3s ease;
     overflow-x: hidden;
     overflow-y: auto;
@@ -97,34 +98,115 @@ main[role="main"] {
 }
 
     #submenuDashboard h5 {
-        font-size: 1.25rem;
+        font-size: 0.85rem;
         transition: font-size 0.3s ease;
     }
 
     #submenuDashboard ul.nav li a {
-        font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 0.65rem;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.1rem;
+        display: flex;
+        flex-direction: column; /* Ícono arriba, texto abajo */
+        align-items: center;
+        text-align: center;
+        gap: 0.2rem;
         transition: font-size 0.3s ease;
     }
 
         #submenuDashboard ul.nav li a i {
-            font-size: 1.3rem;
-            margin-right: 0.5rem;
-            transition: font-size 0.3s ease, margin-right 0.3s ease;
+            font-size: 0.8rem;
+            margin: 0; /* centrado vertical */
+            transition: font-size 0.3s ease;
         }
 
-#toggleSidebarBtn, #toggleSidebarBtnFixed {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+#toggleSidebarBtn,
+#toggleSidebarBtnFixed {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
     transition: padding 0.3s ease, font-size 0.3s ease;
 }
 
-/* Pantallas ? 990px */
-@media (max-width: 990px) {
+/* >= 361px */
+@media (min-width: 340px) {
     #submenuDashboard {
-        width: 180px;
+        width: 200px;
+        padding: 0.5rem;
+    }
+
+        #submenuDashboard h5 {
+            font-size: 0.9rem;
+        }
+
+        #submenuDashboard ul.nav li a {
+            font-size: 0.7rem;
+        }
+
+            #submenuDashboard ul.nav li a i {
+                font-size: 0.9rem;
+            }
+
+    #toggleSidebarBtn, #toggleSidebarBtnFixed {
+        font-size: 0.75rem;
+    }
+}
+
+/* >= 361px */
+@media (min-width: 361px) {
+    #submenuDashboard {
+        width: 220px;
+        padding: 0.5rem;
+    }
+
+        #submenuDashboard h5 {
+            font-size: 0.9rem;
+        }
+
+        #submenuDashboard ul.nav li a {
+            font-size: 0.7rem;
+        }
+
+            #submenuDashboard ul.nav li a i {
+                font-size: 0.9rem;
+            }
+
+    #toggleSidebarBtn, #toggleSidebarBtnFixed {
+        font-size: 0.75rem;
+    }
+}
+
+/* >= 481px */
+@media (min-width: 481px) {
+    #submenuDashboard {
+        width: 240px;
+        padding: 0.6rem;
+    }
+
+        #submenuDashboard h5 {
+            font-size: 1rem;
+        }
+
+        #submenuDashboard ul.nav li a {
+            flex-direction: row; /* Ícono a la izquierda */
+            justify-content: flex-start;
+            text-align: left;
+            font-size: 0.8rem;
+        }
+
+            #submenuDashboard ul.nav li a i {
+                margin-right: 0.4rem;
+            }
+
+    #toggleSidebarBtn, #toggleSidebarBtnFixed {
+        font-size: 0.85rem;
+    }
+}
+
+/* >= 691px */
+@media (min-width: 691px) {
+    #submenuDashboard {
+        width: 200px;
         padding: 0.8rem;
     }
 
@@ -138,93 +220,43 @@ main[role="main"] {
 
             #submenuDashboard ul.nav li a i {
                 font-size: 1.1rem;
-                margin-right: 0.4rem;
             }
 
     #toggleSidebarBtn, #toggleSidebarBtnFixed {
-        padding: 0.4rem 0.8rem;
         font-size: 0.9rem;
     }
 }
 
-/* Pantallas ? 690px */
-@media (max-width: 690px) {
+/* >= 991px */
+@media (min-width: 991px) {
     #submenuDashboard {
-        width: 140px;
-        padding: 0.6rem;
+        width: 220px;
+        padding: 1rem;
     }
 
         #submenuDashboard h5 {
-            font-size: 1rem;
+            font-size: 1.25rem;
         }
 
         #submenuDashboard ul.nav li a {
-            font-size: 0.8rem;
+            font-size: 0.95rem;
         }
 
             #submenuDashboard ul.nav li a i {
-                font-size: 1rem;
-                margin-right: 0.3rem;
+                font-size: 1.3rem;
             }
 
     #toggleSidebarBtn, #toggleSidebarBtnFixed {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.8rem;
+        font-size: 1rem;
     }
 }
 
-/* Pantallas ? 480px */
-@media (max-width: 480px) {
+/* >= 1200px */
+@media (min-width: 1200px) {
     #submenuDashboard {
-        width: 110px;
-        padding: 0.4rem;
-    }
-
-        #submenuDashboard h5 {
-            font-size: 0.9rem;
-        }
-
-        #submenuDashboard ul.nav li a {
-            font-size: 0.7rem;
-        }
-
-            #submenuDashboard ul.nav li a i {
-                font-size: 0.9rem;
-                margin-right: 0.25rem;
-            }
-
-    #toggleSidebarBtn, #toggleSidebarBtnFixed {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.7rem;
+        width: 220px;
     }
 }
-
-/* Pantallas ? 360px */
-@media (max-width: 360px) {
-    #submenuDashboard {
-        width: 90px;
-        padding: 0.3rem;
-    }
-
-        #submenuDashboard h5 {
-            font-size: 0.8rem;
-        }
-
-        #submenuDashboard ul.nav li a {
-            font-size: 0.6rem;
-        }
-
-            #submenuDashboard ul.nav li a i {
-                font-size: 0.8rem;
-                margin-right: 0.2rem;
-            }
-
-    #toggleSidebarBtn, #toggleSidebarBtnFixed {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.6rem;
-    }
-}
-
 
 /* WOW.js + Animate.css efectos */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
@@ -294,66 +326,3 @@ main[role="main"] {
     overflow-y: auto;
     max-height: 60vh;
 }
-/* Solo para cards de estudiantes */
-.estudiante-card {
-    border-radius: 1rem;
-    flex-direction: row;
-    align-items: center;
-    display: flex;
-}
-
-@media (max-width: 576px) {
-    .estudiante-card {
-        flex-direction: column !important;
-        align-items: stretch !important;
-    }
-
-        .estudiante-card .card-body {
-            text-align: center;
-        }
-
-    .estudiante-action-btn {
-        justify-content: center;
-        width: 100%;
-    }
-}
-
-/* Botones de acción de estudiantes */
-.estudiante-action-btn {
-    transition: background 0.2s, color 0.2s;
-    overflow: hidden;
-    position: relative;
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding-right: 0.75rem;
-}
-
-    .estudiante-action-btn .action-text {
-        opacity: 0;
-        max-width: 0;
-        margin-left: 0.5rem;
-        transition: opacity 0.3s, max-width 0.3s;
-        white-space: nowrap;
-        overflow: hidden;
-        color: inherit;
-        font-weight: 500;
-    }
-
-    .estudiante-action-btn:hover .action-text,
-    .estudiante-action-btn:focus .action-text {
-        opacity: 1;
-        max-width: 200px;
-    }
-
-    .estudiante-action-btn i {
-        transition: transform 0.3s;
-        font-size: 1.2rem;
-    }
-
-    .estudiante-action-btn:hover i,
-    .estudiante-action-btn:focus i {
-        transform: scale(1.2) rotate(-10deg);
-    }

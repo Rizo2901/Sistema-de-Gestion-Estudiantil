@@ -8,8 +8,9 @@ namespace Abstracciones.Modelos
 {
     public class ReunionAdministrativaBase
     {
-        public Guid IdReunionAdministrativa { get; set; }
-        public Guid Responsable { get; set; }
+        public Guid IdReunionAdmin { get; set; }
+
+        public Guid? Responsable { get; set; }
         public DateTime Fecha { get; set; }
         public string Tema { get; set; }
         public string Descripcion { get; set; }
@@ -18,13 +19,11 @@ namespace Abstracciones.Modelos
 
     public class ReunionAdministrativaRequest : ReunionAdministrativaBase
     {
-        public Guid IdReunionAdministrativa { get; set; }
       
     }
     public class ReunionAdministrativaResponse : ReunionAdministrativaBase
     {
-        public Guid IdReunionAdministrativa { get; set; }
-        public Guid Responsable { get; set; }
+        public Guid? Responsable { get; set; }
         public DateTime Fecha { get; set; }
         public string Tema { get; set; }
         public string Descripcion { get; set; }

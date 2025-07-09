@@ -24,38 +24,101 @@ else
     </div>
 
     <h2 class="mb-4 text-center text-md-start">Listado de Profesores</h2>
-    <div class="overflow-auto" style="max-height: calc(100vh -250px);">
-        <div class="row g-3 flex-column" style="margin-bottom: 10px; ">
+
+    <div class="container-fluid px-0">
+        <div class="d-flex flex-column gap-3">
             @foreach (var profesor in Model.Profesores)
             {
-                <div class="col-12" style=" padding: 2rem;">
-                    <div class="card shadow h-100">
-                        <div class="p-3 d-flex align-items-center" style="min-width: 120px;">
-                            <h5 class="card-title mb-1">
-                                @profesor.Nombre @profesor.Apellido1 @profesor.Apellido2
-                            </h5>
+                <div class="bg-white shadow rounded p-3 mx-2">
+                    <div class="row align-items-center gy-3">
+
+                        <!-- Info principal -->
+                        <div class="col-12 col-md-5">
+                            <div class="fw-bold">@profesor.Nombre @profesor.Apellido1 @profesor.Apellido2</div>
+                            <div><i class="bi bi-envelope"></i> @profesor.CorreoElectronico</div>
                         </div>
 
-                        <div class="card-body flex-grow-1">
-                            <p class="mb-1"><i class="bi bi-envelope"></i> @profesor.CorreoElectronico</p>
-                            <p class="mb-1"><i class="bi bi-geo-alt"></i> @profesor.Direccion</p>
-                            <p class="mb-1"><i class="bi bi-telephone"></i> @profesor.TelefonoCelular</p>
+                        <!-- Teléfono centrado -->
+                        <div class="col-12 col-md-3 text-md-center">
+                            <i class="bi bi-telephone"></i> @profesor.TelefonoCelular
                         </div>
-                        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-end gap-2 px-3 pb-3">
-                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalDetalles_@profesor.IdProfesor">
-                                <i class="bi bi-info-circle"></i>
-                            </button>
-                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@profesor.IdProfesor">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@profesor.IdProfesor">
-                                <i class="bi bi-trash"></i>
-                            </button>
+
+                        <!-- Acciones al extremo derecho -->
+                        <div class="col-12 col-md-4 text-md-end">
+                            <div class="d-flex flex-wrap justify-content-start justify-content-md-end gap-1">
+
+                                <!-- Botones principales visibles siempre -->
+                                <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalDetalles_@profesor.IdProfesor" title="Detalles">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEditar_@profesor.IdProfesor" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEliminarProfesor_@profesor.IdProfesor" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <!-- Acciones menos usadas en dropdown -->
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalAsignarMateria_@profesor.IdProfesor">
+                                                <i class="bi bi-journal-plus me-1"></i> Asignar Materia
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalAsignarSeccion_@profesor.IdProfesor">
+                                                <i class="bi bi-people-fill me-1"></i> Asignar Sección
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="/Dashboard/Profesores/VerMaterias?IdProfesor=@profesor.IdProfesor">
+                                                <i class="bi bi-eye me-1"></i> Ver Materias
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="/Dashboard/Profesores/VerSecciones?IdProfesor=@profesor.IdProfesor">
+                                                <i class="bi bi-list-check me-1"></i> Ver Secciones
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                
+
+
+
+                <div class="modal fade" id="modalEliminarProfesor_@profesor.IdProfesor" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form method="post" asp-page-handler="EliminarProfesor">
+                            <div class="modal-content p-3">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Eliminar Profesor</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar a <strong>@profesor.Nombre @profesor.Apellido1</strong>?</p>
+                                   
+                                    <input type="hidden" name="Id" value="@profesor.IdProfesor" />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+
                 <div class="modal fade" id="modalDetalles_@profesor.IdProfesor" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-scrollable">
                         <div class="modal-content">
@@ -114,27 +177,61 @@ else
                     </div>
                 </div>
 
-                <div class="modal fade" id="modalEliminar_@profesor.IdProfesor" tabindex="-1" aria-hidden="true">
+
+                <div class="modal fade" id="modalAsignarMateria_@profesor.IdProfesor" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title">Confirmar Eliminación</h5>
+                            <div class="modal-header bg-secondary text-white">
+                                <h5 class="modal-title">Asignar Materia al Profesor</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-                            <div class="modal-body">
-                                ¿Estás seguro que deseas eliminar al profesor <strong>@profesor.Nombre @profesor.Apellido1</strong>?
-                            </div>
-                            <div class="modal-footer">
-                                <form method="post" asp-page-handler="EliminarProfesor">
+                            <form method="post" asp-page-handler="AsignarMateria">
+                                <div class="modal-body">
                                     <input type="hidden" name="IdProfesor" value="@profesor.IdProfesor" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Materia</label>
+                                        <select asp-for="materiaSeleccionada" asp-items="Model.Materias" class="form-control">
+                                            <option value="">Seleccione una materia</option>
+                                        </select>
+                                        <span asp-validation-for="materiaSeleccionada" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                </form>
-                            </div>
+                                    <button type="submit" class="btn btn-success">Asignar Materia</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
 
+
+                <div class="modal fade" id="modalAsignarSeccion_@profesor.IdProfesor" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">Asignar Sección al Profesor</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="post" asp-page-handler="AsignarSeccion">
+                                <div class="modal-body">
+                                    <input type="hidden" name="IdProfesor" value="@profesor.IdProfesor" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Sección</label>
+                                        <select asp-for="seccionseleccionada" asp-items="Model.Secciones" class="form-control">
+                                            <option value="">Seleccione una sección</option>
+                                        </select>
+                                        <span asp-validation-for="seccionseleccionada" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Asignar Sección</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
             }
         </div>

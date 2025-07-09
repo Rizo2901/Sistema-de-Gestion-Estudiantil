@@ -1,0 +1,171 @@
+﻿@page
+@model Web.Pages.Dashboard.ReunionesAdministrativas.IndexModel
+@{
+    ViewData["Title"] = "ReunionesAdministrativas";
+    Layout = "_Layout";
+}
+
+@if (Model.ReunionesAdministrativas == null || !Model.ReunionesAdministrativas.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay Reuniones administrativas registradas.
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Reunion
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4 text-center text-md-start">Listado de Reuniones Administrativas</h2>
+
+    <div class="container-fluid px-0">
+        <div class="d-flex flex-column gap-3">
+            @foreach (var reunionAdmin in Model.ReunionesAdministrativas)
+            {
+                <div class="bg-white shadow rounded p-3 mx-2">
+                    <div class="row align-items-center gy-3">
+
+                        <div class="col flex-grow-1">
+                            <h6 class="mb-1 fw-bold">@reunionAdmin.Tema</h6>
+                            <p class="mb-0 text-muted small">
+                                <strong>Fecha:</strong> @reunionAdmin.Fecha.ToString("dd/MM/yyyy HH:mm")<br />
+                                <strong>Lugar:</strong> @reunionAdmin.Lugar<br />
+                                <strong>Descripción:</strong> @reunionAdmin.Descripcion
+                            </p>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="col-12 col-md-auto d-flex flex-wrap gap-2 justify-content-md-end mt-2 mt-md-0">
+                            <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalDetalles_@reunionAdmin.IdReunionAdmin" title="Detalles">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEditar_@reunionAdmin.IdReunionAdmin" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEliminar_@reunionAdmin.IdReunionAdmin" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal fade" id="modalEditar_@reunionAdmin.IdReunionAdmin" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title">Editar Reunión</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" asp-page-handler="EditarReunion">
+                                    <input type="hidden" name="IdReunionAdmin" value="@reunionAdmin.IdReunionAdmin" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Tema</label>
+                                        <input type="text" name="Tema" class="form-control" value="@reunionAdmin.Tema" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Descripción</label>
+                                        <textarea name="Descripcion" class="form-control">@reunionAdmin.Descripcion</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Lugar</label>
+                                        <input type="text" name="Lugar" class="form-control" value="@reunionAdmin.Lugar" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha</label>
+                                        <input type="datetime-local" name="Fecha" class="form-control" value="@reunionAdmin.Fecha.ToString("yyyy-MM-ddTHH:mm")" />
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal fade" id="modalEliminar_@reunionAdmin.IdReunionAdmin" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form method="post" asp-page-handler="EliminarReunion">
+                            <div class="modal-content p-3">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Eliminar la Reunión</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar la reunión <strong>@reunionAdmin.Tema</strong>?</p>
+                                    <input type="hidden" name="IdReunionAdmin" value="@reunionAdmin.IdReunionAdmin" />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="modalDetalles_@reunionAdmin.IdReunionAdmin" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">Detalles de la Reunión</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Tema:</strong> @reunionAdmin.Tema</p>
+                                <p><strong>Descripción:</strong> @reunionAdmin.Descripcion</p>
+                                <p><strong>Lugar:</strong> @reunionAdmin.Lugar</p>
+                                <p><strong>Fecha:</strong> @reunionAdmin.Fecha.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            </div>
+    </div>
+
+    <div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header text-black border-dark">
+                    <h5 class="modal-title">Crear Reunión Administrativa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" asp-page-handler="CrearReunion">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Tema</label>
+                            <input type="text" name="Tema" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="Descripcion" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Lugar</label>
+                            <input type="text" name="Lugar" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha</label>
+                            <input type="datetime-local" name="Fecha" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="modal-footer border-dark">
+                        <button type="submit" class="btn btn-dark">Crear Reunión</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+}

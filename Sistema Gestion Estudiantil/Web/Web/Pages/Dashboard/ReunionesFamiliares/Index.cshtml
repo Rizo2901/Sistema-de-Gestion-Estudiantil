@@ -1,0 +1,181 @@
+﻿@page
+@model Web.Pages.Dashboard.ReunionesFamiliares.IndexModel
+@{
+    ViewData["Title"] = "Reuniones Familiares";
+    Layout = "_Layout";
+}
+
+@if (Model.Reuniones == null || !Model.Reuniones.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay reuniones familiares registradas.
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Reunión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4 text-center text-md-start">Listado de Reuniones Familiares</h2>
+
+    <div class="container-fluid px-0">
+        <div class="d-flex flex-column gap-3">
+            @foreach (var reunion in Model.Reuniones)
+            {
+                <div class="bg-white shadow rounded p-3 mx-2">
+                    <div class="row align-items-center gy-3">
+                        <div class="col flex-grow-1">
+                            <h6 class="mb-1 fw-bold">@reunion.Motivo</h6>
+                            <p class="mb-0 text-muted small">
+                                <strong>Fecha:</strong> @reunion.Fecha.ToString("dd/MM/yyyy HH:mm")<br />
+                                <strong>Estudiante:</strong> @reunion.Nombre @reunion.Apellido1 @reunion.Apellido2
+                            </p>
+                        </div>
+
+                        <div class="col-12 col-md-auto d-flex flex-wrap gap-2 justify-content-md-end mt-2 mt-md-0">
+                            <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalDetalles_@reunion.IdReunion" title="Detalles">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEditar_@reunion.IdReunion" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEliminar_@reunion.IdReunion" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Detalles -->
+                <div class="modal fade" id="modalDetalles_@reunion.IdReunion" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 shadow">
+                            <div class="modal-header border-bottom-0">
+                                <h5 class="modal-title">Detalles de Reunión</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Motivo:</strong> @reunion.Motivo</p>
+                                <p><strong>Fecha:</strong> @reunion.Fecha.ToString("dd/MM/yyyy HH:mm")</p>
+                                <p><strong>Estudiante:</strong> @reunion.Nombre @reunion.Apellido1 @reunion.Apellido2</p>
+                            </div>
+                            <div class="modal-footer border-top-0">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Editar -->
+                <div class="modal fade" id="modalEditar_@reunion.IdReunion" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 shadow">
+                            <form method="post" asp-page-handler="Editar">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title">Editar Reunión</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                   <input type="hidden" name="idReunion" value="@reunion.IdReunion" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Motivo</label>}
+
+                                        <input type="text" class="form-control" name="Motivo" value="@reunion.Motivo" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha</label>
+                                        <input type="datetime-local" class="form-control" name="Fecha" value="@reunion.Fecha.ToString("yyyy-MM-ddTHH:mm")" required />
+                                    </div>
+                                    <div class="mb-3">
+                                         <label class="form-label">Estudiante</label>
+                            <select name="reunion.IdEstudiante" class="form-select">
+                                <option value="">Seleccione un estudiante</option>
+                                @foreach (var estudiante in Model.Estudiantes)
+        {
+@:          <option value="@estudiante.Value" @(reunion.IdEstudiante != Guid.Empty && reunion.IdEstudiante.ToString() == estudiante.Value ? "selected" : "")>
+@:              @estudiante.Text
+@:          </option>
+        }
+                            </select>                                    
+                            </div>
+                                </div>
+                                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Eliminar -->
+                <div class="modal fade" id="modalEliminar_@reunion.IdReunion" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 shadow">
+                            <form method="post" asp-page-handler="Eliminar">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title">Confirmar eliminación</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro que deseas eliminar la reunión <strong>@reunion.Motivo</strong>?</p>
+                                    <input type="hidden" name="IdReunion" value="@reunion.IdReunion" />
+                                </div>
+                                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Modal Crear -->
+<div class="modal fade" id="modalCrear" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <form method="post" asp-page-handler="Crear">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title">Crear Reunión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Motivo</label>
+                        <input type="text" class="form-control" name="Motivo" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input type="datetime-local" class="form-control" name="Fecha" required />
+                    </div>
+                    <div class="mb-3">
+                                         <label class="form-label">Estudiante</label>
+                            <select asp-for="estudianteSeleccionado" asp-items="Model.Estudiantes" class="form-control">
+                                <option value="">Seleccione una estudiante</option>
+                            </select>
+                            <span asp-validation-for="estudianteSeleccionado" class="text-danger">
+
+                            </span>
+                                  
+                            </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

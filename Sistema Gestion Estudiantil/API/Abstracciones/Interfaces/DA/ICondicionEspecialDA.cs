@@ -11,11 +11,10 @@ namespace Abstracciones.Interfaces.DA
     {
     
         Task<IEnumerable<CondicionesEspecialesResponse>> ObtenerCondicionesEspeciales();
-        Task<IEnumerable<CondicionesEspecialesResponse>> ObtenerCondicionEspecialPorEstudiante(Guid IdEstudiante);
+        Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerCondicionEspecialPorEstudiantes();
         Task<CondicionesEspecialesResponse> ObtenerCondicionEspecial(Guid Id);
         Task<Guid> CrearCondicionEspecial(CondicionesEspecialesRequest condicionEspecial);
         Task<Guid> EditarCondicionEspecial(Guid Id, CondicionesEspecialesRequest condicionEspecial);
         Task<Guid> EliminarCondicionEspecial(Guid Id);
-        Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerEstudiantesConCondiciones();
     }
 }

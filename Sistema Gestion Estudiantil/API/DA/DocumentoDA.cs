@@ -24,7 +24,7 @@ namespace DA
 
         public async Task<Guid> CrearDocumento(DocumentosRequest documento)
         {
-            string query = "SP_InsertarDocumento";
+            string query = "Documento.SP_CrearDocumento";
             string archivoUrl = string.Empty;
 
             if (!string.IsNullOrEmpty(documento.Archivo))
@@ -72,7 +72,7 @@ namespace DA
 
         public async Task<Guid> EditarDocumento(Guid id, DocumentosRequest documento)
         {
-            string query = "SP_EditarDocumento";
+            string query = @"Documento.SP_EditarDocumento";
             string archivoUrl = documento.Archivo;
 
             // 🔹 Si contiene Base64 con encabezado, subir nuevo archivo
@@ -99,7 +99,7 @@ namespace DA
         }
         public async Task<Guid> EliminarDocumento(Guid id)
         {
-            string query = "SP_EliminarDocumento";
+            string query = @"Documento.SP_EliminarDocumento";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdDocumento = id
@@ -111,7 +111,7 @@ namespace DA
 
         public async Task<DocumentosResponse> ObtenerDocumentoPorId(Guid id)
         {
-            string query = "SP_ObtenerDocumentoPorId";
+            string query = @"Documento.SP_ObtenerDocumentoPorId";
 
             var result = await _conn.QueryAsync<DocumentosResponse>(query, new
             {
@@ -123,7 +123,7 @@ namespace DA
 
         public async Task<IEnumerable<DocumentosResponse>> ObtenerDocumentosPorEstudiante(Guid idEstudiante)
         {
-            string query = "SP_Obtener_Documentos_Por_Estudiante";
+            string query = @"Documento.SP_Obtener_Documentos_Por_Estudiante";
 
             var result = await _conn.QueryAsync<DocumentosResponse>(query, new
             {
@@ -136,7 +136,7 @@ namespace DA
         {
             try
             {
-                string query = "SP_ObtenerEstudiantesConDocumentos";
+                string query = @"Documento.SP_ObtenerEstudiantesConDocumentos";
                 var result = await _conn.QueryAsync<EstudianteConDocumentosRaw>(query);
                 foreach (var estudiante in result)
                 {
@@ -169,7 +169,7 @@ namespace DA
 
         public async Task<IEnumerable<DocumentosResponse>> ObtenerTodosLosDocumentos()
         {
-            string query = "SP_ObtenerDocumentos";
+            string query = @"Documento.SP_ObtenerDocumentos";
 
             var result = await _conn.QueryAsync<DocumentosResponse>(query
             );

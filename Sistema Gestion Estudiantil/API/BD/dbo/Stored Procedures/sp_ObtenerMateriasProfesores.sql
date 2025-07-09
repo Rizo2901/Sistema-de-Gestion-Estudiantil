@@ -1,7 +1,10 @@
-﻿CREATE PROCEDURE sp_ObtenerMateriasProfesores
+﻿CREATE PROCEDURE [dbo].[sp_ObtenerMateriasProfesores]
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT 
+        mp.IdMateriaProfesor,
         mp.IdMateria,
         m.Nombre AS Materia,
         mp.IdProfesor,

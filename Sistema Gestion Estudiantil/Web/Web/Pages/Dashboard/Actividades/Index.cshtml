@@ -1,0 +1,168 @@
+﻿@page
+@model Web.Pages.Dashboard.Actividades.IndexModel
+@{
+    ViewData["Title"] = "Actividades";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid px-0">
+    <div class="row mb-3">
+        <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+            <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrear" style="background-color: #343a40">
+                <i class="bi bi-plus-lg"></i> Crear Actividad
+            </button>
+        </div>
+    </div>
+</div>
+
+<h2 class="mb-4 text-center text-md-start">Calendario de Actividades</h2>
+
+<div class="w-100 px-2 px-lg-3">
+    <div class="bg-white shadow rounded p-3 w-100">
+        <div id="calendarioActividades"></div>
+    </div>
+</div>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<!-- Estilo -->
+<style>
+    section.flex-grow-1 {
+        outline: 2px dashed tomato;
+    }
+    #calendarioActividades {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08);
+        font-family: 'Poppins', sans-serif;
+        overflow-x: auto;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+    }
+
+    .fc-button {
+        border-radius: 6px !important;
+        padding: 5px 12px !important;
+        background-color: #0d6efd !important;
+        border: none;
+        font-weight: 500;
+        font-size: 0.85rem !important;
+    }
+
+    .fc-event {
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        color: #0b4121 !important;
+        background-color: #c7f5d9 !important;
+        border: none;
+    }
+
+    @@media (max-width: 768px) {
+        .fc-toolbar-title
+
+    {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .fc-button {
+        font-size: 0.75rem !important;
+    }
+
+    }
+</style>
+
+<!-- Tooltips + JS -->
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendarioActividades');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                height: 'auto',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                events: [
+        @foreach (var act in Model.Actividades)
+        {
+            <text>
+                            {
+                                id: '@act.IdActividad',
+                                title: '@act.Titulo',
+                                start: '@act.Fecha.ToString("yyyy-MM-ddTHH:mm")',
+                                description: '@act.Descripcion',
+                                extendedProps: {
+                                    tipo: '@act.Tipo'
+                                }
+                            },
+            </text>
+        }
+                ],
+                eventDidMount: function (info) {
+                    tippy(info.el, {
+                        content: `<strong>${info.event.title}</strong><br>
+                                  <em>${info.event.extendedProps.tipo}</em><br>
+                                  ${info.event.extendedProps.description}`,
+                        allowHTML: true,
+                        theme: 'light-border'
+                    });
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+}
+<!-- Modal Crear Actividad -->
+<div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header text-black border-dark">
+                <h5 class="modal-title">Crear Actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="CrearActividad">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tema</label>
+                        <input type="text" name="Tema" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="Descripcion" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lugar</label>
+                        <input type="text" name="Lugar" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input type="datetime-local" name="Fecha" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer border-dark">
+                    <button type="submit" class="btn btn-dark">Crear Actividad</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

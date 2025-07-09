@@ -36,7 +36,7 @@ namespace API.Controllers
 
         }
 
-        [HttpPut("{Id}")]
+        [HttpPut("{IdReunion}")]
         public async Task<IActionResult> EditarReunion([FromRoute]Guid IdReunion, [FromBody] ReunionesRequest reunion)
         {
             if (!VerificarReunionExiste(IdReunion).Result)
@@ -47,7 +47,7 @@ namespace API.Controllers
             return Ok(new { mensaje = "Reunion editada correctamente", id = result });
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{IdReunion}")]
         public async Task<IActionResult> EliminarReunion([FromRoute]Guid IdReunion)
         {
             if (!VerificarReunionExiste(IdReunion).Result)
@@ -59,7 +59,7 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("{Id}")]
+        [HttpGet("{IdReunion}")]
         public async Task<IActionResult> ObtenerReunion([FromRoute] Guid IdReunion)
         {
             if (!VerificarReunionExiste(IdReunion).Result)

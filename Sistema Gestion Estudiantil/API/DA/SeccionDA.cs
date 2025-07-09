@@ -23,7 +23,7 @@ namespace DA
 
         public async Task<Guid> CrearSeccion(SeccionesRequest seccion)
         {
-            string query = @"SP_Crear_Seccion";
+            string query = @"Seccion.SP_CrearSeccion";
             var result = await _sqlConn.ExecuteScalarAsync<Guid>(query, new
             {
                 Nombre = seccion.Nombre,
@@ -34,7 +34,7 @@ namespace DA
 
         public Task<Guid> EditarSeccion(Guid Id, SeccionesRequest seccion)
         {
-            string query = @"SP_Actualizar_Seccion";
+            string query = @"Seccion.SP_EditarSeccion";
             var result = _sqlConn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdSeccion = Id,
@@ -46,7 +46,7 @@ namespace DA
         public async Task<Guid> EliminarSeccion(Guid Id)
         {
             await verificarSeccionExiste(Id);
-            string query = @"Sp_Eliminar_Seccion";
+            string query = @"Seccion.Sp_EliminarSeccion";
             var result = await _sqlConn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdSeccion = Id
@@ -56,14 +56,14 @@ namespace DA
 
         public Task<IEnumerable<SeccionesResponse>> ObtenerSecciones()
         {
-            string query = @"SP_Obtener_Secciones";
+            string query = @"Seccion.SP_ObtenerSecciones";
             var result = _sqlConn.QueryAsync<SeccionesResponse>(query);
             return result;
         }
 
         public async Task<SeccionesResponse> ObtenerSeccionPorId(Guid Id)
         {
-            string query = @"SP_Obtener_Seccion_Por_Id";
+            string query = @"Seccion.SP_ObtenerSeccionPorId";
             var result = await _sqlConn.QueryAsync<SeccionesResponse>(query, new
             {
                 IdSeccion = Id

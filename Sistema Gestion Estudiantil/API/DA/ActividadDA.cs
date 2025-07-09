@@ -22,7 +22,7 @@ namespace DA
 
         public async Task<Guid> CrearActividad(ActividadRequest actividad)
         {
-            string query = @"SP_CrearActividad";
+            string query = @"Actividad.SP_CrearActividad";
             var result =await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 Titulo = actividad.Titulo,
@@ -35,7 +35,7 @@ namespace DA
 
         public async Task<Guid> EditarActividad(Guid Id, ActividadRequest actividad)
         {
-            string query = @"SP_EditarActividad";
+            string query = @"Actividad.SP_EditarActividad";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdActividad = Id,
@@ -50,7 +50,7 @@ namespace DA
 
         public Task<Guid> EliminarActividad(Guid Id)
         {
-           string query = @"SP_EliminarActividad";
+           string query = @"Actividad.SP_EliminarActividad";
             var result = _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdActividad = Id
@@ -61,14 +61,14 @@ namespace DA
 
         public Task<IEnumerable<ActividadResponse>> ObtenerActividades()
         {
-            string query = @"SP_ObtenerTodasLasActividades";
+            string query = @"Actividad.SP_ObtenerActividades";
             var result = _conn.QueryAsync<ActividadResponse>(query, commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
 
         public Task<ActividadResponse> ObtenerActividadPorId(Guid Id)
         {
-            string query = @"SP_ObtenerActividadPorId";
+            string query = @"Actividad.SP_ObtenerActividadPorId";
             var result = _conn.QueryFirstOrDefaultAsync<ActividadResponse>(query, new
             {
                 IdActividad = Id

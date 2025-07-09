@@ -71,18 +71,21 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("obtenerPorEstudiante/{IdEstudiante}")]
+        [HttpGet("obtenerPorEstudiante")]
 
-        public async Task<IActionResult> ObtenerCondicionesEspecialesPorEstudiante(Guid IdEstudiante)
+        public async Task<IActionResult> ObtenerCondicionesEspecialesPorEstudiantes()
         {
-            var result = await _condicionEspecialFlujo.ObtenerCondicionesEspecialesPorEstudiantes(IdEstudiante);
+            var result = await _condicionEspecialFlujo.ObtenerCondicionEspecialPorEstudiantes();
             if (result == null || !result.Any())
             {
-                _logger.LogWarning($"No se encontraron condiciones especiales para el estudiante con ID {IdEstudiante}");
-                return NotFound($"No se encontraron condiciones especiales para el estudiante con ID {IdEstudiante}");
+                _logger.LogWarning($"No se encontraron condiciones especiales para el estudiante ");
+                return NotFound($"No se encontraron condiciones especiales para el estudiante");
             }
             return Ok(result);
         }
+
+        
+
         [HttpGet("{Id}")]
         public async Task<IActionResult> ObtenerCondicionEspecial([FromRoute] Guid Id)
         {
@@ -97,17 +100,7 @@ namespace API.Controllers
             return Ok(resultado);
         }
 
-        [HttpGet("estudiantesConCondiciones")]
-        public async Task<IActionResult> ObtenerEstudiantesConCondiciones()
-        {
-            var result = await _condicionEspecialFlujo.ObtenerEstudiantesConCondiciones();
-            if (result == null || !result.Any())
-            {
-                _logger.LogWarning("No se encontraron condiciones especiales para el estudiante");
-                return NotFound("No se encontraron condiciones especiales para el estudiante");
-            }
-            return Ok(result);
-        }
+       
 
 
 
@@ -115,8 +108,8 @@ namespace API.Controllers
         private async Task<bool> VerificarCondicionExiste(Guid Id)
         {
             var resultadoValidacion = false;
-            var resultadoEstudianteExiste = await _condicionEspecialFlujo.ObtenerCondicionEspecial(Id);
-            if (resultadoEstudianteExiste != null)
+            var resultadoExiste = await _condicionEspecialFlujo.ObtenerCondicionEspecial(Id);
+            if (resultadoExiste != null)
                 resultadoValidacion = true;
             return resultadoValidacion;
         }

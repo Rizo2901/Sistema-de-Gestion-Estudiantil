@@ -12,55 +12,147 @@
     </div>
 }
 else
-
 {
     <div class="container-fluid px-0">
-        <div class="row-mb-3">
-            <div class="col-12 col d-flex justify-content-center justify-content-md-end">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <!-- Botón que abre el modal de creación -->
                 <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrear" style="background-color: #343a40">
                     <i class="bi bi-plus-lg"></i> Crear Materia
                 </button>
             </div>
         </div>
-    </div>
 
-    <h2 class="mb-4 text-center text-md-start">Listado de Materias</h2>
-    <div class="row g-3">
-        @foreach (var materia in Model.Materias)
-        {
-            <div class="col-12 col-sm-6 col-lg-4">
-                <div class="card shadow h-100" style="border-radius: 0 0 1rem 1rem;">
-                    <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center flex-wrap">
-                        <div class="mb-3 mb-md-0">
-                            <h5 class="card-title mb-1">Sección: @materia.Nombre</h5>
-                        </div>
-                        <div class="mb-3 mb-md-0">
-                            <h5 class="card-title mb-1">Sección: @materia.Descripcion</h5>
-                        </div>
-                        <div class="btn-group mt-2 mt-md-0 w-100 w-md-auto">
-                            <!-- Botón Editar -->
-                            <button type="button"
-                                    class="btn btn-sm btn-primary w-100 w-md-auto mb-2 mb-md-0"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEditar_@materia.IdMateria">
-                                Editar
-                            </button>
+        <h2 class="mb-4 text-center text-md-start">Listado de Materias</h2>
+        <div class="container-fluid px-0">
+            <div class="d-flex flex-column gap-3">
+                @foreach (var materia in Model.Materias)
+                {
+                    <div class="bg-white shadow rounded p-3 mx-2">
+                        <div class="row align-items-center gy-3">
 
-                            <!-- Botón Eliminar -->
-                            <button type="button"
-                                    class="btn btn-sm btn-danger w-100 w-md-auto mb-2 mb-md-0"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEliminar_@materia.IdMateria">
-                                Eliminar
-                            </button>
+                            <div class="col flex-grow-1">
+                                <h6 class="mb-1 fw-bold">@materia.Nombre</h6>
+                                <p class="mb-0 text-muted small">
+                                    @materia.Descripcion
+                                </p>
+                            </div>
 
-                            <a href="#" class="btn btn-sm btn-secondary w-100 w-md-auto">Ver Detalles</a>
+                            <!-- Acciones -->
+                            <div class="col-12 col-md-auto d-flex flex-wrap gap-2 justify-content-md-end mt-2 mt-md-0">
+                                <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalDetalles_@materia.IdMateria" title="Detalles">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEditar_@materia.IdMateria" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEliminar_@materia.IdMateria" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+
                         </div>
                     </div>
-                </div>
-            </div>
-        }
 
+                    <!-- Modal Editar -->
+                    <div class="modal fade" id="modalEditar_@materia.IdMateria" tabindex="-1" aria-labelledby="modalEditarLabel_@materia.IdMateria" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content rounded-4 shadow">
+                                <form method="post" asp-page-handler="Editar">
+                                    <div class="modal-header border-bottom-0">
+                                        <h5 class="modal-title" id="modalEditarLabel_@materia.IdMateria">Editar Materia</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" name="IdMateria" value="@materia.IdMateria" />
+                                        <div class="mb-3">
+                                            <label for="Nombre_@materia.IdMateria" class="form-label">Nombre</label>
+                                            <input type="text" class="form-control" id="Nombre_@materia.IdMateria" name="Nombre" value="@materia.Nombre" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="Descripcion_@materia.IdMateria" class="form-label">Descripción</label>
+                                            <textarea class="form-control" id="Descripcion_@materia.IdMateria" name="Descripcion" rows="3">@materia.Descripcion</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Eliminar -->
+                    <div class="modal fade" id="modalEliminar_@materia.IdMateria" tabindex="-1" aria-labelledby="modalEliminarLabel_@materia.IdMateria" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content rounded-4 shadow">
+                                <form method="post" asp-page-handler="Eliminar">
+                                    <div class="modal-header border-bottom-0">
+                                        <h5 class="modal-title" id="modalEliminarLabel_@materia.IdMateria">Confirmar eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>¿Estás seguro que deseas eliminar la materia <strong>@materia.Nombre</strong>?</p>
+                                        <input type="hidden" name="IdMateria" value="@materia.IdMateria" />
+                                    </div>
+                                    <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Detalles -->
+                    <div class="modal fade" id="modalDetalles_@materia.IdMateria" tabindex="-1" aria-labelledby="modalDetallesLabel_@materia.IdMateria" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content rounded-4 shadow">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title" id="modalDetallesLabel_@materia.IdMateria">Detalles de Materia</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Nombre:</strong> @materia.Nombre</p>
+                                    <p><strong>Descripción:</strong> @materia.Descripcion</p>
+                                </div>
+                                <div class="modal-footer border-top-0">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 
+    <!-- Modal Crear (fuera del bucle) -->
+    <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <form method="post" asp-page-handler="Crear">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title" id="modalCrearLabel">Crear Materia</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="NombreNuevaMateria" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="NombreNuevaMateria" name="Nombre" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="DescripcionNuevaMateria" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="DescripcionNuevaMateria" name="Descripcion" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Crear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 }

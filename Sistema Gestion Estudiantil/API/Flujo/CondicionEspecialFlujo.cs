@@ -38,9 +38,9 @@ namespace Flujo
             return await _condEspecDA.ObtenerCondicionesEspeciales();
         }
 
-        public async Task<IEnumerable<CondicionesEspecialesResponse>> ObtenerCondicionesEspecialesPorEstudiantes(Guid IdEstudiante)
+        public async Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerCondicionEspecialPorEstudiantes()
         {
-            return await _condEspecDA.ObtenerCondicionEspecialPorEstudiante(IdEstudiante);
+            return await _condEspecDA.ObtenerCondicionEspecialPorEstudiantes();
         }
 
         public async Task<CondicionesEspecialesResponse> ObtenerCondicionEspecial(Guid Id)
@@ -48,9 +48,6 @@ namespace Flujo
            return await _condEspecDA.ObtenerCondicionEspecial(Id);
         }
 
-        public async Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerEstudiantesConCondiciones()
-        {
-            return await _condEspecDA.ObtenerEstudiantesConCondiciones();
-        }
+        
     }
 }

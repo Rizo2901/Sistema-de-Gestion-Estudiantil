@@ -10,9 +10,9 @@ namespace Abstracciones.Interfaces.DA
     public interface IReunionAdministrativaDA
     {
         Task<Guid> CrearReunionAdministrativa(ReunionAdministrativaRequest reunion);
-        Task<Guid> EditarReunionAdministrativa(Guid IdReunion, ReunionAdministrativaRequest reunion);
-        Task<Guid> EliminarReunionAdministrativa(Guid IdReunion);
-        Task<ReunionAdministrativaResponse> ObtenerReunionAdministrativa(Guid IdReunion);
+        Task<Guid> EditarReunionAdministrativa(Guid IdReunionAdmin, ReunionAdministrativaRequest reunion);
+        Task<Guid> EliminarReunionAdministrativa(Guid IdReunionAdmin);
+        Task<ReunionAdministrativaResponse> ObtenerReunionAdministrativa(Guid IdReunionAdmin);
         Task<IEnumerable<ReunionAdministrativaResponse>> ObtenerReunionesAdministrativas();
     }
 }

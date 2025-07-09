@@ -22,6 +22,12 @@ namespace Abstracciones.Modelos
         public Guid IdEstudiante { get; set; }
         public DateTime Fecha { get; set; }
         public string Motivo { get; set; }
+
+        public string Nombre { get; set; }
+
+        public string Apellido1 { get; set; }
+
+        public string Apellido2 { get; set; }
     }
 
 }

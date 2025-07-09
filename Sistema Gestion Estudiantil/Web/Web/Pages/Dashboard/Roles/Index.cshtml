@@ -1,0 +1,159 @@
+﻿@page
+@model Web.Pages.Dashboard.Roles.IndexModel
+@{
+    ViewData["Title"] = "Roles";
+    Layout = "_Layout";
+}
+
+@if (Model.Roles == null || !Model.Roles.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay Roles registrados.
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Rol
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4 text-center text-md-start">Listado de Roles</h2>
+
+    <div class="container-fluid px-0">
+        <div class="d-flex flex-column gap-3">
+            @foreach (var rol in Model.Roles)
+            {
+                <div class="bg-white shadow rounded p-3 mx-2">
+                    <div class="row align-items-center gy-3">
+
+                        <div class="col flex-grow-1">
+                            <h6 class="mb-1 fw-bold">@rol.Nombre</h6>
+                            <p class="mb-0 text-muted small">
+                                 @rol.Descripcion
+                            </p>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="col-12 col-md-auto d-flex flex-wrap gap-2 justify-content-md-end mt-2 mt-md-0">
+                            <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalDetalles_@rol.IdRol" title="Detalles">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEditar_@rol.IdRol" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEliminar_@rol.IdRol" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="modal fade" id="modalEliminar_@rol.IdRol" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form method="post" asp-page-handler="EliminarRol">
+                            <div class="modal-content p-3">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Eliminar el Rol</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar el rol <strong>@rol.Nombre </strong>?</p>
+
+                                    <input type="hidden" name="IdRol" value="@rol.IdRol" />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+
+                <div class="modal fade" id="modalDetalles_@rol.IdRol" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">Detalles del Rol</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Nombre:</strong> @rol.Nombre</p>
+                                <p><strong>Descripción:</strong> @rol.Descripcion</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="modalEditar_@rol.IdRol" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title">Editar Rol</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" asp-page-handler="EditarRol">
+                                    <input type="hidden" name="IdRol" value="@rol.IdRol" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre</label>
+                                        <input type="text" name="Nombre" class="form-control" value="@rol.Nombre" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Descripción</label>
+                                        <input type="text" name="Descripcion" class="form-control" value="@rol.Descripcion" />
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+            
+            }
+
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header text-black border-dark">
+                    <h5 class="modal-title">Crear Rol</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" asp-page-handler="Crear">
+                <div class="modal-body">
+                    
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="Nombre" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <input type="text" name="Descripcion" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="modal-footer border-dark">
+                        <button type="submit" class="btn btn-dark">Crear Rol</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+}

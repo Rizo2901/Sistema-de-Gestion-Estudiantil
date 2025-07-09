@@ -22,7 +22,7 @@ namespace DA
 
         public async Task<Guid> CrearReunionAdministrativa(ReunionAdministrativaRequest reunion)
         {
-            string query = @"Sp_CrearReunionAdministrativa";
+            string query = @"ReunionAdministrativa.Sp_CrearReunionAdministrativa";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 Fecha = reunion.Fecha,
@@ -35,12 +35,12 @@ namespace DA
             return result;
         }
 
-        public async Task<Guid> EditarReunionAdministrativa(Guid IdReunion, ReunionAdministrativaRequest reunion)
+        public async Task<Guid> EditarReunionAdministrativa(Guid IdReunionAdmin, ReunionAdministrativaRequest reunion)
         {
-            string query = @"SP_EditarReunionAdministrativa";
+            string query = @"ReunionAdministrativa.SP_EditarReunionAdministrativa";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
-                IdReunionAdministrativa = reunion.IdReunionAdministrativa,
+                IdReunionAdmin = reunion.IdReunionAdmin,
                 Fecha = reunion.Fecha,
                 Tema = reunion.Tema,
                 Descripcion = reunion.Descripcion,
@@ -50,31 +50,31 @@ namespace DA
             return result;
         }
 
-        public async Task<Guid> EliminarReunionAdministrativa(Guid IdReunion)
+        public async Task<Guid> EliminarReunionAdministrativa(Guid IdReunionAdmin)
         {
-            string query = @"SP_EliminarReunionAdministrativa";
+            string query = @"ReunionAdministrativa.SP_EliminarReunionAdministrativa";
             var result =await _conn.ExecuteScalarAsync<Guid>(query, new
             {
-                IdReunionAdministrativa = IdReunion
+                IdReunionAdmin = IdReunionAdmin
             });
             return result;
 
 
         }
 
-        public async Task<ReunionAdministrativaResponse> ObtenerReunionAdministrativa(Guid IdReunion)
+        public async Task<ReunionAdministrativaResponse> ObtenerReunionAdministrativa(Guid IdReunionAdmin)
         {
-            string query = @"Sp_ObtenerReunionAdministrativa";
+            string query = @"ReunionAdministrativa.Sp_ObtenerReunionAdministrativa";
             var result = await _conn.QueryAsync<ReunionAdministrativaResponse>(query, new
             {
-                IdReunionAdministrativa = IdReunion
+                IdReunionAdmin = IdReunionAdmin
             });
             return result.FirstOrDefault();
         }
 
         public async Task<IEnumerable<ReunionAdministrativaResponse>> ObtenerReunionesAdministrativas()
         {
-            string query = @"SP_ObtenerReunionesAdministrativas";
+            string query = @"ReunionAdministrativa.SP_ObtenerReunionesAdministrativas";
             var result = await _conn.QueryAsync<ReunionAdministrativaResponse>(query);
             return result;
         }

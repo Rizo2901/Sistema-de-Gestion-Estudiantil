@@ -7,16 +7,13 @@ namespace Abstracciones.Modelos
 {
     public class CondicionesEspecialesBase
     {
+        public Guid IdCondicion { get; set; }
+        public Guid IdCategoria { get; set; }
+
         [Required]
         public Guid IdEstudiante { get; set; }
 
-        [Required]
-        [MaxLength(50)]
-        public string TipoCondicion { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string NombreCondicion { get; set; }
 
         [DataType(DataType.Date)]
         [Range(typeof(DateTime), "1900-01-01", "9999-12-31", ErrorMessage = "Fecha inválida.")]
@@ -34,40 +31,39 @@ namespace Abstracciones.Modelos
     {
         public Guid IdCondicion { get; set; }
 
-        [MaxLength(50)]
-        public string TipoCondicion { get; set; }
-
-        [MaxLength(100)]
-        public string NombreCondicion { get; set; }
-
-        [DataType(DataType.Date)]
-        [Range(typeof(DateTime), "1900-01-01", "9999-12-31", ErrorMessage = "Fecha inválida.")]
         public DateTime? FechaDiagnostico { get; set; }
 
         public string? Observaciones { get; set; }
 
+        public string NombreCategoria { get; set; }
+        public string DescripcionCategoria { get; set; }
+
     }
-
-    public class EstudianteConCondicionesResponse
-    {
-        public Guid IdEstudiante { get; set; }
-        public string Nombre { get; set; }
-        public string Apellido1 { get; set; }
-        public string Apellido2 { get; set; }
-
-        public List<CondicionesEspecialesResponse> Condiciones { get; set; } = new List<CondicionesEspecialesResponse>();
-    }
-
-  
-
     public class EstudianteConCondicionesRaw
     {
         public Guid IdEstudiante { get; set; }
-        public string Nombre { get; set; }
-        public string Apellido1 { get; set; }
-        public string Apellido2 { get; set; }
+        public string NombreCompleto { get; set; }
 
-        [Column("Condiciones")] // Dapper necesita este nombre exacto para mapear correctamente
-        public string? Condiciones { get; set; }
+        public string Condiciones { get; set; }
     }
+    public class EstudianteConCondicionesResponse
+    {
+        public Guid IdEstudiante { get; set; }
+        public string NombreCompleto { get; set; }
+        public List<CondicionEspecialItem> Condiciones { get; set; }
+    }
+
+    public class CondicionEspecialItem
+    {
+        public Guid IdCondicion { get; set; }
+        public DateTime? FechaDiagnostico { get; set; }
+        public string? Observaciones { get; set; }
+        public string CategoriaNombre { get; set; }
+        public string CategoriaDescripcion { get; set; }
+    }
+
+
+
+
+
 }
