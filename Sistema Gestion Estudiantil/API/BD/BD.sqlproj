@@ -311,5 +311,15 @@
     <Build Include="SeccionProfesor\Stored Procedures\SP_CrearSeccionProfesor.sql" />
     <Build Include="Security\SituacionFamiliar.sql" />
     <Build Include="Security\SeccionProfesor.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerFamiliarPorId.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerFamiliares.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerComportamientos.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerComportamientoPorId.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarFamiliar.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarComportamiento.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EditarFamiliar.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EditarComportamiento.sql" />
+    <Build Include="dbo\Stored Procedures\SP_CrearFamiliar.sql" />
+    <Build Include="dbo\Stored Procedures\SP_CrearComportamiento.sql" />
   </ItemGroup>
 </Project>
