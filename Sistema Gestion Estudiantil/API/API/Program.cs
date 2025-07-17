@@ -40,6 +40,12 @@ builder.Services.AddScoped<ICategoriaDiscapacidadFlujo, CategoriaDiscapacidadFlu
 builder.Services.AddScoped<ICategoriaCondicionEspecialDA, CategoriaCondicionEspecialDA>();
 builder.Services.AddScoped<ICategoriaCondicionEspecialFlujo, CategoriaCondicionEspecialFlujo>();
 
+builder.Services.AddScoped<IFamiliarDA, FamiliarDA>();
+builder.Services.AddScoped<IFamiliarFlujo, FamiliarFlujo>();
+
+builder.Services.AddScoped<IComportamientoDA, ComportamientoDA>();
+builder.Services.AddScoped<IComportamientoFlujo, ComportamientoFlujo>();
+
 
 builder.Services.AddScoped<ICondicionEspecialDA, CondicionEspecialDA>();
 builder.Services.AddScoped<ICondicionEspecialFlujo, CondicionEspecialFlujo>();

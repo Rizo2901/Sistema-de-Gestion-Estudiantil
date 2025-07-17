@@ -1,0 +1,510 @@
+﻿@page
+@model Web.Pages.Dashboard.Estudiantes.IndexModel
+@{
+    ViewData["Title"] = "Estudiantes";
+    Layout = "_Layout";
+}
+
+@if (Model.Estudiantes == null || !Model.Estudiantes.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay estudiantes registrados.
+    </div>
+   <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Estudiante
+                </button>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+     <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarModal" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Estudiante
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+
+<form method="get" class="row mb-4 justify-content-center">
+    <div class="col-md-3 mb-2">
+        <input type="text" name="FiltroNombre" class="form-control" placeholder="Buscar por Nombre" value="@Model.FiltroNombre" />
+    </div>
+    <div class="col-md-3 mb-2">
+      <input type="text" name="FiltroCedula" class="form-control" placeholder="Buscar por Cédula" value="@Model.FiltroCedula" />
+
+    </div>
+    <div class="col-md-3 mb-2">
+        <input type="text" name="FiltroGrado" class="form-control" placeholder="Buscar por Grado" value="@Model.FiltroGrado" />
+    </div>
+    <div class="col-md-3 mb-2">
+        <input type="text" name="FiltroSeccion" class="form-control" placeholder="Buscar por Sección" value="@Model.FiltroSeccion" />
+    </div>
+
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </div>
+</form>
+
+
+
+    
+    <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-column gap-3">
+        @foreach (var estudiante in Model.Estudiantes)
+        {
+<div class="bg-white shadow-sm rounded-3 p-3 mx-2">
+    <div class="row align-items-center gy-2 gx-3">
+
+        <!-- Foto -->
+        <div class="col-auto">
+            <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : estudiante.Fotografia)"
+                 alt="Foto"
+                 class="rounded-circle"
+                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ccc;" />
+        </div>
+
+        <!-- Nombre, correo y datos -->
+        <div class="col flex-grow-1">
+            <h6 class="mb-1 fw-bold">@estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2</h6>
+            <p class="mb-0 text-muted small">
+                <i class="bi bi-envelope"></i> @estudiante.CorreoElectronico
+            </p>
+            <p class="mb-0 text-muted small mt-1">
+                <i class="bi bi-folder2-open"></i> Documentos: <strong>2</strong> &nbsp; | &nbsp;
+                <i class="bi bi-universal-access"></i> Discapacidades: <strong>1</strong>
+            </p>
+        </div>
+
+        <!-- Estado -->
+        <div class="col-auto text-center">
+            <div class="form-check form-switch d-inline-block">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="estadoSwitch_@estudiante.IdEstudiante"
+                       @(estudiante.Estado ? "checked" : "")
+                       onchange="cambiarEstado('@estudiante.IdEstudiante', this.checked)" />
+            </div>
+            <div class="small mt-1">
+                <span class="badge @(estudiante.Estado ? "bg-success" : "bg-secondary")">
+                    @(estudiante.Estado ? "Activo" : "Inactivo")
+                </span>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="col-12 col-md-auto d-flex flex-wrap justify-content-md-end gap-2 mt-2 mt-md-0">
+
+            <!-- Botones principales visibles -->
+            <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#detalleModal_@estudiante.IdEstudiante" title="Detalles">
+                <i class="bi bi-info-circle"></i>
+            </button>
+            <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#editarModal_@estudiante.IdEstudiante" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#eliminarModal_@estudiante.IdEstudiante" title="Eliminar">
+                <i class="bi bi-trash"></i>
+            </button>
+
+            <!-- Dropdown con acciones menos usadas -->
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle square-btn" type="button" data-bs-toggle="dropdown" title="Más acciones">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#agregarModalDocumento-@estudiante.IdEstudiante">
+                            <i class="bi bi-file-earmark-plus me-1"></i> Crear Documento
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" title="Crear Usuario">
+                            <i class="bi bi-person-plus me-1"></i> Crear Usuario
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCondicionEspecial-@estudiante.IdEstudiante">
+                            <i class="bi bi-exclamation-diamond me-1"></i> Condición Especial
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+        
+       
+         
+
+              <!-- Modal Editar Estudiante -->
+<div class="modal fade" id="editarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="editarLabel_@estudiante.IdEstudiante" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarLabel_@estudiante.IdEstudiante">Editar Estudiante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="post" asp-page-handler="Editar" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="idEstudiante" value="@estudiante.IdEstudiante" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Cédula</label>
+                            <input name="estudiante.Cedula" class="form-control" value="@estudiante.Cedula" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input name="estudiante.Nombre" class="form-control" value="@estudiante.Nombre" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 1</label>
+                            <input name="estudiante.Apellido1" class="form-control" value="@estudiante.Apellido1" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 2</label>
+                            <input name="estudiante.Apellido2" class="form-control" value="@estudiante.Apellido2" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input name="estudiante.FechaNacimiento" type="date" class="form-control" value="@(estudiante.FechaNacimiento.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Género</label>
+                            <select name="estudiante.Genero" class="form-select">
+                                <option value="M" selected="@(estudiante.Genero == "M")">Masculino</option>
+                                <option value="F" selected="@(estudiante.Genero == "F")">Femenino</option>
+                                <option value="O" selected="@(estudiante.Genero == "O")">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Grado Actual</label>
+                            <input name="estudiante.GradoActual" class="form-control" value="@estudiante.GradoActual" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Repitiendo</label>
+                            <select name="estudiante.Repitiendo" class="form-select">
+                                <option value="true" selected="@(estudiante.Repitiendo)">Sí</option>
+                                <option value="false" selected="@(!estudiante.Repitiendo)">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Historial Académico</label>
+                            <textarea name="estudiante.HistorialAcademico" class="form-control">@estudiante.HistorialAcademico</textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Fotografía</label>
+                            <div class="mb-2">
+                                <img id="fotoPreview_@estudiante.IdEstudiante"
+                                     src="@(estudiante.Fotografia.StartsWith("http") ? estudiante.Fotografia : $"data:image/jpeg;base64,{estudiante.Fotografia}")"
+                                     alt="Foto actual"
+                                     class="rounded-circle"
+                                     style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #ccc;" />
+                            </div>
+                            <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo"
+                                   onchange="mostrarVistaPrevia(this, 'fotoPreview_@estudiante.IdEstudiante')" />
+                            <input type="hidden" name="estudiante.Fotografia" value="@estudiante.Fotografia" />
+                            <small class="text-muted">Si seleccionas un archivo, reemplazará la foto actual.</small>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Dirección</label>
+                            <textarea name="estudiante.Direccion" class="form-control">@estudiante.Direccion</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono Celular</label>
+                            <input name="estudiante.TelefonoCelular" class="form-control" value="@estudiante.TelefonoCelular" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input name="estudiante.CorreoElectronico" class="form-control" value="@estudiante.CorreoElectronico" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select name="estudiante.Estado" class="form-select">
+                                <option value="true" selected="@(estudiante.Estado)">Activo</option>
+                                <option value="false" selected="@(!estudiante.Estado)">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sección</label>
+                            <select name="estudiante.IdSeccion" class="form-select">
+                                <option value="">Seleccione una sección</option>
+                                @foreach (var seccion in Model.Secciones)
+        {
+@:          <option value="@seccion.Value" @(estudiante.IdSeccion != Guid.Empty && estudiante.IdSeccion.ToString() == seccion.Value ? "selected" : "")>
+@:              @seccion.Text
+@:          </option>
+        }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Actualizar Estudiante</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+                <!-- Modal Eliminar Estudiante -->
+                <div class="modal fade" id="eliminarModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="eliminarLabel_@estudiante.IdEstudiante" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 shadow">
+                            <form method="post" asp-page-handler="Eliminar">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title" id="eliminarLabel_@estudiante.IdEstudiante">Eliminar Estudiante</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar a <strong>@estudiante.Nombre @estudiante.Apellido1</strong>?</p>
+                                    <input type="hidden" name="idEstudiante" value="@estudiante.IdEstudiante" />
+                                </div>
+                                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal Ver Detalles -->
+                <div class="modal fade" id="detalleModal_@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="detalleLabel_@estudiante.IdEstudiante" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="detalleLabel_@estudiante.IdEstudiante">Detalles del Estudiante</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Nombre:</strong> @estudiante.Nombre</p>
+                                <p><strong>Apellido 1:</strong> @estudiante.Apellido1</p>
+                                <p><strong>Apellido 2:</strong> @estudiante.Apellido2</p>
+                                <p><strong>Correo Electrónico:</strong> @estudiante.CorreoElectronico</p>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+<!-- Modal: Crear Documento a Estudiante -->
+<div class="modal fade" id="agregarModalDocumento-@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="agregarLabel-@estudiante.IdEstudiante" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarLabel-@estudiante.IdEstudiante">
+                    Crear Documento a: @estudiante.Nombre @estudiante.Apellido1
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="post" asp-page-handler="CrearDocumento" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" asp-for="documento.IdEstudiante" value="@estudiante.IdEstudiante" />
+                    <div class="mb-3">
+                        <label class="form-label">Archivo del Documento</label>
+                        <input type="file" asp-for="ArchivoDocumento" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Documento</label>
+                        <input type="text" asp-for="documento.TipoDocumento" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea asp-for="documento.Descripcion" class="form-control" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar Documento</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Crear Condición Especial a Estudiante -->
+<div class="modal fade" id="modalCondicionEspecial-@estudiante.IdEstudiante" tabindex="-1" aria-labelledby="modalCondicionLabel-@estudiante.IdEstudiante" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content text-black">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="modalCondicionLabel-@estudiante.IdEstudiante">
+                    Crear Condición Especial a: @estudiante.Nombre @estudiante.Apellido1
+                </h5>
+                <button type="button" class="btn-close btn-close-black" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="post" asp-page-handler="CrearCondicion">
+                <div class="modal-body">
+                    <!-- Campo oculto para enviar el ID del estudiante -->
+                    <input type="hidden" name="condicion.IdEstudiante" value="@estudiante.IdEstudiante" />
+                    
+                    <p><strong>ID Estudiante:</strong> @estudiante.IdEstudiante</p>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Condición</label>
+                        <input type="text" name="condicion.TipoCondicion" class="form-control bg-white text-black border-dark" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Condición</label>
+                        <input type="text" name="condicion.NombreCondicion" class="form-control bg-white text-black border-dark" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fecha Diagnóstico</label>
+                        <input type="date" name="condicion.FechaDiagnostico" class="form-control bg-white text-black border-dark" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea name="condicion.Observaciones" class="form-control bg-white text-black border-dark"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar Condición</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+           }
+    </div>
+</div>
+    
+}
+<!-- Modal Agregar Estudiante -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarLabel">Agregar Estudiante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="post" asp-page-handler="Crear" enctype="multipart/form-data">
+
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Cédula</label>
+                            <input asp-for="Estudiante.Cedula" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input asp-for="Estudiante.Nombre" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 1</label>
+                            <input asp-for="Estudiante.Apellido1" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 2</label>
+                            <input asp-for="Estudiante.Apellido2" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input asp-for="Estudiante.FechaNacimiento" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Género</label>
+                            <select asp-for="Estudiante.Genero" class="form-select">
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                                <option value="O">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Grado Actual</label>
+                            <input asp-for="Estudiante.GradoActual" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Repitiendo</label>
+                            <select asp-for="Estudiante.Repitiendo" class="form-select">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Historial Académico</label>
+                            <textarea asp-for="Estudiante.HistorialAcademico" class="form-control"></textarea>
+                        </div>
+                       
+                        <div class="col-md-12">
+                            <label class="form-label">Fotografía</label>
+                            <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo" />
+
+                            <input type="hidden" asp-for="Estudiante.Fotografia" id="fotoBase64" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Dirección</label>
+                            <textarea asp-for="Estudiante.Direccion" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono Celular</label>
+                            <input asp-for="Estudiante.TelefonoCelular" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input asp-for="Estudiante.CorreoElectronico" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+    <label class="form-label">Estado</label>
+    <select asp-for="Estudiante.Estado" class="form-select">
+        <option value="true">Activo</option>
+        <option value="false">Inactivo</option>
+    </select>
+</div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Sección</label>
+                            <select asp-for="seccionseleccionada" asp-items="Model.Secciones" class="form-control">
+                                <option value="">Seleccione una sección</option>
+                            </select>
+                            <span asp-validation-for="seccionseleccionada" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear Estudiante</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function mostrarVistaPrevia(input, previewId) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById(previewId).src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+
+
+
+
+
