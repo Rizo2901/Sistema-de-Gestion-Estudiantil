@@ -15,5 +15,9 @@ namespace Abstracciones.Interfaces.Flujo
         Task<EstudianteMedicamentoResponse> ObtenerEstudianteMedicamentoPorId(Guid Id);
         Task<IEnumerable<EstudianteMedicamentoResponse>> ObtenerEstudianteMedicamentosPorEstudiante(Guid IdEstudiante);
 
+        Task<IEnumerable<EstudianteConMedicamentosResponse>> ObtenerEstudianteMedicamentosPorEstudiantes();
+
+        Task<IEnumerable<EstudianteMedicamentoResponse>> ObtenerEstudianteMedicamentos();
+
     }
 }

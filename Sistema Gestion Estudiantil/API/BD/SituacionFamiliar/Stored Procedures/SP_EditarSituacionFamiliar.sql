@@ -1,8 +1,9 @@
 ﻿
-CREATE PROCEDURE SituacionFamiliar.SP_EditarSituacionFamiliar
+CREATE PROCEDURE [SituacionFamiliar].[SP_EditarSituacionFamiliar]
     @IdSituacion UNIQUEIDENTIFIER,
     @IdEstudiante UNIQUEIDENTIFIER,
     @IdCategoria UNIQUEIDENTIFIER,
+	@FechaRegistro DATETIME,
     @Descripcion TEXT
 AS
 BEGIN
@@ -10,6 +11,7 @@ BEGIN
     UPDATE dbo.SituacionFamiliar
     SET IdEstudiante = @IdEstudiante,
         IdCategoria = @IdCategoria,
+		FechaRegistro = @FechaRegistro,
         Descripcion = @Descripcion
     WHERE IdSituacion = @IdSituacion;
     SELECT @IdSituacion AS IdSituacionEditada;

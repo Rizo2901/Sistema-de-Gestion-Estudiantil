@@ -2,7 +2,7 @@
 -- =============================
 -- EDITAR
 -- =============================
-CREATE   PROCEDURE SP_EditarEstudianteMedicamento
+CREATE   PROCEDURE [EstudianteMedicamento].SP_EditarEstudianteMedicamento
     @IdEstudiante UNIQUEIDENTIFIER,
     @IdMedicamento UNIQUEIDENTIFIER,
     @Dosis VARCHAR(50),

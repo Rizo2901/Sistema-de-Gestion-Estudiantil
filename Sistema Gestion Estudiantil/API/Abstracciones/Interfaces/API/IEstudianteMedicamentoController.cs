@@ -10,10 +10,14 @@ namespace Abstracciones.Interfaces.API
 {
     public interface IEstudianteMedicamentoController
     {
-        Task<IActionResult> CrearEstudianteMedicamento(EstudianteMedicamentoRequest estudianteMedicamento);
-        Task<IActionResult> EditarEstudianteMedicamento(Guid Id, EstudianteMedicamentoRequest estudianteMedicamento);
+        Task<IActionResult> CrearEstudianteMedicamento(EstudianteMedicamentoResponse estudianteMedicamento);
+        Task<IActionResult> EditarEstudianteMedicamento(Guid Id, EstudianteMedicamentoResponse estudianteMedicamento);
         Task<IActionResult> EliminarEstudianteMedicamento(Guid Id);
         Task<IActionResult> ObtenerEstudianteMedicamentoPorId(Guid Id);
         Task<IActionResult> ObtenerEstudianteMedicamentosPorEstudiante(Guid IdEstudiante);
+
+        Task<IActionResult> ObtenerEstudianteMedicamentosPorEstudiantes();
+
+        Task<IActionResult> ObtenerEstudianteMedicamentos();
     }
 }

@@ -1,5 +1,4 @@
-﻿-- SP_EditarComportamiento
-CREATE PROCEDURE SP_EditarComportamiento
+﻿CREATE PROCEDURE SP_EditarComportamiento
     @IdComportamiento UNIQUEIDENTIFIER,
     @IdEstudiante UNIQUEIDENTIFIER,
     @Fecha DATE,

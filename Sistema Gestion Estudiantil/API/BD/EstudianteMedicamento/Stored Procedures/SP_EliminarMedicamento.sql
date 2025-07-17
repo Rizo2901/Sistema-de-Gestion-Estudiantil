@@ -1,6 +1,6 @@
 ﻿
 -- ELIMINAR
-CREATE   PROCEDURE SP_EliminarMedicamento
+CREATE   PROCEDURE [EstudianteMedicamento].SP_EliminarMedicamento
     @IdMedicamento UNIQUEIDENTIFIER
 AS
 BEGIN

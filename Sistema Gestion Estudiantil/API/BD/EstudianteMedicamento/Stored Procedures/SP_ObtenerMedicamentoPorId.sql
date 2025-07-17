@@ -1,6 +1,6 @@
 ﻿
 -- OBTENER POR ID
-CREATE   PROCEDURE SP_ObtenerMedicamentoPorId
+CREATE   PROCEDURE [EstudianteMedicamento].SP_ObtenerMedicamentoPorId
     @IdMedicamento UNIQUEIDENTIFIER
 AS
 BEGIN

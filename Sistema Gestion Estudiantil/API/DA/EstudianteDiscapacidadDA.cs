@@ -2,12 +2,8 @@
 using Abstracciones.Modelos;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+
 
 namespace DA
 {
@@ -67,9 +63,9 @@ namespace DA
         public async Task<IEnumerable<EstudianteDiscapacidadResponse>> ObtenerDiscapacidadesPorEstudiante(Guid idEstudiante)
         {
             string query = @"Estudiante_Discapacidad.SP_ObtenerDiscapacidadesPorEstudiante";
-            var result = await _conn.QueryAsync<EstudianteDiscapacidadResponse>(query, new 
-            { 
-                IdEstudiante = idEstudiante 
+            var result = await _conn.QueryAsync<EstudianteDiscapacidadResponse>(query, new
+            {
+                IdEstudiante = idEstudiante
             });
             return result;
         }

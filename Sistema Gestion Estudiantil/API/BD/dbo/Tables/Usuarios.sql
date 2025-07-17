@@ -6,6 +6,7 @@
     [IdRol]             UNIQUEIDENTIFIER NOT NULL,
     [Estado]            BIT              DEFAULT ((0)) NULL,
     [FechaActivacion]   DATETIME         NULL,
+    [TipoEntidad]       VARCHAR (20)     NULL,
     PRIMARY KEY CLUSTERED ([IdUsuario] ASC),
     FOREIGN KEY ([IdRol]) REFERENCES [dbo].[Roles] ([IdRol]) ON DELETE CASCADE,
     UNIQUE NONCLUSTERED ([NombreUsuario] ASC)
