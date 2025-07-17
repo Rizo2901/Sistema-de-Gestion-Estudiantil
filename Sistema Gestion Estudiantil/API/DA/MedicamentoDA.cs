@@ -24,7 +24,7 @@ namespace DA
 
         public async Task<Guid> CrearMedicamento(MedicamentoResponse medicamento)
         {
-            string query = @"EstudianteMedicamento.Sp_CrearMedicamento";
+            string query = @"Sp_CrearMedicamento";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 Nombre = medicamento.Nombre,
@@ -35,7 +35,7 @@ namespace DA
 
         public async Task<Guid> EditarMedicamento(Guid Id, MedicamentoResponse medicamento)
         {
-            string query = @"EstudianteMedicamento.SP_EditarMedicamento";
+            string query = @"SP_EditarMedicamento";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdMedicamento = Id,
@@ -47,7 +47,7 @@ namespace DA
 
         public async Task<Guid> EliminarMedicamento(Guid Id)
         {
-            string query = @"EstudianteMedicamento.SP_EliminarMedicamento";
+            string query = @"SP_EliminarMedicamento";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdMedicamento = Id
@@ -57,7 +57,7 @@ namespace DA
 
         public async Task<MedicamentoResponse> ObtenerMedicamentoPorId(Guid Id)
         {
-            string query = @"EstudianteMedicamento.SP_ObtenerMedicamentoPorId";
+            string query = @"SP_ObtenerMedicamentoPorId";
             var result = await _conn.QueryAsync<MedicamentoResponse>(query, new
             {
                 IdMedicamento = Id
@@ -67,7 +67,7 @@ namespace DA
 
         public Task<IEnumerable<MedicamentoResponse>> ObtenerMedicamentos()
         {
-           string query = @"EstudianteMedicamento.SP_ObtenerTodosMedicamentos";
+           string query = @"SP_ObtenerTodosMedicamentos";
             var result = _conn.QueryAsync<MedicamentoResponse>(query);
             return result;
         }

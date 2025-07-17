@@ -16,9 +16,5 @@ namespace Abstracciones.Interfaces.API
         Task<IActionResult> ObtenerAdaptacionCurricularPorId(Guid Id);
         Task<IActionResult> ObtenerAdaptacionesPorEstudiante(Guid IdEstudiante);
 
-        Task<IActionResult> ObtenerAdaptacionesPorEstudiantes();
-
-        Task<IActionResult> ObtenerAdaptacionesCurriculares();
-
     }
 }

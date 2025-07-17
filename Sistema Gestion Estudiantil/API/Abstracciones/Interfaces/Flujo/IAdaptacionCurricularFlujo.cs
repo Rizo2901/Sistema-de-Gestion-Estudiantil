@@ -14,9 +14,5 @@ namespace Abstracciones.Interfaces.Flujo
         Task<Guid> EliminarAdaptacionCurricular(Guid Id);
         Task<AdaptacionCurricularResponse> ObtenerAdaptacionCurricularPorId(Guid Id);
         Task<IEnumerable<AdaptacionCurricularResponse>> ObtenerAdaptacionesPorEstudiante(Guid IdEstudiante);
-
-        Task<IEnumerable<EstudianteConAdaptacionesResponse>> ObtenerAdaptacionesPorEstudiantes();
-
-        Task<IEnumerable<AdaptacionCurricularResponse>> ObtenerAdaptacionesCurriculares();
     }
 }

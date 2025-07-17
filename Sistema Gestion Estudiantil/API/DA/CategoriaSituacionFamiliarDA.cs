@@ -66,7 +66,7 @@ namespace DA
 
         public async Task<IEnumerable<CategoriasSituacionFamiliarResponse>> ObtenerCategoriasSituacionFamiliar()
         {
-            string query = @"SituacionFamiliar.SP_ObtenerTodasCategoriasSituacionFamiliar";
+            string query = @"SituacionFamiliar.Sp_ObtenerCategoriaSituacionFamiliarPorId";
             var result = await _conn.QueryAsync<CategoriasSituacionFamiliarResponse>(query);
             return result;
 

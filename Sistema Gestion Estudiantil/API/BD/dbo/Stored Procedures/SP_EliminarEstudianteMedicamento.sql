@@ -2,7 +2,7 @@
 -- =============================
 -- ELIMINAR
 -- =============================
-CREATE   PROCEDURE [EstudianteMedicamento].SP_EliminarEstudianteMedicamento
+CREATE   PROCEDURE SP_EliminarEstudianteMedicamento
     @IdEstudiante UNIQUEIDENTIFIER,
     @IdMedicamento UNIQUEIDENTIFIER
 AS

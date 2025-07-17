@@ -15,9 +15,5 @@ namespace Abstracciones.Interfaces.DA
         Task<AdaptacionCurricularResponse> ObtenerAdaptacionCurricularPorId(Guid Id);
         Task<IEnumerable<AdaptacionCurricularResponse>> ObtenerAdaptacionesPorEstudiante(Guid IdEstudiante);
 
-        Task<IEnumerable<EstudianteConAdaptacionesResponse>> ObtenerAdaptacionesPorEstudiantes();
-
-        Task<IEnumerable<AdaptacionCurricularResponse>> ObtenerAdaptacionesCurriculares();
-
     }
 }

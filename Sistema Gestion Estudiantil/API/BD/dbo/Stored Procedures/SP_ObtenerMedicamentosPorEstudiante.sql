@@ -1,4 +1,8 @@
-﻿CREATE   PROCEDURE [EstudianteMedicamento].[SP_ObtenerMedicamentosPorEstudiante]
+﻿
+-- =============================
+-- OBTENER POR ESTUDIANTE
+-- =============================
+CREATE   PROCEDURE SP_ObtenerMedicamentosPorEstudiante
     @IdEstudiante UNIQUEIDENTIFIER
 AS
 BEGIN

@@ -90,13 +90,6 @@
     <Folder Include="SituacionFamiliar\Stored Procedures\" />
     <Folder Include="SeccionProfesor\" />
     <Folder Include="SeccionProfesor\Stored Procedures\" />
-    <Folder Include="EstudianteMedicamento\" />
-    <Folder Include="EstudianteMedicamento\Stored Procedures\" />
-    <Folder Include="AdaptacionCurricular\" />
-    <Folder Include="AdaptacionCurricular\Stored Procedures\" />
-    <Folder Include="dbo\Views\" />
-    <Folder Include="Reporte\" />
-    <Folder Include="Reporte\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Usuarios.sql" />
@@ -182,12 +175,21 @@
     <Build Include="dbo\Tables\CategoriasAlergia.sql" />
     <Build Include="dbo\Tables\Alergias.sql" />
     <Build Include="dbo\Tables\AdaptacionesCurriculares.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerTodosMedicamentos.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerMedicamentosPorEstudiante.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerMedicamentoPorId.sql" />
     <Build Include="dbo\Stored Procedures\SP_ObtenerEnfermedadesPorEstudiante.sql" />
     <Build Include="dbo\Stored Procedures\SP_ObtenerAdaptacionesPorEstudiante.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarMedicamento.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EliminarEstudianteMedicamento.sql" />
     <Build Include="dbo\Stored Procedures\SP_EliminarEstudianteEnfermedad.sql" />
     <Build Include="dbo\Stored Procedures\SP_EliminarAdaptacionCurricular.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EditarMedicamento.sql" />
+    <Build Include="dbo\Stored Procedures\SP_EditarEstudianteMedicamento.sql" />
     <Build Include="dbo\Stored Procedures\SP_EditarEstudianteEnfermedad.sql" />
     <Build Include="dbo\Stored Procedures\SP_EditarAdaptacionCurricular.sql" />
+    <Build Include="dbo\Stored Procedures\SP_CrearMedicamento.sql" />
+    <Build Include="dbo\Stored Procedures\SP_CrearEstudianteMedicamento.sql" />
     <Build Include="dbo\Stored Procedures\SP_CrearEstudianteEnfermedad.sql" />
     <Build Include="dbo\Stored Procedures\SP_CrearAdaptacionCurricular.sql" />
     <Build Include="Security\Estudiante.sql" />
@@ -309,29 +311,5 @@
     <Build Include="SeccionProfesor\Stored Procedures\SP_CrearSeccionProfesor.sql" />
     <Build Include="Security\SituacionFamiliar.sql" />
     <Build Include="Security\SeccionProfesor.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_ObtenerTodosMedicamentos.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_ObtenerMedicamentoPorId.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_EliminarMedicamento.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_EditarMedicamento.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_CrearMedicamento.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_ObtenerMedicamentosPorEstudiante.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_EliminarEstudianteMedicamento.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_EditarEstudianteMedicamento.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_CrearEstudianteMedicamento.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_ObtenerMedicamentosPorEstudiantes.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_ObtenerEstudiantesMedicamentos.sql" />
-    <Build Include="EstudianteMedicamento\Stored Procedures\SP_ObtenerEstudianteMedicamentoPorId.sql" />
-    <Build Include="AdaptacionCurricular\Stored Procedures\SP_ObtenerAdaptacionesPorEstudiantes.sql" />
-    <Build Include="AdaptacionCurricular\Stored Procedures\SP_ObtenerAdaptacionesPorEstudiante.sql" />
-    <Build Include="AdaptacionCurricular\Stored Procedures\SP_ObtenerAdaptacionesCurriculares.sql" />
-    <Build Include="AdaptacionCurricular\Stored Procedures\SP_ObtenerAdaptacionCurricularPorId.sql" />
-    <Build Include="AdaptacionCurricular\Stored Procedures\SP_EliminarAdaptacionCurricular.sql" />
-    <Build Include="AdaptacionCurricular\Stored Procedures\SP_EditarAdaptacionCurricular.sql" />
-    <Build Include="AdaptacionCurricular\Stored Procedures\SP_CrearAdaptacionCurricular.sql" />
-    <Build Include="Security\EstudianteMedicamento.sql" />
-    <Build Include="Security\AdaptacionCurricular.sql" />
-    <Build Include="dbo\Views\vw_PerfilEstudiantilCompleto.sql" />
-    <Build Include="Reporte\Stored Procedures\SP_ReporteEstudiantilAvanzado.sql" />
-    <Build Include="Security\Reporte.sql" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿
 -- EDITAR
-CREATE   PROCEDURE [EstudianteMedicamento].SP_EditarMedicamento
+CREATE   PROCEDURE SP_EditarMedicamento
     @IdMedicamento UNIQUEIDENTIFIER,
     @Nombre VARCHAR(100),
     @Descripcion TEXT
