@@ -1,4 +1,4 @@
-﻿CREATE   PROCEDURE SP_CrearEstudianteMedicamento
+﻿CREATE   PROCEDURE [EstudianteMedicamento].SP_CrearEstudianteMedicamento
     @IdEstudiante UNIQUEIDENTIFIER,
     @IdMedicamento UNIQUEIDENTIFIER,
     @Dosis VARCHAR(50),

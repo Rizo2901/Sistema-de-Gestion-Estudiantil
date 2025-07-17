@@ -14,5 +14,10 @@ namespace Abstracciones.Interfaces.DA
         Task<Guid> EliminarEstudianteMedicamento(Guid Id);
         Task<EstudianteMedicamentoResponse> ObtenerEstudianteMedicamentoPorId(Guid Id);
         Task<IEnumerable<EstudianteMedicamentoResponse>> ObtenerEstudianteMedicamentosPorEstudiante(Guid IdEstudiante);
+
+        Task<IEnumerable<EstudianteConMedicamentosResponse>> ObtenerEstudianteMedicamentosPorEstudiantes();
+
+        Task<IEnumerable<EstudianteMedicamentoResponse>> ObtenerEstudianteMedicamentos();
+
     }
 }

@@ -1,5 +1,5 @@
 ﻿-- CREAR
-CREATE   PROCEDURE SP_CrearMedicamento
+CREATE   PROCEDURE [EstudianteMedicamento].SP_CrearMedicamento
     @Nombre VARCHAR(100),
     @Descripcion TEXT
 AS

@@ -1,6 +1,6 @@
 ﻿
 -- OBTENER TODOS
-CREATE   PROCEDURE SP_ObtenerTodosMedicamentos
+CREATE   PROCEDURE [EstudianteMedicamento].SP_ObtenerTodosMedicamentos
 AS
 BEGIN
     SET NOCOUNT ON;

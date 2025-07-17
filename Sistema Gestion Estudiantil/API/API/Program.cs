@@ -1,9 +1,9 @@
-
 using Abstracciones.Interfaces.DA;
 using Abstracciones.Interfaces.Flujo;
 using DA;
 using DA.Repositorios;
 using Flujo;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +40,9 @@ builder.Services.AddScoped<ICategoriaDiscapacidadFlujo, CategoriaDiscapacidadFlu
 builder.Services.AddScoped<ICategoriaCondicionEspecialDA, CategoriaCondicionEspecialDA>();
 builder.Services.AddScoped<ICategoriaCondicionEspecialFlujo, CategoriaCondicionEspecialFlujo>();
 
+builder.Services.AddScoped<ICategoriaSituacionFamiliarDA, CategoriaSituacionFamiliarDA>();
+builder.Services.AddScoped<ICategoriaSituacionFamiliarFlujo, CategoriaSituacionFamiliarFlujo>();
+
 
 builder.Services.AddScoped<ICondicionEspecialDA, CondicionEspecialDA>();
 builder.Services.AddScoped<ICondicionEspecialFlujo, CondicionEspecialFlujo>();
@@ -62,6 +65,9 @@ builder.Services.AddScoped<IEstudianteAlergiaFlujo, EstudianteAlergiaFlujo>();
 builder.Services.AddScoped<IEstudianteDiscapacidadFlujo, EstudianteDiscapacidadFlujo >();
 builder.Services.AddScoped<IEstudianteDiscapacidadDA, EstudianteDiscapacidadDA>();
 
+builder.Services.AddScoped<IEstudianteMedicamentoDA, EstudianteMedicamentoDA>();
+builder.Services.AddScoped<IEstudianteMedicamentoFlujo, EstudianteMedicamentoFlujo>();
+
 builder.Services.AddScoped<IProfesorDA, ProfesorDA>();
 builder.Services.AddScoped<IProfesorFlujo, ProfesorFlujo>();
 
@@ -75,11 +81,17 @@ builder.Services.AddScoped<IReunionFlujo, ReunionFlujo>();
 builder.Services.AddScoped<IReunionAdministrativaDA, ReunionAdministrativaDA>();
 builder.Services.AddScoped<IReunionAdministrativaFlujo, ReunionAdministrativaFlujo>();
 
+builder.Services.AddScoped<IReporteDA, ReporteDA>();
+builder.Services.AddScoped<IReporteFlujo, ReporteFlujo>();
+
 builder.Services.AddScoped<ISeccionDA, SeccionDA>();
 builder.Services.AddScoped<ISeccionFlujo, SeccionFlujo>();
 
 builder.Services.AddScoped<ISeccionProfesorDA, SeccionProfesorDA>();
 builder.Services.AddScoped<ISeccionProfesorFlujo, SeccionProfesorFlujo>();
+
+builder.Services.AddScoped<ISituacionFamiliarDA, SituacionFamiliarDA>();
+builder.Services.AddScoped<ISituacionFamiliarFlujo, SituacionFamiliarFlujo>();
 
 
 builder.Services.AddScoped<IMateriaDA, MateriaDA>();
@@ -89,7 +101,8 @@ builder.Services.AddScoped<IMateriaProfesorDA, MateriaProfesorDA>();
 builder.Services.AddScoped<IMateriaProfesorFlujo, MateriaProfesorFlujo>();
 
 
-
+builder.Services.AddScoped<IMedicamentoDA, MedicamentoDA>();
+builder.Services.AddScoped<IMedicamentoFlujo, MedicamentoFlujo>();
 
 
 builder.Services.AddScoped<IHorarioDA, HorarioDA>();
@@ -111,6 +124,9 @@ builder.Services.AddCors(options =>
                    .AllowAnyHeader();
         });
 });
+
+QuestPDF.Settings.License = LicenseType.Community;
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
