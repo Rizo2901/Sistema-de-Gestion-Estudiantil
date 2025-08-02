@@ -38,6 +38,7 @@ namespace DA
             {
                 IdEstudiante = familiar.IdEstudiante,
                 Nombre = familiar.Nombre,
+                Cedula = familiar.Cedula,
                 Apellido1 = familiar.Apellido1,
                 Apellido2 = familiar.Apellido2,
                 Direccion = familiar.Direccion,
@@ -61,6 +62,7 @@ namespace DA
                 IdFamiliar = id,
                 IdEstudiante = familiar.IdEstudiante,
                 Nombre = familiar.Nombre,
+                Cedula = familiar.Cedula,
                 Apellido1 = familiar.Apellido1,
                 Apellido2 = familiar.Apellido2,
                 Direccion = familiar.Direccion,

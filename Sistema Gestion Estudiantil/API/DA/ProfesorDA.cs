@@ -27,6 +27,7 @@ namespace DA
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 Nombre = profesor.Nombre,
+                Cedula = profesor.Cedula,
                 Apellido1 = profesor.Apellido1,
                 Apellido2 = profesor.Apellido2,
                 Direccion = profesor.Direccion,
@@ -45,6 +46,7 @@ namespace DA
             {
                 IdProfesor = Id,
                 Nombre = profesor.Nombre,
+                Cedula = profesor.Cedula,
                 Apellido1 = profesor.Apellido1,
                 Apellido2 = profesor.Apellido2,
                 CorreoElectronico = profesor.CorreoElectronico,

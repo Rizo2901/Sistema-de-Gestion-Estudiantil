@@ -361,5 +361,7 @@
     <Build Include="Security\EstudianteMedicamento.sql" />
     <Build Include="Security\Administrador.sql" />
     <Build Include="Security\AdaptacionCurricular.sql" />
+    <Build Include="Usuario\Stored Procedures\ObtenerPorNombreOEmail.sql" />
+    <Build Include="Usuario\Stored Procedures\ActualizarContrasena.sql" />
   </ItemGroup>
 </Project>

@@ -37,6 +37,9 @@ namespace Abstracciones.Modelos
         [MaxLength(100)]
         public string? Ocupacion { get; set; }
 
+       
+        public string Cedula { get; set; }
+
         [Required]
         [MaxLength(10)]
         public string EstadoCivil { get; set; }
