@@ -1,17 +1,16 @@
-using Abstracciones.Interfaces.Reglas;
+﻿using Abstracciones.Interfaces.Reglas;
 using Reglas;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddScoped<IConfiguracion, Configuracion>();
 
-
+builder.Services.AddSingleton<IConfiguracion, Configuracion>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+Abstracciones.Modelos.Seguridad.AuthConfiguracion.Instancia = app.Services.GetRequiredService<IConfiguracion>();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -22,7 +21,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 
 app.UseAuthorization();
 

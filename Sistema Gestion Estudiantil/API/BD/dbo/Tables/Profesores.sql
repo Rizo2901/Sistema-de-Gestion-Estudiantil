@@ -7,6 +7,7 @@
     [TelefonoCelular]   VARCHAR (20)     NULL,
     [CorreoElectronico] VARCHAR (100)    NULL,
     [IdUsuario]         UNIQUEIDENTIFIER NULL,
+    [Cedula]            VARCHAR (40)     NULL,
     PRIMARY KEY CLUSTERED ([IdProfesor] ASC),
     FOREIGN KEY ([IdUsuario]) REFERENCES [dbo].[Usuarios] ([IdUsuario])
 );

@@ -1,6 +1,7 @@
 ﻿using Abstracciones.Interfaces.DA;
 using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
+using Abstracciones.Modelos.Seguridad;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,39 +21,74 @@ namespace Flujo
             _config = config;
         }
 
-        /// <summary>
-        /// Autentica al usuario por identificador único (correo o nombre de usuario).
-        /// Retorna token JWT con claims estructurados.
-        /// </summary>
+
         public async Task<string> AutenticarUsuarioAsync(LoginRequest request)
         {
+            Console.WriteLine("Iniciando autenticación...");
+
             if (string.IsNullOrWhiteSpace(request.Identificador) || string.IsNullOrWhiteSpace(request.Contrasena))
                 throw new Exception("Credenciales incompletas.");
 
             var usuario = await _usuarioDA.ObtenerPorNombreOEmail(request.Identificador);
+            Console.WriteLine(usuario == null ? "Usuario no encontrado" : $"Usuario encontrado: {usuario.NombreUsuario}");
 
-            if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Contrasena, usuario.ContrasenaHash))
-                throw new Exception("Credenciales inválidas.");
+            if (usuario == null)
+                throw new Exception("Credenciales inválidas (usuario no existe).");
+
+            if (usuario.ContrasenaHash == null)
+            {
+                Console.WriteLine("El hash de la contraseña es nulo.");
+                throw new Exception("El hash de la contraseña es nulo.");
+            }
+
+            bool passwordOk = BCrypt.Net.BCrypt.Verify(request.Contrasena, usuario.ContrasenaHash);
+            Console.WriteLine($"Verificación de contraseña: {passwordOk}");
+
+            if (!passwordOk)
+                throw new Exception("Credenciales inválidas (contraseña incorrecta).");
+
+            Console.WriteLine($"IdUsuario: {usuario.IdUsuario}");
+            Console.WriteLine($"NombreUsuario: {usuario.NombreUsuario}");
+            Console.WriteLine($"IdRol: {usuario.IdRol}");
+            Console.WriteLine($"TipoEntidad: {usuario.TipoEntidad}");
+
+            if (usuario.IdUsuario == Guid.Empty)
+                throw new Exception("Usuario sin identificador válido.");
+
+            if (string.IsNullOrWhiteSpace(usuario.NombreUsuario))
+                throw new Exception("Usuario sin nombre asignado.");
+
+            if (usuario.IdRol == null)
+                throw new Exception("Usuario sin rol asignado.");
 
             var claims = new[]
             {
-                new Claim("IdUsuario", usuario.IdUsuario.ToString()),
-                new Claim(ClaimTypes.Name, usuario.NombreUsuario),
-                new Claim("Rol", usuario.IdRol.ToString()),
-                new Claim("Entidad", usuario.TipoEntidad ?? "")
-            };
+        new Claim("IdUsuario", usuario.IdUsuario.ToString()),
+        new Claim(ClaimTypes.Name, usuario.NombreUsuario ?? ""),
+        new Claim("Rol", usuario.IdRol.ToString() ?? "0"),
+        new Claim("Entidad", usuario.TipoEntidad ?? "")
+    };
 
-            var key = Encoding.ASCII.GetBytes(_config["JwtSettings:SecretKey"]);
+            var secret = _config["JwtSettings:SecretKey"];
+            Console.WriteLine($"SecretKey: {(string.IsNullOrWhiteSpace(secret) ? "VACÍA O NULA" : "OK")}");
+
+            if (string.IsNullOrWhiteSpace(secret))
+                throw new Exception("Configuración de clave JWT ausente.");
+
+            var key = Encoding.ASCII.GetBytes(secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(8),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
+            Console.WriteLine("Token generado correctamente.");
             return tokenHandler.WriteToken(token);
         }
 

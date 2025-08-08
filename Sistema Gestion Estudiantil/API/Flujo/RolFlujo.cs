@@ -37,6 +37,11 @@ namespace Flujo
             return await _rolDA.ObtenerRolePorId(Id);
         }
 
+        public async Task<RolesResponse> ObtenerRolePorNombre(string nombre)
+        {
+            return await _rolDA.ObtenerRolePorNombre(nombre);
+        }
+
         public async Task<IEnumerable<RolesResponse>> ObtenerRoles()
         {
             return await _rolDA.ObtenerRoles();

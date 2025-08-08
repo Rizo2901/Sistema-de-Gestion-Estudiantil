@@ -32,5 +32,10 @@ namespace Abstracciones.Interfaces.DA
         Task<Guid> CambiarContrasena(Guid Id, string nuevaContrasena, string contrasenaActual);
 
         Task<UsuariosResponse> ObtenerPorNombreOEmail(string identificador);
+
+        Task<EntidadBasicaResponse> ObtenerDatosEntidadAsync(string tipoEntidad, Guid idEntidad);
+
+        Task ActualizarIdUsuarioEnEntidad(string tipoEntidad, Guid idEntidad, Guid idUsuario);
+
     }
 }

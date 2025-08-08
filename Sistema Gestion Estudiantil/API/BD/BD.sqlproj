@@ -101,6 +101,8 @@
     <Folder Include="Administrador\Stored Procedures\" />
     <Folder Include="AdaptacionCurricular\" />
     <Folder Include="AdaptacionCurricular\Stored Procedures\" />
+    <Folder Include="Entidad\" />
+    <Folder Include="Entidad\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Usuarios.sql" />
@@ -363,5 +365,16 @@
     <Build Include="Security\AdaptacionCurricular.sql" />
     <Build Include="Usuario\Stored Procedures\ObtenerPorNombreOEmail.sql" />
     <Build Include="Usuario\Stored Procedures\ActualizarContrasena.sql" />
+    <Build Include="Entidad\Stored Procedures\ActualizarIdUsuarioFamiliar.sql" />
+    <Build Include="Entidad\Stored Procedures\ActualizarIdUsuarioProfesor.sql" />
+    <Build Include="Entidad\Stored Procedures\ActualizarIdUsuarioAdministrador.sql" />
+    <Build Include="Entidad\Stored Procedures\ObtenerAdministradorBasico.sql" />
+    <Build Include="Entidad\Stored Procedures\ObtenerFamiliarBasico.sql" />
+    <Build Include="Entidad\Stored Procedures\ObtenerProfesorBasico.sql" />
+    <Build Include="Entidad\Stored Procedures\ObtenerEstudianteBasico.sql" />
+    <Build Include="Security\Entidad.sql" />
+    <Build Include="Entidad\Stored Procedures\ActualizarIdUsuarioEstudiante.sql" />
+    <Build Include="Entidad\Stored Procedures\VincularUsuarioPorCorreoYEntidad.sql" />
+    <Build Include="dbo\Stored Procedures\ObtenerRolPorNombre.sql" />
   </ItemGroup>
 </Project>

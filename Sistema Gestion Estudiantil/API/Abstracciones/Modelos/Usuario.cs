@@ -48,29 +48,13 @@ namespace Abstracciones.Modelos
         public Guid IdRol { get; set; } // Aunque ya está en la base, lo mantenés obligatorio en request
     }
 
-    public class LoginRequest
+   
+
+    public class CrearUsuarioEntidadRequest
     {
-        public string Identificador { get; set; } // Puede ser usuario o correo
-        public string Contrasena { get; set; }
+        public string TipoEntidad { get; set; } = string.Empty;
+        public Guid IdEntidad { get; set; }
+        public Guid IdRol { get; set; }
     }
 
-
-    public class Perfil
-    {
-        public Guid IdUsuario { get; set; }
-
-        public string NombreUsuario { get; set; }
-
-        public string CorreoElectronico { get; set; }
-
-        public string FotoPerfil { get; set; }
-
-        // Rol institucional
-        public string RolNombre { get; set; }
-        public string RolDescripcion { get; set; }
-
-        // Entidad (Profesor, Familiar, etc.)
-        public string TipoEntidad { get; set; }
-        public string NombreEntidad { get; set; }
-    }
 }

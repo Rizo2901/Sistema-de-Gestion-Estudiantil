@@ -1,6 +1,7 @@
 ﻿using Abstracciones.Interfaces.API;
 using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
+using Abstracciones.Modelos.Seguridad;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +11,14 @@ namespace API.Controllers
     [ApiController]
     public class AutenticacionController : ControllerBase, IAutenticacionController
     {
-        private readonly IAutenticacionFlujo _autenticacionFlujo;
+        private  IAutenticacionFlujo _autenticacionFlujo;
 
         public AutenticacionController(IAutenticacionFlujo autenticacionFlujo)
         {
             _autenticacionFlujo = autenticacionFlujo;
         }
 
-        [HttpPost("login")]
+        [HttpPost]
         public async Task<IActionResult> Autenticar([FromBody] LoginRequest request)
         {
             try
@@ -35,7 +36,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("perfil")]
+        [HttpGet]
         [Authorize]
         public async Task<IActionResult> ObtenerPerfil()
         {

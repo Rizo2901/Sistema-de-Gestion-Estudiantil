@@ -4,6 +4,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,6 +61,18 @@ namespace DA
             {
                 IdRol = Id
             }, commandType: System.Data.CommandType.StoredProcedure);
+            return result.FirstOrDefault();
+        }
+
+        public async Task<RolesResponse> ObtenerRolePorNombre(string nombre)
+        {
+            string query = @"ObtenerRolPorNombre";
+
+            var result = await _conn.QueryAsync<RolesResponse>(query, new
+            {
+                NombreRol = nombre
+            }, commandType: CommandType.StoredProcedure);
+
             return result.FirstOrDefault();
         }
 

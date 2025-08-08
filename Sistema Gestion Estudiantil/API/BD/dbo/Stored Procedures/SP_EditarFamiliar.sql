@@ -1,7 +1,8 @@
-﻿CREATE PROCEDURE SP_EditarFamiliar
+﻿CREATE PROCEDURE [dbo].[SP_EditarFamiliar]
     @IdFamiliar UNIQUEIDENTIFIER,
     @IdEstudiante UNIQUEIDENTIFIER,
     @Nombre VARCHAR(255),
+	@Cedula VARCHAR (40),
     @Apellido1 VARCHAR(255),
     @Apellido2 VARCHAR(255),
     @Direccion VARCHAR(MAX),
@@ -20,6 +21,7 @@ BEGIN
     SET
         IdEstudiante = @IdEstudiante,
         Nombre = @Nombre,
+		Cedula= @Cedula,
         Apellido1 = @Apellido1,
         Apellido2 = @Apellido2,
         Direccion = @Direccion,

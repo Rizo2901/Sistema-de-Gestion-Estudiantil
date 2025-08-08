@@ -1,6 +1,7 @@
 ﻿
 CREATE PROCEDURE [dbo].[SP_CrearProfesor] (
     @Nombre VARCHAR(255),
+	@Cedula VARCHAR (40),
     @Apellido1 VARCHAR(255),
     @Apellido2 VARCHAR(255),
     @Direccion TEXT = NULL,
@@ -14,12 +15,12 @@ BEGIN
 
     INSERT INTO Profesores (
         IdProfesor,
-        Nombre, Apellido1, Apellido2, Direccion, TelefonoCelular, CorreoElectronico,
+        Nombre,Cedula, Apellido1, Apellido2, Direccion, TelefonoCelular, CorreoElectronico,
         IdUsuario
     )
     VALUES (
         @NuevoId,
-         @Nombre, @Apellido1, @Apellido2,  @Direccion, @TelefonoCelular, @CorreoElectronico,
+         @Nombre, @Cedula,@Apellido1, @Apellido2,  @Direccion, @TelefonoCelular, @CorreoElectronico,
          @IdUsuario
     );
 

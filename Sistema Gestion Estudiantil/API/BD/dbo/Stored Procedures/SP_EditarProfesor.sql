@@ -1,7 +1,8 @@
 ﻿
-CREATE PROCEDURE SP_EditarProfesor(
+CREATE PROCEDURE [dbo].[SP_EditarProfesor](
    @IdProfesor UNIQUEIDENTIFIER,
     @Nombre VARCHAR(255),
+	@Cedula VARCHAR (40),
     @Apellido1 VARCHAR(255),
     @Apellido2 VARCHAR(255),
     @Direccion TEXT = NULL,
@@ -16,6 +17,7 @@ BEGIN
     UPDATE Profesores
     SET
         Nombre = @Nombre,
+		Cedula = @Cedula,
         Apellido1 = @Apellido1,
         Apellido2 = @Apellido2,
         Direccion = @Direccion,

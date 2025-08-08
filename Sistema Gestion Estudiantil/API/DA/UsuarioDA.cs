@@ -22,15 +22,23 @@ namespace DA
 
         public async Task<Guid> CrearUsuario(UsuariosRequest usuario)
         {
-            string query = @"Usuario.CrearUsuario";
-            var result = await _conn.ExecuteScalarAsync<Guid>(query, new
+            const string query = "Usuario.CrearUsuario";
+
+            var parametros = new
             {
                 NombreUsuario = usuario.NombreUsuario,
                 Contrasena = usuario.Contrasena,
                 CorreoElectronico = usuario.CorreoElectronico,
                 IdRol = usuario.IdRol,
                 TipoEntidad = usuario.TipoEntidad
-            });
+            };
+
+            var result = await _conn.ExecuteScalarAsync<Guid>(
+                query,
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
+
             return result;
         }
 
@@ -116,6 +124,52 @@ namespace DA
             );
 
             return result;
+        }
+
+        public async Task<EntidadBasicaResponse> ObtenerDatosEntidadAsync(string tipoEntidad, Guid idEntidad)
+        {
+            string sp = tipoEntidad switch
+            {
+                "Estudiante" => "Entidad.ObtenerEstudianteBasico",
+                "Profesor" => "Entidad.ObtenerProfesorBasico",
+                "Familiar" => "Entidad.ObtenerFamiliarBasico",
+                "Administrador" => "Entidad.ObtenerAdministradorBasico",
+                _ => throw new Exception("Tipo de entidad no soportado.")
+            };
+
+            string nombreParametro = tipoEntidad switch
+            {
+                "Estudiante" => "IdEstudiante",
+                "Profesor" => "IdProfesor",
+                "Familiar" => "IdFamiliar",
+                "Administrador" => "IdAdministrador",
+                _ => "IdEntidad"
+            };
+
+            var parametros = new DynamicParameters();
+            parametros.Add(nombreParametro, idEntidad);
+
+            return await _conn.QueryFirstOrDefaultAsync<EntidadBasicaResponse>(
+                sp,
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
+        }
+
+
+        public async Task ActualizarIdUsuarioEnEntidad(string tipoEntidad, Guid idEntidad, Guid idUsuario)
+        {
+            // 🔍 Obtener el correo del usuario recién creado
+            var usuario = await ObtenerUsuarioPorId(idUsuario);
+            if (usuario == null)
+                throw new Exception("Usuario no encontrado para vinculación.");
+
+            var parametros = new DynamicParameters();
+            parametros.Add("@CorreoElectronico", usuario.CorreoElectronico);
+            parametros.Add("@IdEntidad", idEntidad);
+            parametros.Add("@TipoEntidad", tipoEntidad);
+
+            await _conn.ExecuteAsync("Entidad.VincularUsuarioPorCorreoYEntidad", parametros, commandType: CommandType.StoredProcedure);
         }
 
 

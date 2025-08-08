@@ -74,6 +74,16 @@ else
                                                 <i class="bi bi-people-fill me-1"></i> Asignar Sección
                                             </a>
                                         </li>
+
+                                        @if (profesor.IdUsuario == null)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario_@profesor.IdProfesor">
+                                                    <i class="bi bi-person-plus-fill me-1"></i> Crear Usuario
+                                                </a>
+                                            </li>
+                                        }
+
                                         <li>
                                             <a class="dropdown-item" href="/Dashboard/Profesores/VerMaterias?IdProfesor=@profesor.IdProfesor">
                                                 <i class="bi bi-eye me-1"></i> Ver Materias
@@ -87,6 +97,31 @@ else
                                     </ul>
                                 </div>
 
+                                <!-- Modal de confirmación para creación de usuario -->
+                                <div class="modal fade" id="modalCrearUsuario_@profesor.IdProfesor" tabindex="-1"
+                                     aria-labelledby="modalCrearUsuarioLabel_@profesor.IdProfesor" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-dark text-white">
+                                                <h5 class="modal-title" id="modalCrearUsuarioLabel_@profesor.IdProfesor">
+                                                    Crear Usuario para @profesor.Nombre
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                            </div>
+                                            <form method="post" asp-page-handler="CrearUsuarioAuto">
+                                                <div class="modal-body">
+                                                    <p>¿Deseás crear un usuario institucional para <strong>@profesor.Nombre</strong>?</p>
+                                                    <input type="hidden" name="IdEntidad" value="@profesor.IdProfesor" />
+                                                    <input type="hidden" name="TipoEntidad" value="Profesor" />
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-dark">Crear y Enviar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

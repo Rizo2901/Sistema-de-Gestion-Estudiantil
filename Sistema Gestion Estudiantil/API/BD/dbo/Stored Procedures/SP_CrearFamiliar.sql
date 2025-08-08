@@ -1,6 +1,8 @@
-﻿CREATE PROCEDURE SP_CrearFamiliar
+﻿
+CREATE PROCEDURE [dbo].[SP_CrearFamiliar]
     @IdEstudiante UNIQUEIDENTIFIER,
     @Nombre VARCHAR(255),
+	@Cedula VARCHAR (40),
     @Apellido1 VARCHAR(255),
     @Apellido2 VARCHAR(255),
     @Direccion VARCHAR(MAX),
@@ -17,12 +19,12 @@ AS
 BEGIN
     DECLARE @NewId UNIQUEIDENTIFIER = NEWID();
     INSERT INTO Familiares (
-        IdFamiliar, IdEstudiante, Nombre, Apellido1, Apellido2, Direccion, Parentesco,
+        IdFamiliar, IdEstudiante, Nombre,Cedula, Apellido1, Apellido2, Direccion, Parentesco,
         TelefonoCelular, CorreoElectronico, Ocupacion, EstadoCivil, CantidadHijos,
         IdUsuario, ViveConEstudiante, EsResponsableLegal
     )
     VALUES (
-        @NewId, @IdEstudiante, @Nombre, @Apellido1, @Apellido2, @Direccion, @Parentesco,
+        @NewId, @IdEstudiante, @Nombre,@Cedula, @Apellido1, @Apellido2, @Direccion, @Parentesco,
         @TelefonoCelular, @CorreoElectronico, @Ocupacion, @EstadoCivil, @CantidadHijos,
         @IdUsuario, @ViveConEstudiante, @EsResponsableLegal
     );

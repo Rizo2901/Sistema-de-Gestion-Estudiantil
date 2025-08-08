@@ -8,14 +8,18 @@ CREATE PROCEDURE [Usuario].[CrearUsuario]
 AS
 BEGIN
     SET NOCOUNT ON;
-	 DECLARE @NuevoId UNIQUEIDENTIFIER = NEWID();
+
+    DECLARE @NuevoId UNIQUEIDENTIFIER = NEWID();
 
     INSERT INTO [dbo].[Usuarios] (
-        IdUsuario,NombreUsuario, Contrasena, CorreoElectronico,
+        IdUsuario, NombreUsuario, Contrasena, CorreoElectronico,
         IdRol, Estado, FechaActivacion, TipoEntidad
     )
     VALUES (
-        @NuevoId,@NombreUsuario, @Contrasena, @CorreoElectronico,
+        @NuevoId, @NombreUsuario, @Contrasena, @CorreoElectronico,
         @IdRol, 1, GETDATE(), @TipoEntidad
     );
+
+   
+    SELECT @NuevoId;
 END

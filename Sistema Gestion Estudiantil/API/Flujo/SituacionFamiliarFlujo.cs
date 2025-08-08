@@ -46,5 +46,9 @@ namespace Flujo
             return await _situacionFamiliarDA.ObtenerSituacionesFamiliaresPorEstudiante(IdEstudiante);
         }
 
+        public async Task<SituacionFamiliarResponse> ObtenerSituacionFamiliarPorId(Guid Id)
+        {
+            return await _situacionFamiliarDA.ObtenerSituacionFamiliarPorId(Id);
+        }
     }
 }

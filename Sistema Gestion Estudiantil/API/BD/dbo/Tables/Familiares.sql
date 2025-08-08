@@ -14,6 +14,7 @@
     [IdUsuario]          UNIQUEIDENTIFIER NULL,
     [ViveConEstudiante]  BIT              DEFAULT ((0)) NULL,
     [EsResponsableLegal] BIT              DEFAULT ((0)) NULL,
+    [Cedula]             VARCHAR (40)     NULL,
     PRIMARY KEY CLUSTERED ([IdFamiliar] ASC),
     FOREIGN KEY ([IdEstudiante]) REFERENCES [dbo].[Estudiantes] ([IdEstudiante]) ON DELETE CASCADE,
     FOREIGN KEY ([IdUsuario]) REFERENCES [dbo].[Usuarios] ([IdUsuario])

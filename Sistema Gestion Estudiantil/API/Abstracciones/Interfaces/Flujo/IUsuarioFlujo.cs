@@ -31,5 +31,9 @@ namespace Abstracciones.Interfaces.Flujo
 
         // Lógica extendida en backend: verificación previa
         Task<Guid> CambiarContrasena(Guid Id, string nuevaContrasena, string contrasenaActual);
+
+        Task<Guid> CrearUsuarioDesdeEntidad(string tipoEntidad, Guid idEntidad);
     }
-}
+
+        
+ }

@@ -1,12 +1,73 @@
 
 using Abstracciones.Interfaces.DA;
 using Abstracciones.Interfaces.Flujo;
+using Abstracciones.Modelos.Servicios.Helpers;
 using DA;
 using DA.Repositorios;
 using Flujo;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
+using Servicios.Helpers;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+// Configuración JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:SecretKey"])
+        )
+    };
+});
+
+// ... configuración JWT y servicios ...
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "API Sistema Escolar",
+        Version = "v1"
+    });
+
+    // Configuración de seguridad JWT para Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // Add services to the container.
 
@@ -28,6 +89,7 @@ builder.Services.AddScoped<IAtencionMedicaFlujo, AtencionMedicaFlujo>();
 
 builder.Services.AddScoped<IArchivoServiceFlujo, ArchivoServiceFlujo>();
 builder.Services.AddScoped<IArchivoService, ArchivoService>();
+builder.Services.AddScoped<IAutenticacionFlujo, AutenticacionFlujo>();
 
 builder.Services.AddScoped<ICalificacionDA, CalificacionDA>();
 builder.Services.AddScoped<ICalificacionFlujo, CalificacionFlujo>();
@@ -45,6 +107,7 @@ builder.Services.AddScoped<ICategoriaCondicionEspecialFlujo, CategoriaCondicionE
 builder.Services.AddScoped<ICategoriaSituacionFamiliarDA, CategoriaSituacionFamiliarDA>();
 builder.Services.AddScoped<ICategoriaSituacionFamiliarFlujo, CategoriaSituacionFamiliarFlujo>();
 
+builder.Services.AddScoped<ICorreoHelper, CorreoHelper>();
 
 builder.Services.AddScoped<IFamiliarDA, FamiliarDA>();
 builder.Services.AddScoped<IFamiliarFlujo, FamiliarFlujo>();
@@ -116,6 +179,9 @@ builder.Services.AddScoped<IMateriaProfesorFlujo, MateriaProfesorFlujo>();
 builder.Services.AddScoped<IHorarioDA, HorarioDA>();
 builder.Services.AddScoped<IHorarioFlujo, HorarioFlujo>();
 
+builder.Services.AddScoped<IUsuarioDA, UsuarioDA>();
+builder.Services.AddScoped<IUsuarioFlujo, UsuarioFlujo>();
+
 
 
 builder.Services.AddScoped<IRepositorioDapper, RepositorioDapper>();
@@ -147,6 +213,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowMyOrigin"); // Aplica la política de CORS
 
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();

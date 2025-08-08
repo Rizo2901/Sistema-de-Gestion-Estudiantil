@@ -1,9 +1,20 @@
-﻿@{
-    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString()?.ToLower(); bool mostrarMenuDashboard = paginaActual != null && paginaActual.StartsWith("/dashboard");
+﻿@using Abstracciones.Modelos.Seguridad
+@{
+    var perfil = await AuthHelper.ObtenerPerfilAsync(Context.Request);
 }
+
+@if (perfil != null)
+{
+    
+}
+@{
+
+    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString()?.ToLower(); bool mostrarMenuDashboard = paginaActual != null && paginaActual.StartsWith("/dashboard");
+} 
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Web</title>
@@ -52,23 +63,50 @@
                         <i class="bi bi-envelope-fill me-2"></i>Contacto
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-black @(paginaActual == "/login" ? "active" : "")" asp-page="/Login">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-black @(paginaActual == "/dashboard/dashboard" ? "active" : "")" asp-page="/Dashboard/Dashboard">
-                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                    </a>
-                </li>
+                @if (perfil != null)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-black @(paginaActual == "/dashboard/dashboard" ? "active" : "")" asp-page="/Dashboard/Dashboard">
+                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" asp-page="/Cuenta/Logout">
+                            <button type="submit" class="nav-link btn btn-link text-black w-100 text-start">
+                                <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-black @(paginaActual == "/cuenta/login" ? "active" : "")" asp-page="/Cuenta/Login">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+                        </a>
+                    </li>
+                }
+
+                
             </ul>
         </div>
         <div style="border-top: 1px solid #ddd; padding-top: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <img src="/img/avatar.png" alt="Usuario" class="rounded-circle" width="60" height="60" style="object-fit: cover;" />
+            
             <div>
-                <span style="font-weight: 600;">Juan Pérez</span><br />
-                <small style="color: gray;">juanperez@email.com</small>
+                @if (perfil != null)
+                {
+                    <span style="font-weight: 600;">@perfil.NombreUsuario</span>
+                
+                    <br />
+                    <small style="color: gray;">@perfil.CorreoElectronico</small>
+                }
+                else
+                {
+                    <span style="font-weight: 600;">Invitado</span>
+                
+                    <br />
+                    <small style="color: gray;">Sin sesión</small>
+                }
             </div>
         </div>
     </div>
@@ -97,115 +135,50 @@
                             </button>
                         </div>
                         <ul class="nav flex-column">
+                            <!-- Común para todos -->
                             <li class="nav-item">
                                 <a class="nav-link text-white @(paginaActual == "/dashboard" ? "fw-bold" : "")"
                                    asp-page="/Dashboard/Dashboard">
                                     <i class="bi bi-house me-2"></i>Inicio
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Estudiantes/Index" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Estudiantes/Index">
-                                    <i class="bi bi-person-lines-fill me-2"></i>Estudiantes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/calificaciones" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Calificaciones">
-                                    <i class="bi bi-clipboard-data me-2"></i>Calificaciones
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Profesores/Index" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Profesores/Index">
-                                    <i class="bi bi-person-lines-fill me-2"></i>Profesores
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Roles" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Roles/Index">
-                                    <i class="bi bi-person-gear me-2"></i>Roles
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/usuarios" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Usuarios">
-                                    <i class="bi bi-people-fill me-2"></i>Usuarios
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/atencionesmedicas" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/AtencionesMedicas">
-                                    <i class="bi bi-heart-pulse me-2"></i>Atenciones médicas
-                                </a>
-                            </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/misnotas" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/MisNotas">
-                                    <i class="bi bi-journal-check me-2"></i>Mis notas
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Secciones" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Secciones/Index">
-                                    <i class="bi bi-diagram-3 me-2"></i>Secciones
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Materias" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Materias/Index">
-                                    <i class="bi bi-card-list me-2"></i>Materias
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Documentos" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Documentos/Index">
-                                    <i class="bi bi-file-earmark me-2"></i>Documentos
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/CondicionesEspeciales" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/CondicionesEspeciales/Index">
-                                    <i class="bi bi-person-lines-fill me-2"></i>Condiciones Especiales
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/missecciones" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/MisSecciones">
-                                    <i class="bi bi-person-badge me-2"></i>Mis secciones
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/horarios" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Horarios">
-                                    <i class="bi bi-calendar-week me-2"></i>Horarios
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/dashboard/mishorarios" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/MisHorarios">
-                                    <i class="bi bi-clock-history me-2"></i>Mis horarios
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/ReunionesFamiliares" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/ReunionesFamiliares/Index">
-                                    <i class="bi bi-people me-2"></i>Reuniones familiares
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/ReunionesAdministrativas" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/ReunionesAdministrativas/Index">
-                                    <i class="bi bi-building me-2"></i>Reuniones administrativas
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(paginaActual == "/Dashboard/Actividades" ? "fw-bold" : "")"
-                                   asp-page="/Dashboard/Actividades/Index">
-                                    <i class="bi bi-kanban me-2"></i>Actividades
-                                </a>
-                            </li>
+                            @if (perfil?.TipoEntidad == "Administrador")
+                            {
+                                <!-- Opciones generales para administrador -->
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Estudiantes/Index"><i class="bi bi-person-lines-fill me-2"></i>Estudiantes</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Profesores/Index"><i class="bi bi-person-lines-fill me-2"></i>Profesores</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Roles/Index"><i class="bi bi-person-gear me-2"></i>Roles</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Usuarios"><i class="bi bi-people-fill me-2"></i>Usuarios</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/AtencionesMedicas"><i class="bi bi-heart-pulse me-2"></i>Atenciones médicas</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Secciones/Index"><i class="bi bi-diagram-3 me-2"></i>Secciones</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Materias/Index"><i class="bi bi-card-list me-2"></i>Materias</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Documentos/Index"><i class="bi bi-file-earmark me-2"></i>Documentos</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/CondicionesEspeciales/Index"><i class="bi bi-person-lines-fill me-2"></i>Condiciones Especiales</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Reuniones familiares</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Reuniones administrativas</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Actividades/Index"><i class="bi bi-kanban me-2"></i>Actividades</a></li>
+                            }
+                            else if (perfil?.TipoEntidad == "Estudiante")
+                            {
+                                <!-- Opciones específicas para estudiante -->
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisSecciones"><i class="bi bi-person-badge me-2"></i>Mi sección</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisHorarios"><i class="bi bi-clock-history me-2"></i>Mis horarios</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisMaterias"><i class="bi bi-card-list me-2"></i>Mis materias</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisNotas"><i class="bi bi-journal-check me-2"></i>Mis notas</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Actividades/Index"><i class="bi bi-kanban me-2"></i>Actividades</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisDocumentos"><i class="bi bi-file-earmark me-2"></i>Mis documentos</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Mis reuniones familiares</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Mis reuniones administrativas</a></li>
+                            }
+                            else if (perfil?.TipoEntidad == "Profesor")
+                            {
+                                <!-- Opciones específicas para profesor -->
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisSecciones"><i class="bi bi-person-badge me-2"></i>Mis secciones</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisMaterias"><i class="bi bi-card-list me-2"></i>Mis materias</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Reuniones familiares</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Reuniones administrativas</a></li>
+                            }
                         </ul>
                     </nav>
 
