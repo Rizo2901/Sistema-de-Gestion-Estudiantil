@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/usuarios")]
+    [Route("api/[controller]")]
     public class UsuarioController : ControllerBase, IUsuarioController
     {
         private readonly IUsuarioFlujo _usuarioFlujo;

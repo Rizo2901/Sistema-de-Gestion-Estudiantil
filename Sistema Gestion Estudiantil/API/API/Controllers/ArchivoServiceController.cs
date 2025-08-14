@@ -35,13 +35,13 @@ namespace API.Controllers
         }
 
         [HttpPost("documento")]
-        public async Task<IActionResult> SubirDocumentoDriveAsync(IFormFile file)
+        public async Task<IActionResult> SubirDocumentoFirebaseAsync(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("El archivo no es válido.");
 
             using var stream = file.OpenReadStream();
-            var result = await _archivoServiceFlujo.SubirDocumentoDriveAsync(stream, file.FileName);
+            var result = await _archivoServiceFlujo.SubirDocumentoFirebaseAsync(stream, file.FileName);
 
             if (string.IsNullOrEmpty(result))
                 return StatusCode(500, "Error al subir el documento.");

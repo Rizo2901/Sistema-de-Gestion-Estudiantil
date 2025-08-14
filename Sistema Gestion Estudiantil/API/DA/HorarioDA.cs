@@ -3,6 +3,7 @@ using Abstracciones.Modelos;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace DA
@@ -20,46 +21,64 @@ namespace DA
 
         public async Task<IEnumerable<HorarioResponse>> ObtenerHorarios()
         {
-            string query = "SP_ObtenerHorarios";
-            return await _conn.QueryAsync<HorarioResponse>(query, commandType: System.Data.CommandType.StoredProcedure);
+            string query = "Horario.SP_ObtenerHorarios";
+            var result = await _conn.QueryAsync<HorarioResponse>(query);
+            return result;
         }
 
-        public async Task<HorarioResponse> ObtenerHorarioPorId(Guid id)
+        public async Task<HorarioResponse> ObtenerHorarioPorId(Guid IdHorario)
         {
-            string query = "SP_ObtenerHorarioPorId";
-            var result = await _conn.QueryAsync<HorarioResponse>(query, new { IdHorario = id }, commandType: System.Data.CommandType.StoredProcedure);
+            string query = "Horario.SP_ObtenerHorarioPorId";
+            var result = await _conn.QueryAsync<HorarioResponse>(query, 
+                new 
+                { 
+                    IdHorario = IdHorario
+                });
             return result.FirstOrDefault();
         }
 
         public async Task<Guid> CrearHorario(HorarioRequest horario)
         {
-            string query = "SP_CrearHorario";
-            return await _conn.ExecuteScalarAsync<Guid>(query, new
+            string query = @"Horario.SP_CrearHorario";
+            var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
+                IdSeccion = horario.IdSeccion,
+                IdMateria = horario.IdMateria,
+                IdProfesor = horario.IdProfesor,
                 Dia = horario.Dia,
                 HoraInicio = horario.HoraInicio,
                 HoraFin = horario.HoraFin,
-                IdSeccion = horario.IdSeccion
-            }, commandType: System.Data.CommandType.StoredProcedure);
+                Aula = horario.Aula
+            });
+            return result;
         }
 
-        public async Task<Guid> EditarHorario(Guid id, HorarioRequest horario)
+        public async Task<Guid> EditarHorario(Guid IdHorario, HorarioRequest horario)
         {
-            string query = "SP_EditarHorario";
-            return await _conn.ExecuteScalarAsync<Guid>(query, new
+            string query = "Horario.SP_EditarHorario";
+            var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
-                IdHorario = id,
+                IdHorario = IdHorario,
+                IdSeccion = horario.IdSeccion,
+                IdMateria = horario.IdMateria,
+                IdProfesor = horario.IdProfesor,
                 Dia = horario.Dia,
                 HoraInicio = horario.HoraInicio,
                 HoraFin = horario.HoraFin,
-                IdSeccion = horario.IdSeccion
-            }, commandType: System.Data.CommandType.StoredProcedure);
+                Aula = horario.Aula
+            });
+            return result;
         }
 
-        public async Task<Guid> EliminarHorario(Guid id)
+        public async Task<Guid> EliminarHorario(Guid IdHorario)
         {
-            string query = "SP_EliminarHorario";
-            return await _conn.ExecuteScalarAsync<Guid>(query, new { IdHorario = id }, commandType: System.Data.CommandType.StoredProcedure);
+            string query = "Horario.SP_EliminarHorario";
+            var result = await  _conn.ExecuteScalarAsync<Guid>(query, 
+                new 
+                { 
+                    IdHorario = IdHorario
+                });
+            return result;
         }
     }
 }

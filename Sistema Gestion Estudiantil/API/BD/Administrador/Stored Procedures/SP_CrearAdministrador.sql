@@ -21,4 +21,6 @@ BEGIN
         @NuevoId,@Nombre,@Cedula, @Apellido1, @Apellido2, @Direccion,
         @TelefonoCelular, @CorreoElectronico, @IdUsuario
     );
+
+	SELECT @NuevoId AS IdAdministrador;
 END

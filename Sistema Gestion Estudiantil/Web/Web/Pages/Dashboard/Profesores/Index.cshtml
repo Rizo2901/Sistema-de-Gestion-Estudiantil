@@ -24,22 +24,44 @@ else
     </div>
 
     <h2 class="mb-4 text-center text-md-start">Listado de Profesores</h2>
+    <div class="container-fluid px-0 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title mb-3"><i class="bi bi-funnel-fill me-2"></i>Filtros</h5>
+                <div class="row g-2">
+                    <!-- Filtro por nombre -->
+                    <div class="col-12 col-md-4">
+                        <input type="text" id="filtroNombre" class="form-control" placeholder="Buscar por nombre...">
+                    </div>
+                    <!-- Filtro por teléfono -->
+                    <div class="col-12 col-md-4">
+                        <input type="text" id="filtroTelefono" class="form-control" placeholder="Buscar por teléfono...">
+                    </div>
+                    <!-- Filtro por cédula -->
+                    <div class="col-12 col-md-4">
+                        <input type="text" id="filtroCedula" class="form-control" placeholder="Buscar por cédula...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container-fluid px-0">
         <div class="d-flex flex-column gap-3">
             @foreach (var profesor in Model.Profesores)
             {
-                <div class="bg-white shadow rounded p-3 mx-2">
+                <div class="bg-white shadow rounded p-3 mx-2 profesor-card">
                     <div class="row align-items-center gy-3">
 
                         <!-- Info principal -->
                         <div class="col-12 col-md-5">
-                            <div class="fw-bold">@profesor.Nombre @profesor.Apellido1 @profesor.Apellido2</div>
+                            <div class="fw-bold profesor-nombre">@profesor.Nombre @profesor.Apellido1 @profesor.Apellido2</div>
                             <div><i class="bi bi-envelope"></i> @profesor.CorreoElectronico</div>
+                            <div class="d-none profesor-cedula">@profesor.Cedula</div>  <!-- oculto para filtro -->
                         </div>
 
                         <!-- Teléfono centrado -->
-                        <div class="col-12 col-md-3 text-md-center">
+                        <div class="col-12 col-md-3 text-md-center profesor-telefono">
                             <i class="bi bi-telephone"></i> @profesor.TelefonoCelular
                         </div>
 
@@ -83,12 +105,20 @@ else
                                                 </a>
                                             </li>
                                         }
-
+                                        @if (profesor.IdUsuario != null)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item text-primary" href="/Dashboard/Usuarios/Ver?IdUsuario=@profesor.IdUsuario">
+                                                    <i class="bi bi-person-check-fill me-1"></i> Ver Usuario
+                                                </a>
+                                            </li>
+                                        }
                                         <li>
                                             <a class="dropdown-item" href="/Dashboard/Profesores/VerMaterias?IdProfesor=@profesor.IdProfesor">
                                                 <i class="bi bi-eye me-1"></i> Ver Materias
                                             </a>
                                         </li>
+
                                         <li>
                                             <a class="dropdown-item" href="/Dashboard/Profesores/VerSecciones?IdProfesor=@profesor.IdProfesor">
                                                 <i class="bi bi-list-check me-1"></i> Ver Secciones
@@ -97,37 +127,46 @@ else
                                     </ul>
                                 </div>
 
-                                <!-- Modal de confirmación para creación de usuario -->
-                                <div class="modal fade" id="modalCrearUsuario_@profesor.IdProfesor" tabindex="-1"
-                                     aria-labelledby="modalCrearUsuarioLabel_@profesor.IdProfesor" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-dark text-white">
-                                                <h5 class="modal-title" id="modalCrearUsuarioLabel_@profesor.IdProfesor">
-                                                    Crear Usuario para @profesor.Nombre
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                            </div>
-                                            <form method="post" asp-page-handler="CrearUsuarioAuto">
-                                                <div class="modal-body">
-                                                    <p>¿Deseás crear un usuario institucional para <strong>@profesor.Nombre</strong>?</p>
-                                                    <input type="hidden" name="IdEntidad" value="@profesor.IdProfesor" />
-                                                    <input type="hidden" name="TipoEntidad" value="Profesor" />
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                    <button type="submit" class="btn btn-dark">Crear y Enviar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
 
+
+                <!-- Modal de confirmación para creación de usuario -->
+                <div class="modal fade" id="modalCrearUsuario_@profesor.IdProfesor" tabindex="-1"
+                     aria-labelledby="modalCrearUsuarioLabel_@profesor.IdProfesor" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-dark text-white">
+                                <h5 class="modal-title" id="modalCrearUsuarioLabel_@profesor.IdProfesor">
+                                    Crear Usuario para @profesor.Nombre
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body text-start">
+                                <p>¿Deseás crear un usuario institucional para <strong>@profesor.Nombre</strong>?</p>
+                                <div id="feedbackCrearUsuario_@profesor.IdProfesor"
+                                     class="text-center mt-3" style="display:none;">
+                                    <div class="spinner-border text-success" role="status">
+                                        <span class="visually-hidden">Enviando...</span>
+                                    </div>
+                                    <p class="mt-2 text-success fw-bold">Correo enviado con credenciales institucionales</p>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-dark"
+                                        onclick="crearUsuarioDesdeEntidad('@profesor.IdProfesor', 'Profesor')"
+                                        id="btnCrearUsuario_@profesor.IdProfesor">
+                                    Crear y Enviar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
                 <div class="modal fade" id="modalEliminarProfesor_@profesor.IdProfesor" tabindex="-1" aria-hidden="true">
@@ -192,6 +231,10 @@ else
                                     <div class="mb-3">
                                         <label class="form-label">Apellido 2</label>
                                         <input type="text" name="Apellido2" class="form-control" value="@profesor.Apellido2" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Cedula de Identificación</label>
+                                        <input type="text" name="Cedula" class="form-control" value="@profesor.Cedula" />
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Correo</label>
@@ -279,7 +322,7 @@ else
                     <h5 class="modal-title" id="modalCrearLabel">Crear Profesor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <form method="post" asp-page-handler="Crear">
+                <form method="post" asp-page-handler="CrearHorario">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="Nombre" class="form-label">Nombre</label>
@@ -294,6 +337,11 @@ else
                             <input type="text" class="form-control" id="Apellido2" name="Apellido2" />
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Cedula de Identificación</label>
+                            <input type="text" name="Cedula" class="form-control" id="Cedula" />
+                        </div>
+
+                        <div class="mb-3">
                             <label for="CorreoElectronico" class="form-label">Correo Electrónico</label>
                             <input type="email" class="form-control" id="CorreoElectronico" name="CorreoElectronico" />
                         </div>
@@ -305,10 +353,6 @@ else
                             <label for="Direccion" class="form-label">Dirección</label>
                             <textarea class="form-control" id="Direccion" name="Direccion" rows="3"></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="IdUsuario" class="form-label">ID de Usuario (opcional)</label>
-                            <input type="text" class="form-control" id="IdUsuario" name="IdUsuario" />
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -318,5 +362,84 @@ else
             </div>
         </div>
     </div>
+
+}
+
+@section Scripts {
+    <script>
+        async function crearUsuarioDesdeEntidad(idEntidad, tipoEntidad) {
+            const btn = document.getElementById("btnCrearUsuario_" + idEntidad);
+            const feedback = document.getElementById("feedbackCrearUsuario_" + idEntidad);
+            btn.disabled = true;
+            feedback.style.display = "block";
+
+            const payload = {
+                IdEntidad: idEntidad,
+                TipoEntidad: tipoEntidad
+            };
+
+            try {
+                const response = await fetch("/Dashboard/Profesores?handler=CrearUsuarioAuto", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": document.querySelector("input[name='__RequestVerificationToken']").value
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById("modalCrearUsuario_" + idEntidad));
+                        modal.hide();
+                    }, 2000);
+                } else {
+                    feedback.innerHTML = `<p class="text-danger fw-bold">Error al crear el usuario.</p>`;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                feedback.innerHTML = `<p class="text-danger fw-bold">Error de conexión.</p>`;
+                btn.disabled = false;
+            }
+        }
+
+
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const filtroNombre = document.getElementById("filtroNombre");
+            const filtroTelefono = document.getElementById("filtroTelefono");
+            const filtroCedula = document.getElementById("filtroCedula");
+
+            const tarjetasProfesores = document.querySelectorAll(".profesor-card");
+
+            function aplicarFiltros() {
+                const nombre = filtroNombre.value.toLowerCase();
+                const telefono = filtroTelefono.value.toLowerCase();
+                const cedula = filtroCedula.value.toLowerCase();
+
+                tarjetasProfesores.forEach(card => {
+                    const nombreText = card.querySelector(".profesor-nombre").textContent.toLowerCase();
+                    const telefonoText = card.querySelector(".profesor-telefono").textContent.toLowerCase();
+                    const cedulaText = card.querySelector(".profesor-cedula")?.textContent.toLowerCase() || "";
+
+                    const coincideNombre = nombreText.includes(nombre);
+                    const coincideTelefono = telefonoText.includes(telefono);
+                    const coincideCedula = cedulaText.includes(cedula);
+
+                    if (coincideNombre && coincideTelefono && coincideCedula) {
+                        card.style.display = "";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            }
+
+            [filtroNombre, filtroTelefono, filtroCedula].forEach(input => {
+                input.addEventListener("input", aplicarFiltros);
+            });
+        });
+    </script>
 
 }

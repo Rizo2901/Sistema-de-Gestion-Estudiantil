@@ -3,6 +3,7 @@ using Abstracciones.Modelos;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace DA
@@ -21,20 +22,25 @@ namespace DA
         public async Task<IEnumerable<FamiliarResponse>> ObtenerFamiliares()
         {
             string query = "SP_ObtenerFamiliares";
-            return await _conn.QueryAsync<FamiliarResponse>(query, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await _conn.QueryAsync<FamiliarResponse>(query);
+            return result;
         }
 
-        public async Task<FamiliarResponse> ObtenerFamiliarPorId(Guid id)
+        public async Task<FamiliarResponse> ObtenerFamiliarPorId(Guid IdFamiliar)
         {
             string query = "SP_ObtenerFamiliarPorId";
-            var result = await _conn.QueryAsync<FamiliarResponse>(query, new { IdFamiliar = id }, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await _conn.QueryAsync<FamiliarResponse>(query, 
+                new 
+                { 
+                    IdFamiliar = IdFamiliar
+                });
             return result.FirstOrDefault();
         }
 
         public async Task<Guid> CrearFamiliar(FamiliarRequest familiar)
         {
             string query = "SP_CrearFamiliar";
-            return await _conn.ExecuteScalarAsync<Guid>(query, new
+            var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdEstudiante = familiar.IdEstudiante,
                 Nombre = familiar.Nombre,
@@ -51,15 +57,16 @@ namespace DA
                 IdUsuario = familiar.IdUsuario,
                 ViveConEstudiante = familiar.ViveConEstudiante,
                 EsResponsableLegal = familiar.EsResponsableLegal
-            }, commandType: System.Data.CommandType.StoredProcedure);
+            },commandType: CommandType.StoredProcedure);
+            return result;
         }
 
-        public async Task<Guid> EditarFamiliar(Guid id, FamiliarRequest familiar)
+        public async Task<Guid> EditarFamiliar(Guid IdFamiliar, FamiliarRequest familiar)
         {
             string query = "SP_EditarFamiliar";
-            return await _conn.ExecuteScalarAsync<Guid>(query, new
+            var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
-                IdFamiliar = id,
+                IdFamiliar = IdFamiliar,
                 IdEstudiante = familiar.IdEstudiante,
                 Nombre = familiar.Nombre,
                 Cedula = familiar.Cedula,
@@ -75,13 +82,19 @@ namespace DA
                 IdUsuario = familiar.IdUsuario,
                 ViveConEstudiante = familiar.ViveConEstudiante,
                 EsResponsableLegal = familiar.EsResponsableLegal
-            }, commandType: System.Data.CommandType.StoredProcedure);
+            });
+            return result;
         }
 
-        public async Task<Guid> EliminarFamiliar(Guid id)
+        public async Task<Guid> EliminarFamiliar(Guid IdFamiliar)
         {
             string query = "SP_EliminarFamiliar";
-            return await _conn.ExecuteScalarAsync<Guid>(query, new { IdFamiliar = id }, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await _conn.ExecuteScalarAsync<Guid>(query, 
+                new 
+                { 
+                    IdFamiliar = IdFamiliar
+                });
+            return result;
         }
     }
 }

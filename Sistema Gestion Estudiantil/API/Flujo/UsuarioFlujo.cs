@@ -88,22 +88,18 @@ namespace Flujo
 
         public async Task<Guid> CrearUsuarioDesdeEntidad(string tipoEntidad, Guid idEntidad)
         {
-            // 🔍 1. Obtener datos de la entidad (Profesor, Estudiante, etc.)
             var entidad = await _usuarioDA.ObtenerDatosEntidadAsync(tipoEntidad, idEntidad);
             if (entidad == null)
                 throw new Exception("Entidad no encontrada.");
 
-            // 🧠 2. Resolver el rol automáticamente por nombre
-            var rol = await _rolFlujo.ObtenerRolePorNombre(tipoEntidad); // ← ¿es el flujo?
+            var rol = await _rolFlujo.ObtenerRolePorNombre(tipoEntidad); 
             if (rol == null)
                 throw new Exception($"No se encontró rol activo para entidad '{tipoEntidad}'.");
 
-            // 🔐 3. Generar credenciales
             var nombreUsuario = UsuarioHelper.GenerarNombreUsuario(entidad);
             var contrasena = UsuarioHelper.GenerarContrasenaSegura();
             var hash = BCrypt.Net.BCrypt.HashPassword(contrasena);
 
-            // 🧩 4. Crear el usuario
             var usuario = new UsuariosRequest
             {
                 NombreUsuario = nombreUsuario,
@@ -115,20 +111,117 @@ namespace Flujo
 
             var usuarioId = await _usuarioDA.CrearUsuario(usuario);
 
-            // 🔗 5. Vincular usuario con la entidad
             await _usuarioDA.ActualizarIdUsuarioEnEntidad(tipoEntidad, idEntidad, usuarioId);
 
-            // 📧 6. Enviar correo institucional
+            
             var correo = new CorreoPayload
             {
-                Destinatario = usuario.CorreoElectronico,
-                Asunto = "Credenciales institucionales",
-                CuerpoHtml = $@"
-            <h2>Bienvenido</h2>
-            <p>Tu usuario es <strong>{usuario.NombreUsuario}</strong></p>
-            <p>Tu contraseña es <strong>{contrasena}</strong></p>
-            <p>Accedé al sistema y actualizá tu contraseña.</p>"
-            };
+
+    Destinatario = usuario.CorreoElectronico,
+    Asunto = "Credenciales Institucionales - S.G.E",
+    CuerpoHtml = $@"
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }}
+        /* Header estilo SG.E */
+        .header {{
+            background: linear-gradient(90deg, #dc3545, #b02a37);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }}
+        .header img {{
+            vertical-align: middle;
+            margin-right: 10px;
+        }}
+        .header-title {{
+            font-size: 18px;
+            font-weight: bold;
+        }}
+        /* Contenido */
+        .content {{
+            padding: 20px;
+            color: #212529;
+        }}
+        .content h2 {{
+            color: #dc3545;
+            margin-bottom: 10px;
+        }}
+        .credentials {{
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }}
+        .credentials p {{
+            margin: 5px 0;
+            font-size: 15px;
+        }}
+        /* Footer estilo SG.E */
+        .footer {{
+            background-color: #212529;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+        }}
+        .footer a {{
+            color: white;
+            margin: 0 5px;
+            text-decoration: none;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <!-- Header -->
+        <div class='header'>
+            <img src='https://tuservidor.com/static/images/icons8-colegio-100.svg' alt='Logo' width='40' height='40' />
+            <span class='header-title'>Sistema de Gestión Estudiantil (S.G.E)</span>
+        </div>
+
+        <!-- Contenido -->
+        <div class='content'>
+            <h2>Bienvenido(a)</h2>
+            <p>Se han creado tus credenciales institucionales para acceder al sistema de la <strong>Escuela Carolina Dent</strong>.</p>
+            
+            <div class='credentials'>
+                <p><strong>Usuario:</strong> {usuario.NombreUsuario}</p>
+                <p><strong>Contraseña:</strong> {contrasena}</p>
+            </div>
+            
+            <p>Por seguridad, te recomendamos iniciar sesión y cambiar tu contraseña en tu primer acceso.</p>
+            <p><a href='https://tuservidor.com/login' style='color: #dc3545; font-weight: bold;'>Iniciar Sesión en S.G.E</a></p>
+        </div>
+
+        <!-- Footer -->
+        <div class='footer'>
+            <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+            <p>Contacto: <a href='mailto:sgeescuelacarolinaden@gmail.com'>sgeescuelacarolinaden@gmail.com</a></p>
+            <p>© 2025 Sistema de Gestión Estudiantil (S.G.E), Inc</p>
+        </div>
+    </div>
+</body>
+</html>"
+};
+
 
             await _correoHelper.EnviarCorreoAsync(correo);
 

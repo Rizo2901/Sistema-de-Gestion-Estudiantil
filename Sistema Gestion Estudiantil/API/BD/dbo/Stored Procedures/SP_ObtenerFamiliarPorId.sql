@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE SP_ObtenerFamiliarPorId
+﻿CREATE PROCEDURE [dbo].[SP_ObtenerFamiliarPorId]
     @IdFamiliar UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -8,6 +8,7 @@ BEGIN
         Nombre,
         Apellido1,
         Apellido2,
+		Cedula,
         Direccion,
         Parentesco,
         TelefonoCelular,

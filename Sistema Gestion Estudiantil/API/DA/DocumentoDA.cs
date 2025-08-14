@@ -54,7 +54,7 @@ namespace DA
 
                 string nombreArchivo = $"documento_{Guid.NewGuid()}.{extension}";
 
-                archivoUrl = await _archivoService.SubirDocumentoDriveAsync(stream, nombreArchivo);
+                archivoUrl = await _archivoService.SubirImagenFirebaseAsync(stream, nombreArchivo);
             }
 
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
@@ -83,7 +83,7 @@ namespace DA
                 byte[] archivoBytes = Convert.FromBase64String(base64);
                 using var stream = new MemoryStream(archivoBytes);
 
-                archivoUrl = await _archivoService.SubirDocumentoDriveAsync(stream, $"documento_{Guid.NewGuid()}.pdf");
+                archivoUrl = await _archivoService.SubirDocumentoFirebaseAsync(stream, $"documento_{Guid.NewGuid()}.pdf");
             }
 
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new

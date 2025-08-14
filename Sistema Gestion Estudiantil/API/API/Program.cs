@@ -87,6 +87,12 @@ builder.Services.AddScoped<IAlergiaFlujo, AlergiaFlujo>();
 builder.Services.AddScoped<IAtencionMedicaDA, AtencionMedicaDA>();
 builder.Services.AddScoped<IAtencionMedicaFlujo, AtencionMedicaFlujo>();
 
+builder.Services.AddScoped<IAdministradorDA, AdministradorDA>();
+builder.Services.AddScoped<IAdministradorFlujo, AdministradorFlujo>();
+
+builder.Services.AddScoped<IAsistenciaProfesorDA, AsistenciaProfesorDA>();
+builder.Services.AddScoped<IAsistenciaProfesorFlujo, AsistenciaProfesorFlujo>();
+
 builder.Services.AddScoped<IArchivoServiceFlujo, ArchivoServiceFlujo>();
 builder.Services.AddScoped<IArchivoService, ArchivoService>();
 builder.Services.AddScoped<IAutenticacionFlujo, AutenticacionFlujo>();

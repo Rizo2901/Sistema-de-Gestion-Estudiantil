@@ -1,0 +1,337 @@
+﻿@page
+@model Web.Pages.Dashboard.Horarios.IndexModel
+
+@{
+    ViewData["Title"] = "Horarios por Sección";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid px-0 mb-3">
+    <div class="row">
+        <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+            <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrearHorario" style="background-color: #343a40">
+                <i class="bi bi-plus-lg"></i> Crear Horario
+            </button>
+        </div>
+    </div>
+</div>
+<h2 class="mb-4 text-center text-md-start">Listado de Horarios</h2>
+
+<!-- Filtros -->
+<div class="container-fluid px-0 mb-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi bi-funnel-fill me-2"></i>Filtros</h5>
+            <div class="row g-2">
+                <div class="col-12 col-md-4">
+                    <input type="text" id="filtroMateria" class="form-control" placeholder="Buscar por materia...">
+                </div>
+                <div class="col-12 col-md-4">
+                    <input type="text" id="filtroProfesor" class="form-control" placeholder="Buscar por profesor...">
+                </div>
+                <div class="col-12 col-md-4">
+                    <input type="text" id="filtroSeccion" class="form-control" placeholder="Buscar por sección...">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listado de horarios por sección -->
+@if (Model.Horarios == null || !Model.Horarios.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay horarios registrados.
+    </div>
+}
+else
+{
+   <div class="accordion" id="accordionSecciones">
+    @foreach (var seccion in Model.Horarios)
+    {
+        var seccionId = seccion.IdSeccion.ToString();
+        <div class="accordion-item mb-4 horario-seccion shadow" data-seccion="@seccion.NombreSeccion.ToLower()">
+            <h2 class="accordion-header" id="heading_@seccionId">
+                <button class="accordion-button collapsed bg-light text-dark fw-bold fs-4" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapse_@seccionId" 
+                        aria-expanded="false" 
+                        aria-controls="collapse_@seccionId">
+                    Sección: @seccion.NombreSeccion
+                </button>
+            </h2>
+            <div id="collapse_@seccionId" 
+                 class="accordion-collapse collapse" 
+                 aria-labelledby="heading_@seccionId" 
+                 data-bs-parent="#accordionSecciones">
+                <div class="accordion-body bg-light">
+                    @foreach (var dia in seccion.Dias)
+                    {
+                        <h5 class="fw-bold text-secondary">@dia.Dia</h5>
+                        <ul class="list-group mb-3 shadow-sm">
+                            @foreach (var horario in dia.Horarios.OrderBy(h => h.HoraInicio))
+                            {
+                                var horarioId = $"{seccion.IdSeccion}_{horario.IdHorario}";
+                                <li class="list-group-item bg-light shadow-sm d-flex justify-content-between align-items-center horario-card"
+                                    data-materia="@horario.NombreMateria.ToLower()"
+                                    data-profesor="@horario.NombreProfesor.ToLower()"
+                                    data-seccion="@seccion.NombreSeccion.ToLower()">
+                                    <div>
+                                        <strong class="text-dark">@horario.HoraInicio - @horario.HoraFin</strong> &rarr;
+                                        <span class="horario-materia fw-bold text-dark">@horario.NombreMateria</span>
+                                        (<span class="horario-profesor text-secondary">@horario.NombreProfesor</span>)
+                                        <br />
+                                        <small class="text-muted">@horario.Aula</small>
+                                    </div>
+
+                                    <div class="btn-group" role="group" aria-label="Acciones Horario">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalDetalles_@horarioId" title="Detalles">
+                                            <i class="bi bi-info-circle"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@horarioId" title="Editar">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@horarioId" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                           
+
+
+                                    <!-- Modal Detalles -->
+                                    <div class="modal fade" id="modalDetalles_@horarioId" tabindex="-1" aria-labelledby="modalDetallesLabel_@horarioId" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalDetallesLabel_@horarioId">Detalles del Horario</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p><strong>Materia:</strong> @horario.NombreMateria</p>
+                                                    <p><strong>Profesor:</strong> @horario.NombreProfesor</p>
+                                                    <p><strong>Hora:</strong> @horario.HoraInicio - @horario.HoraFin</p>
+                                                    <p><strong>Día:</strong> @horario.Dia</p>
+                                                    <p><strong>Aula:</strong> @horario.Aula</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Editar -->
+                                    <div class="modal fade" id="modalEditar_@horarioId" tabindex="-1" aria-labelledby="modalEditarLabel_@horarioId" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="post" asp-page-handler="EditarHorario">
+                                                    <input type="hidden" name="IdHorario" value="@horario.IdHorario" />
+
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modalEditarLabel_@horarioId">Editar Horario</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Sección</label>
+                                                            <select name="horario.IdSeccion" class="form-select">
+                                <option value="">Seleccione una sección</option>
+                                @foreach (var seccion in Model.Secciones)
+        {
+@:          <option value="@seccion.Value" @(horario.IdSeccion != Guid.Empty && horario.IdSeccion.ToString() == seccion.Value ? "selected" : "")>
+@:              @seccion.Text
+@:          </option>
+        }
+                            </select>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Materia</label>
+                                                           <select name="horario.IdMateria" class="form-select">
+                                <option value="">Seleccione una sección</option>
+                                @foreach (var materia in Model.Materias)
+        {
+@:          <option value="@materia.Value" @(horario.IdMateria != Guid.Empty && horario.IdMateria.ToString() == materia.Value ? "selected" : "")>
+@:              @materia.Text
+@:          </option>
+        }
+                            </select>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Profesor</label>
+                                                          <select name="horario.IdProfesor" class="form-select">
+                                <option value="">Seleccione una sección</option>
+                                @foreach (var profesor in Model.Profesores)
+        {
+@:          <option value="@profesor.Value" @(horario.IdProfesor != Guid.Empty && horario.IdProfesor.ToString() == profesor.Value ? "selected" : "")>
+@:              @profesor.Text
+@:          </option>
+        }
+                            </select>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label asp-for="horario.HoraInicio" class="form-label">Hora Inicio</label>
+                                                            <input asp-for="horario.HoraInicio" class="form-control" value="@horario.HoraInicio" />
+                                                            <span asp-validation-for="horario.HoraInicio" class="text-danger"></span>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label asp-for="horario.HoraFin" class="form-label">Hora Fin</label>
+                                                            <input asp-for="horario.HoraFin" class="form-control" value="@horario.HoraFin" />
+                                                            <span asp-validation-for="horario.HoraFin" class="text-danger"></span>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label asp-for="horario.Dia" class="form-label">Día</label>
+                                                            <input asp-for="horario.Dia" class="form-control" value="@dia.Dia" />
+                                                            <span asp-validation-for="horario.Dia" class="text-danger"></span>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label asp-for="horario.Aula" class="form-label">Aula</label>
+                                                            <input asp-for="horario.Aula" class="form-control" value="@horario.Aula" />
+                                                            <span asp-validation-for="horario.Aula" class="text-danger"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Eliminar -->
+                                    <div class="modal fade" id="modalEliminar_@horarioId" tabindex="-1" aria-labelledby="modalEliminarLabel_@horarioId" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="post" asp-page-handler="EliminarHorario">
+                                                    <input type="hidden" name="IdHorario" value="@horario.IdHorario" />
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modalEliminarLabel_@horarioId">Eliminar Horario</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>¿Estás seguro de que deseas eliminar el horario de <strong>@horario.NombreMateria</strong> con <strong>@horario.NombreProfesor</strong>?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+<!-- Modal Crear Horario -->
+<div class="modal fade" id="modalCrearHorario" tabindex="-1" aria-labelledby="modalCrearHorarioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="CrearHorario">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCrearHorarioLabel">Crear Nuevo Horario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label asp-for="seccionSeleccionada" class="form-label">Sección</label>
+                        <select asp-for="seccionSeleccionada" asp-items="Model.Secciones" class="form-select"></select>
+                        <span asp-validation-for="seccionSeleccionada" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="materiaSeleccionada" class="form-label">Materia</label>
+                        <select asp-for="materiaSeleccionada" asp-items="Model.Materias" class="form-select"></select>
+                        <span asp-validation-for="materiaSeleccionada" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="profesorSeleccionado" class="form-label">Profesor</label>
+                        <select asp-for="profesorSeleccionado" asp-items="Model.Profesores" class="form-select"></select>
+                        <span asp-validation-for="profesorSeleccionado" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="horario.HoraInicio" class="form-label">Hora Inicio</label>
+                        <input asp-for="horario.HoraInicio" class="form-control" />
+                        <span asp-validation-for="horario.HoraInicio" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="horario.HoraFin" class="form-label">Hora Fin</label>
+                        <input asp-for="horario.HoraFin" class="form-control" />
+                        <span asp-validation-for="horario.HoraFin" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="horario.Dia" class="form-label">Día</label>
+                        <input asp-for="horario.Dia" class="form-control" />
+                        <span asp-validation-for="horario.Dia" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="horario.Aula" class="form-label">Aula</label>
+                        <input asp-for="horario.Aula" class="form-control" />
+                        <span asp-validation-for="horario.Aula" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const filtroMateria = document.getElementById("filtroMateria");
+        const filtroProfesor = document.getElementById("filtroProfesor");
+        const filtroSeccion = document.getElementById("filtroSeccion");
+
+        const tarjetasHorarios = document.querySelectorAll(".horario-card");
+
+        function aplicarFiltros() {
+            const materia = filtroMateria.value.toLowerCase();
+            const profesor = filtroProfesor.value.toLowerCase();
+            const seccion = filtroSeccion.value.toLowerCase();
+
+            tarjetasHorarios.forEach(card => {
+                const materiaText = card.dataset.materia;
+                const profesorText = card.dataset.profesor;
+                const seccionText = card.dataset.seccion;
+
+                const coincideMateria = materiaText.includes(materia);
+                const coincideProfesor = profesorText.includes(profesor);
+                const coincideSeccion = seccionText.includes(seccion);
+
+                if (coincideMateria && coincideProfesor && coincideSeccion) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        [filtroMateria, filtroProfesor, filtroSeccion].forEach(input => {
+            input.addEventListener("input", aplicarFiltros);
+        });
+    });
+</script>
+}

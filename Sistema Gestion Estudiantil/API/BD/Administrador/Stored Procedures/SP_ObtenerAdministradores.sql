@@ -8,6 +8,7 @@ BEGIN
         A.Nombre,
         A.Apellido1,
         A.Apellido2,
+		A.Cedula,
         A.Direccion,
         A.TelefonoCelular,
         A.CorreoElectronico,

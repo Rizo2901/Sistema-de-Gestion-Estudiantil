@@ -1,4 +1,4 @@
-using Abstracciones.Interfaces.Reglas;
+Ôªøusing Abstracciones.Interfaces.Reglas;
 using Abstracciones.Modelos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -60,7 +60,7 @@ namespace Web.Pages.Dashboard.Profesores
             {
                 if (string.IsNullOrWhiteSpace(profesor.Nombre) || string.IsNullOrWhiteSpace(profesor.Apellido1))
                 {
-                    ModelState.AddModelError("", "Los campos obligatorios no pueden estar vacÌos.");
+                    ModelState.AddModelError("", "Los campos obligatorios no pueden estar vac√≠os.");
                     return Page();
                 }
 
@@ -69,6 +69,7 @@ namespace Web.Pages.Dashboard.Profesores
                     Nombre = profesor.Nombre,
                     Apellido1 = profesor.Apellido1,
                     Apellido2 = profesor.Apellido2,
+                    Cedula = profesor.Cedula,
                     Direccion = profesor.Direccion,
                     TelefonoCelular = profesor.TelefonoCelular,
                     CorreoElectronico = profesor.CorreoElectronico,
@@ -138,19 +139,19 @@ namespace Web.Pages.Dashboard.Profesores
 
                 if (respuesta.StatusCode == System.Net.HttpStatusCode.Conflict)
                 {
-                    ModelState.AddModelError(string.Empty, "No se puede eliminar el profesor porque est· asociado a otras entidades.");
+                    ModelState.AddModelError(string.Empty, "No se puede eliminar el profesor porque est√° asociado a otras entidades.");
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, $"Error al eliminar el profesor: {contenidoError}");
                 }
 
-                // Carga los profesores otra vez para que no quede vacÌo el listado
+                // Carga los profesores otra vez para que no quede vac√≠o el listado
                 await OnGetAsync();
                 return Page();
             }
 
-            // Recargar la lista despuÈs de eliminar
+            // Recargar la lista despu√©s de eliminar
             await OnGetAsync();
             return Page();
         }
@@ -161,7 +162,7 @@ namespace Web.Pages.Dashboard.Profesores
             {
                 if (string.IsNullOrWhiteSpace(profesor.Nombre) || string.IsNullOrWhiteSpace(profesor.Apellido1))
                 {
-                    ModelState.AddModelError("", "Los campos obligatorios no pueden estar vacÌos.");
+                    ModelState.AddModelError("", "Los campos obligatorios no pueden estar vac√≠os.");
                     await OnGetAsync();
                     return Page();
                 }
@@ -171,13 +172,14 @@ namespace Web.Pages.Dashboard.Profesores
                     Nombre = profesor.Nombre,
                     Apellido1 = profesor.Apellido1,
                     Apellido2 = profesor.Apellido2,
+                    Cedula = profesor.Cedula,
                     Direccion = profesor.Direccion,
                     TelefonoCelular = profesor.TelefonoCelular,
                     CorreoElectronico = profesor.CorreoElectronico
                 };
 
                 string jsonProfesor = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
-                Console.WriteLine($"[DEBUG] JSON enviado para ediciÛn:\n{jsonProfesor}");
+                Console.WriteLine($"[DEBUG] JSON enviado para edici√≥n:\n{jsonProfesor}");
 
                 string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "EditarProfesor");
                 using var cliente = new HttpClient();
@@ -243,7 +245,7 @@ namespace Web.Pages.Dashboard.Profesores
 
         public async Task<IActionResult> OnPostAsignarMateriaAsync()
         {
-            _logger.LogDebug("? Iniciando asignaciÛn de materiaÖ");
+            _logger.LogDebug("? Iniciando asignaci√≥n de materia‚Ä¶");
 
             await ObtenerMaterias();
 
@@ -268,16 +270,16 @@ namespace Web.Pages.Dashboard.Profesores
 
             if (!Guid.TryParse(materiaSeleccionada, out var IdMateria))
             {
-                _logger.LogWarning("Materia seleccionada inv·lida: '{Value}'", materiaSeleccionada);
-                ModelState.AddModelError(nameof(materiaSeleccionada), "Debe seleccionar una materia v·lida.");
+                _logger.LogWarning("Materia seleccionada inv√°lida: '{Value}'", materiaSeleccionada);
+                ModelState.AddModelError(nameof(materiaSeleccionada), "Debe seleccionar una materia v√°lida.");
                 await ObtenerMaterias();
                 return Page();
             }
 
             if (Materiaprofesor == null || Materiaprofesor.IdProfesor == Guid.Empty)
             {
-                _logger.LogError("Materiaprofesor es null o IdProfesor vacÌo.");
-                ModelState.AddModelError(string.Empty, "No se encontrÛ el profesor a asignar.");
+                _logger.LogError("Materiaprofesor es null o IdProfesor vac√≠o.");
+                ModelState.AddModelError(string.Empty, "No se encontr√≥ el profesor a asignar.");
                 return Page();
             }
 
@@ -298,56 +300,83 @@ namespace Web.Pages.Dashboard.Profesores
                 if (!resp.IsSuccessStatusCode)
                 {
                     var err = await resp.Content.ReadAsStringAsync();
-                    _logger.LogError("API devolviÛ {Status}: {Error}", resp.StatusCode, err);
+                    _logger.LogError("API devolvi√≥ {Status}: {Error}", resp.StatusCode, err);
                     ModelState.AddModelError(string.Empty, "Error al asignar la materia.");
                     return Page();
                 }
 
-                _logger.LogInformation("Materia asignada con Èxito.");
+                _logger.LogInformation("Materia asignada con √©xito.");
                 ViewData["MensajeAsignacion"] = "Materia asignada correctamente.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "ExcepciÛn al asignar materia");
-                ModelState.AddModelError(string.Empty, "OcurriÛ un error inesperado.");
+                _logger.LogError(ex, "Excepci√≥n al asignar materia");
+                ModelState.AddModelError(string.Empty, "Ocurri√≥ un error inesperado.");
             }
 
             await OnGetAsync();
-            _logger.LogDebug("Refrescando p·gina tras asignaciÛn.");
+            _logger.LogDebug("Refrescando p√°gina tras asignaci√≥n.");
             return Page();
         }
 
 
-        //public async Task <IActionResult> AsignarMateria()
-        //{
+        public async Task<IActionResult> OnPostCrearUsuarioAutoAsync()
+        {
+            _logger.LogDebug("üöÄ Iniciando creaci√≥n de usuario institucional desde entidad‚Ä¶");
 
-        //await ObtenerSecciones();
+            using var reader = new StreamReader(Request.Body);
+            var body = await reader.ReadToEndAsync();
+
+            var data = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
+            if (data == null || !data.ContainsKey("IdEntidad") || !data.ContainsKey("TipoEntidad"))
+            {
+                _logger.LogWarning("Payload inv√°lido.");
+                return new JsonResult(new { success = false, error = "Datos incompletos." }) { StatusCode = 400 };
+            }
+
+            if (!Guid.TryParse(data["IdEntidad"], out var idEntidad))
+            {
+                _logger.LogWarning("IdEntidad inv√°lido: '{Value}'", data["IdEntidad"]);
+                return new JsonResult(new { success = false, error = "Entidad inv√°lida." }) { StatusCode = 400 };
+            }
+
+            var tipoEntidad = data["TipoEntidad"];
+            if (string.IsNullOrWhiteSpace(tipoEntidad))
+            {
+                _logger.LogWarning("TipoEntidad vac√≠o.");
+                return new JsonResult(new { success = false, error = "Tipo de entidad no especificado." }) { StatusCode = 400 };
+            }
+
+            var payload = new { tipoEntidad, idEntidad };
+            var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
+            _logger.LogDebug("Payload JSON:\n{Json}", json);
+
+            try
+            {
+                var endpoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearUsuarioDesdeEntidad");
+                _logger.LogDebug("Endpoint: {Endpoint}", endpoint);
+
+                using var client = new HttpClient();
+                var response = await client.PostAsync(endpoint, new StringContent(json, Encoding.UTF8, "application/json"));
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogError("API devolvi√≥ {Status}: {Error}", response.StatusCode, error);
+                    return new JsonResult(new { success = false, error = "Error al crear el usuario." }) { StatusCode = 400 };
+                }
+
+                _logger.LogInformation("‚úÖ Usuario creado y correo enviado correctamente.");
+                return new JsonResult(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Excepci√≥n al crear usuario desde entidad.");
+                return new JsonResult(new { success = false, error = "Error inesperado." }) { StatusCode = 500 };
+            }
+        }
 
 
-
-        // Validar secciÛn
-        //if (!Guid.TryParse(seccionseleccionada, out var idSeccion))
-        //{
-        //      ModelState.AddModelError("seccionseleccionada", "Debe seleccionar una secciÛn v·lida.");
-        //        await ObtenerSecciones();
-        //          return Page();
-        //}
-
-        //          Materiaprofesor.
-
-
-
-        // Enviar al API
-        //string endpoint = _configuracion.ObtenerMetodo("ApiEndPoints", "CrearEstudiante");
-        //var contenido = new StringContent(JsonSerializer.Serialize(Estudiante), Encoding.UTF8, "application/json");
-
-        //using var client = new HttpClient();
-        //var respuesta = await client.PostAsync(endpoint, contenido);
-        //respuesta.EnsureSuccessStatusCode();
-
-        //return RedirectToPage();
-
-        //        }
 
     }
 }

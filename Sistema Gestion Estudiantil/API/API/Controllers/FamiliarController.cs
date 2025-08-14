@@ -1,5 +1,8 @@
-﻿using Abstracciones.Interfaces.Flujo;
+﻿using Abstracciones.Interfaces.API;
+using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
+using DA;
+using Flujo;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -8,7 +11,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FamiliarController : ControllerBase
+    public class FamiliarController : ControllerBase, IFamiliarController
     {
         private readonly IFamiliarFlujo _familiarFlujo;
 
@@ -24,13 +27,16 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerFamiliarPorId(Guid id)
+        [HttpGet("{IdFamiliar}")]
+        public async Task<IActionResult> ObtenerFamiliarPorId(Guid IdFamiliar)
         {
-            var result = await _familiarFlujo.ObtenerFamiliarPorId(id);
-            if (result == null)
-                return NotFound("El familiar no existe");
-            return Ok(result);
+            var result = await VerificarExiste(IdFamiliar);
+            if (result == false)
+            {
+                return NotFound("El Familiar no existe");
+            }
+            var resultado = await _familiarFlujo.ObtenerFamiliarPorId(IdFamiliar);
+            return Ok(resultado);
         }
 
         [HttpPost]
@@ -42,18 +48,38 @@ namespace API.Controllers
             return BadRequest("No se pudo crear el familiar");
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> EditarFamiliar(Guid id, [FromBody] FamiliarRequest familiar)
+        [HttpPut("{IdFamiliar}")]
+        public async Task<IActionResult> EditarFamiliar([FromRoute]Guid IdFamiliar, [FromBody] FamiliarRequest familiar)
         {
-            var result = await _familiarFlujo.EditarFamiliar(id, familiar);
-            return Ok("Familiar editado correctamente");
+            var result = await VerificarExiste(IdFamiliar);
+            if (result == false)
+            {
+                return NotFound("El Familiar no existe");
+            }
+            var resultado = await _familiarFlujo.EditarFamiliar(IdFamiliar, familiar);
+            return Ok(resultado);
+          
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> EliminarFamiliar(Guid id)
+        [HttpDelete("{IdFamiliar}")]
+        public async Task<IActionResult> EliminarFamiliar(Guid IdFamiliar)
         {
-            var result = await _familiarFlujo.EliminarFamiliar(id);
-            return Ok("Familiar eliminado correctamente");
+            var result = await VerificarExiste(IdFamiliar);
+            if (result == false)
+            {
+                return NotFound("El Familiar no existe");
+            }
+            var resultado = await _familiarFlujo.EliminarFamiliar(IdFamiliar);
+            return Ok(resultado);
+        }
+
+        private async Task<bool> VerificarExiste(Guid Id)
+        {
+            var resultadoValidacion = false;
+            var resultadoExiste = await _familiarFlujo.ObtenerFamiliarPorId(Id);
+            if (resultadoExiste != null)
+                resultadoValidacion = true;
+            return resultadoValidacion;
         }
     }
 }

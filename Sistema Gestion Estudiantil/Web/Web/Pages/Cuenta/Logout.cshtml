@@ -1,0 +1,49 @@
+﻿@page
+@model Web.Pages.Cuenta.LogoutModel
+@{
+    ViewData["Title"] = "Cerrar Sesión";
+    Layout = "_Layout";
+}
+
+<section class="vh-100 bg-light">
+    <div class="container py-5 h-100">
+        <div class="row justify-content-center align-items-center h-100">
+            <!-- Imagen ilustrativa -->
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <img src="~/static/images/mobile login-pana (1).svg"
+                     class="img-fluid" alt="Ilustración de cierre de sesión" style="max-height: 400px;" />
+                <p class="text-muted small mt-2">
+                    Tu seguridad es importante. Recuerda cerrar sesión en dispositivos públicos.
+                </p>
+            </div>
+
+            <!-- Mensaje y botón -->
+            <div class="col-lg-6">
+                <div class="card shadow border-0 p-4 text-center">
+                    <h3 class="mb-4 text-dark fw-bold">¿Deseas cerrar sesión?</h3>
+                    <p class="mb-4 text-secondary">
+                        Serás desconectado de tu cuenta y deberás iniciar sesión nuevamente para acceder.
+                    </p>
+
+                    <form method="post" asp-page-handler="Logout">
+                        <div class="d-grid mb-2">
+                            <button type="submit" class="btn btn-outline-danger btn-lg">
+                                <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                            </button>
+                        </div>
+                        <a asp-page="/Index" class="btn btn-outline-secondary btn-lg">
+                            Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+    </script>
+}

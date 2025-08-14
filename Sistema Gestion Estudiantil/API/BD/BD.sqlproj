@@ -103,6 +103,10 @@
     <Folder Include="AdaptacionCurricular\Stored Procedures\" />
     <Folder Include="Entidad\" />
     <Folder Include="Entidad\Stored Procedures\" />
+    <Folder Include="Horario\" />
+    <Folder Include="Horario\Stored Procedures\" />
+    <Folder Include="AsistenciaProfesor\" />
+    <Folder Include="AsistenciaProfesor\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Usuarios.sql" />
@@ -376,5 +380,18 @@
     <Build Include="Entidad\Stored Procedures\ActualizarIdUsuarioEstudiante.sql" />
     <Build Include="Entidad\Stored Procedures\VincularUsuarioPorCorreoYEntidad.sql" />
     <Build Include="dbo\Stored Procedures\ObtenerRolPorNombre.sql" />
+    <Build Include="Horario\Stored Procedures\Sp_EliminarHorario.sql" />
+    <Build Include="Horario\Stored Procedures\Sp_EditarHorario.sql" />
+    <Build Include="Horario\Stored Procedures\Sp_ObtenerHorarioPorId.sql" />
+    <Build Include="Horario\Stored Procedures\Sp_ObtenerHorarios.sql" />
+    <Build Include="Horario\Stored Procedures\Sp_CrearHorario.sql" />
+    <Build Include="Security\Horario.sql" />
+    <Build Include="AsistenciaProfesor\Stored Procedures\SP_ObtenerAsistenciasPorProfesor.sql" />
+    <Build Include="AsistenciaProfesor\Stored Procedures\SP_EliminarAsistenciaProfesor.sql" />
+    <Build Include="AsistenciaProfesor\Stored Procedures\SP_ActualizarAsistenciaProfesor.sql" />
+    <Build Include="AsistenciaProfesor\Stored Procedures\SP_ObtenerAsistenciaProfesorPorId.sql" />
+    <Build Include="AsistenciaProfesor\Stored Procedures\SP_ObtenerAsistenciasProfesor.sql" />
+    <Build Include="AsistenciaProfesor\Stored Procedures\SP_CrearAsistenciaProfesor.sql" />
+    <Build Include="Security\AsistenciaProfesor.sql" />
   </ItemGroup>
 </Project>

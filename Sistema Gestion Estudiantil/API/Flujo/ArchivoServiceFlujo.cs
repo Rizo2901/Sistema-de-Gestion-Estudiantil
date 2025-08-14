@@ -13,9 +13,9 @@ namespace Flujo
             _archivoService = archivoService;
         }
 
-        public async Task<string> SubirDocumentoDriveAsync(Stream fileStream, string fileName)
+        public async Task<string> SubirDocumentoFirebaseAsync(Stream fileStream, string fileName)
         {
-            return await _archivoService.SubirDocumentoDriveAsync(fileStream, fileName);
+            return await _archivoService.SubirDocumentoFirebaseAsync(fileStream, fileName);
         }
 
         public async Task<string> SubirImagenFirebaseAsync(Stream fileStream, string fileName)

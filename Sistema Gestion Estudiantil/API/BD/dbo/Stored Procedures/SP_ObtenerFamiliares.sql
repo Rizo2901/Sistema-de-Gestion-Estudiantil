@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE SP_ObtenerFamiliares
+﻿CREATE PROCEDURE [dbo].[SP_ObtenerFamiliares]
 AS
 BEGIN
     SELECT 
@@ -7,6 +7,7 @@ BEGIN
         Nombre,
         Apellido1,
         Apellido2,
+		Cedula,
         Direccion,
         Parentesco,
         TelefonoCelular,

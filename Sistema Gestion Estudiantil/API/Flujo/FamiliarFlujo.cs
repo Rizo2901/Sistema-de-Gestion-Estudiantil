@@ -16,14 +16,29 @@ namespace Flujo
             _familiarDA = familiarDA;
         }
 
-        public Task<IEnumerable<FamiliarResponse>> ObtenerFamiliares() => _familiarDA.ObtenerFamiliares();
+        public async Task<Guid> CrearFamiliar(FamiliarRequest familiar)
+        {
+            return await _familiarDA.CrearFamiliar(familiar);
+        }
 
-        public Task<FamiliarResponse> ObtenerFamiliarPorId(Guid id) => _familiarDA.ObtenerFamiliarPorId(id);
+        public async Task<Guid> EditarFamiliar(Guid IdFamiliar, FamiliarRequest familiar)
+        {
+            return await _familiarDA.EditarFamiliar(IdFamiliar, familiar);
+        }
 
-        public Task<Guid> CrearFamiliar(FamiliarRequest familiar) => _familiarDA.CrearFamiliar(familiar);
+        public async Task<Guid> EliminarFamiliar(Guid IdFamiliar)
+        {
+            return await _familiarDA.EliminarFamiliar(IdFamiliar);
+        }
 
-        public Task<Guid> EditarFamiliar(Guid id, FamiliarRequest familiar) => _familiarDA.EditarFamiliar(id, familiar);
+        public async Task<IEnumerable<FamiliarResponse>> ObtenerFamiliares()
+        {
+            return await _familiarDA.ObtenerFamiliares();
+        }
 
-        public Task<Guid> EliminarFamiliar(Guid id) => _familiarDA.EliminarFamiliar(id);
+        public async Task<FamiliarResponse> ObtenerFamiliarPorId(Guid IdFamiliar)
+        {
+            return await _familiarDA.ObtenerFamiliarPorId(IdFamiliar);
+        }
     }
 }

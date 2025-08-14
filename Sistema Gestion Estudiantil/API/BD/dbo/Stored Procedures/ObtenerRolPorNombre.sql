@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE ObtenerRolPorNombre
+﻿CREATE PROCEDURE [dbo].[ObtenerRolPorNombre]
     @NombreRol VARCHAR(50)
 AS
 BEGIN
@@ -8,5 +8,5 @@ BEGIN
         IdRol,
         Nombre
     FROM Roles
-    WHERE Nombre = @NombreRol 
+    WHERE UPPER(Nombre) = UPPER(@NombreRol)
 END

@@ -9,10 +9,11 @@ namespace Abstracciones.Interfaces.Flujo
 {
     public interface IFamiliarFlujo
     {
-        Task<IEnumerable<FamiliarResponse>> ObtenerFamiliares();
-        Task<FamiliarResponse> ObtenerFamiliarPorId(Guid id);
+  
         Task<Guid> CrearFamiliar(FamiliarRequest familiar);
-        Task<Guid> EditarFamiliar(Guid id, FamiliarRequest familiar);
-        Task<Guid> EliminarFamiliar(Guid id);
+        Task<Guid> EditarFamiliar(Guid IdFamiliar, FamiliarRequest familiar);
+        Task<Guid> EliminarFamiliar(Guid IdFamiliar);
+        Task<IEnumerable<FamiliarResponse>> ObtenerFamiliares();
+        Task<FamiliarResponse> ObtenerFamiliarPorId(Guid IdFamiliar);
     }
 }

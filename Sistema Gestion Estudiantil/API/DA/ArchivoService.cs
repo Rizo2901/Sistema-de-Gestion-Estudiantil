@@ -92,32 +92,57 @@ namespace DA
             return rutaPublica;
         }
 
-        public async Task<string> SubirDocumentoDriveAsync(Stream fileStream, string fileName)
+        public async Task<string> SubirDocumentoFirebaseAsync(Stream fileStream, string fileName)
         {
-            var fileMetadata = new Google.Apis.Drive.v3.Data.File
+            if (fileStream == null || fileStream.Length == 0)
+                throw new ArgumentException("El archivo está vacío o el stream es nulo.");
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException("El nombre del archivo no puede estar vacío.");
+
+            // 🔹 Ruta institucional del documento
+            var rutaConCarpeta = $"estudiantes_documentos/{fileName}";
+
+            // 🔹 Token de acceso (si querés acceso público temporal)
+            var token = Guid.NewGuid().ToString();
+
+            // 🔹 Detectar tipo MIME automáticamente
+            var extension = Path.GetExtension(fileName)?.ToLowerInvariant();
+            var contentType = extension switch
             {
-                Name = fileName,
-                Parents = new List<string> { _driveFolderId }
+                ".pdf" => "application/pdf",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".jpg" => "image/jpeg",
+                ".png" => "image/png",
+                ".txt" => "text/plain",
+                _ => "application/octet-stream" // genérico
             };
 
-            var request = _driveService.Files.Create(fileMetadata, fileStream, "application/pdf");
-            request.Fields = "id";
-
-            var result = await request.UploadAsync();
-
-            // 🔹 Verificar si la subida se completó correctamente
-            if (result.Status != UploadStatus.Completed)
+            var objeto = new Google.Apis.Storage.v1.Data.Object
             {
-                throw new Exception($"Error en la subida: {result.Exception?.Message}");
-            }
+                Bucket = _firebaseBucket,
+                Name = rutaConCarpeta,
+                ContentType = contentType,
+                Metadata = new Dictionary<string, string>
+        {
+            { "firebaseStorageDownloadTokens", token },
+            { "tipo", "documento" },
+            { "fecha_subida", DateTime.UtcNow.ToString("o") }
+        }
+            };
 
-            // 🔹 Verificar si la respuesta de Google Drive es válida
-            if (request.ResponseBody == null)
-            {
-                throw new Exception("La respuesta de Google Drive es nula. Verifica la configuración de la API.");
-            }
+            await _firebaseStorageClient.UploadObjectAsync(
+                objeto,
+                fileStream,
+                new UploadObjectOptions
+                {
+                    PredefinedAcl = PredefinedObjectAcl.Private // 🔐 Solo accesible si lo autorizás
+                }
+            );
 
-            return $"https://drive.google.com/file/d/{request.ResponseBody.Id}/view";
+            var rutaPublica = $"https://firebasestorage.googleapis.com/v0/b/{_firebaseBucket}/o/{Uri.EscapeDataString(rutaConCarpeta)}?alt=media&token={token}";
+            return rutaPublica;
         }
     }
 }
