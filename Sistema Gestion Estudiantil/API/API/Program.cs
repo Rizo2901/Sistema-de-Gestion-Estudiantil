@@ -201,9 +201,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowMyOrigin",
         policy =>
         {
-            policy.WithOrigins("https://localhost:7079") // Especifica el origen del proyecto frontend
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
+            policy.AllowAnyOrigin()
+      .AllowAnyMethod()
+      .AllowAnyHeader();
+
         });
 });
 var app = builder.Build();

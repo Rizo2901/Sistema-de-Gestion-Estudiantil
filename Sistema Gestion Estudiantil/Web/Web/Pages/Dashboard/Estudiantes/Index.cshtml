@@ -1,4 +1,5 @@
 ﻿@page
+@using Abstracciones.Modelos
 @model Web.Pages.Dashboard.Estudiantes.IndexModel
 @{
     ViewData["Title"] = "Estudiantes";
@@ -57,92 +58,114 @@ else
 
 
 
-    
-    <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
+  <h2 class="mb-4 text-center text-md-start">Listado de Estudiantes</h2>
 
 <div class="container-fluid px-0">
     <div class="d-flex flex-column gap-3">
-        @foreach (var estudiante in Model.Estudiantes)
+        @foreach (var estudiante in Model.Estudiantes ?? new List<EstudiantesResponse>())
         {
-<div class="bg-white shadow-sm rounded-3 p-3 mx-2">
-    <div class="row align-items-center gy-2 gx-3">
+            <div class="bg-white shadow-sm rounded-3 p-3 mx-2">
+                <div class="row align-items-center gy-2 gx-3">
 
-        <!-- Foto -->
-        <div class="col-auto">
-            <img src="@(string.IsNullOrEmpty(estudiante.Fotografia) ? "/img/user-default.png" : estudiante.Fotografia)"
-                 alt="Foto"
-                 class="rounded-circle"
-                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ccc;" />
-        </div>
+                    <!-- Foto -->
+                    <div class="col-auto">
+                       @{
+    var foto = string.IsNullOrWhiteSpace(estudiante?.Fotografia)
+        ? "/img/user-default.png"
+        : estudiante.Fotografia;
+}
 
-        <!-- Nombre, correo y datos -->
-        <div class="col flex-grow-1">
-            <h6 class="mb-1 fw-bold">@estudiante.Nombre @estudiante.Apellido1 @estudiante.Apellido2</h6>
-            <p class="mb-0 text-muted small">
-                <i class="bi bi-envelope"></i> @estudiante.CorreoElectronico
-            </p>
-            <p class="mb-0 text-muted small mt-1">
-                <i class="bi bi-folder2-open"></i> Documentos: <strong>2</strong> &nbsp; | &nbsp;
-                <i class="bi bi-universal-access"></i> Discapacidades: <strong>1</strong>
-            </p>
-        </div>
+<img src="@foto"
+     alt="Foto"
+     class="rounded-circle"
+     style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ccc;" />
+                    </div>
 
-        <!-- Estado -->
-        <div class="col-auto text-center">
-            <div class="form-check form-switch d-inline-block">
-                <input class="form-check-input"
-                       type="checkbox"
-                       id="estadoSwitch_@estudiante.IdEstudiante"
-                       @(estudiante.Estado ? "checked" : "")
-                       onchange="cambiarEstado('@estudiante.IdEstudiante', this.checked)" />
+                    <!-- Nombre, correo y datos -->
+                    <div class="col flex-grow-1">
+                        <h6 class="mb-1 fw-bold">
+                            @(estudiante?.Nombre ?? "") @(estudiante?.Apellido1 ?? "") @(estudiante?.Apellido2 ?? "")
+                        </h6>
+                        <p class="mb-0 text-muted small">
+                            <i class="bi bi-envelope"></i> @(estudiante?.CorreoElectronico ?? "Sin correo")
+                        </p>
+                        <p class="mb-0 text-muted small mt-1">
+                            <i class="bi bi-folder2-open"></i> Documentos: <strong>2</strong> &nbsp; | &nbsp;
+                            <i class="bi bi-universal-access"></i> Discapacidades: <strong>1</strong>
+                        </p>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-auto text-center">
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="estadoSwitch_@estudiante?.IdEstudiante"
+                                   @(estudiante?.Estado == true ? "checked" : "")
+                                   onchange="cambiarEstado('@estudiante?.IdEstudiante', this.checked)" />
+                        </div>
+                        <div class="small mt-1">
+                            <span class="badge @(estudiante?.Estado == true ? "bg-success" : "bg-secondary")">
+                                @(estudiante?.Estado == true ? "Activo" : "Inactivo")
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="col-12 col-md-auto d-flex flex-wrap justify-content-md-end gap-2 mt-2 mt-md-0">
+                        <button class="btn btn-outline-primary btn-sm square-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#detalleModal_@estudiante?.IdEstudiante"
+                                title="Detalles">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                        <button class="btn btn-outline-success btn-sm square-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editarModal_@estudiante?.IdEstudiante"
+                                title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm square-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#eliminarModal_@estudiante?.IdEstudiante"
+                                title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle square-btn"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    title="Más acciones">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#agregarModalDocumento-@estudiante?.IdEstudiante">
+                                        <i class="bi bi-file-earmark-plus me-1"></i> Crear Documento
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" title="Crear Usuario">
+                                        <i class="bi bi-person-plus me-1"></i> Crear Usuario
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#modalCondicionEspecial-@estudiante?.IdEstudiante">
+                                        <i class="bi bi-exclamation-diamond me-1"></i> Condición Especial
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="small mt-1">
-                <span class="badge @(estudiante.Estado ? "bg-success" : "bg-secondary")">
-                    @(estudiante.Estado ? "Activo" : "Inactivo")
-                </span>
-            </div>
-        </div>
 
-        <!-- Acciones -->
-        <div class="col-12 col-md-auto d-flex flex-wrap justify-content-md-end gap-2 mt-2 mt-md-0">
-
-            <!-- Botones principales visibles -->
-            <button class="btn btn-outline-primary btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#detalleModal_@estudiante.IdEstudiante" title="Detalles">
-                <i class="bi bi-info-circle"></i>
-            </button>
-            <button class="btn btn-outline-success btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#editarModal_@estudiante.IdEstudiante" title="Editar">
-                <i class="bi bi-pencil-square"></i>
-            </button>
-            <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#eliminarModal_@estudiante.IdEstudiante" title="Eliminar">
-                <i class="bi bi-trash"></i>
-            </button>
-
-            <!-- Dropdown con acciones menos usadas -->
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle square-btn" type="button" data-bs-toggle="dropdown" title="Más acciones">
-                    <i class="bi bi-three-dots"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#agregarModalDocumento-@estudiante.IdEstudiante">
-                            <i class="bi bi-file-earmark-plus me-1"></i> Crear Documento
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" title="Crear Usuario">
-                            <i class="bi bi-person-plus me-1"></i> Crear Usuario
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCondicionEspecial-@estudiante.IdEstudiante">
-                            <i class="bi bi-exclamation-diamond me-1"></i> Condición Especial
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
         
        
          
@@ -203,20 +226,38 @@ else
                             <label class="form-label">Historial Académico</label>
                             <textarea name="estudiante.HistorialAcademico" class="form-control">@estudiante.HistorialAcademico</textarea>
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Fotografía</label>
-                            <div class="mb-2">
-                                <img id="fotoPreview_@estudiante.IdEstudiante"
-                                     src="@(estudiante.Fotografia.StartsWith("http") ? estudiante.Fotografia : $"data:image/jpeg;base64,{estudiante.Fotografia}")"
-                                     alt="Foto actual"
-                                     class="rounded-circle"
-                                     style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #ccc;" />
-                            </div>
-                            <input type="file" class="form-control" accept="image/*" name="FotografiaArchivo"
-                                   onchange="mostrarVistaPrevia(this, 'fotoPreview_@estudiante.IdEstudiante')" />
-                            <input type="hidden" name="estudiante.Fotografia" value="@estudiante.Fotografia" />
-                            <small class="text-muted">Si seleccionas un archivo, reemplazará la foto actual.</small>
-                        </div>
+                       <div class="col-md-12">
+    <label class="form-label">Fotografía</label>
+    @{
+        var fotoPreview = "/img/user-default.png";
+
+        if (!string.IsNullOrWhiteSpace(estudiante?.Fotografia))
+        {
+            fotoPreview = estudiante.Fotografia.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+                ? estudiante.Fotografia
+                : $"data:image/jpeg;base64,{estudiante.Fotografia}";
+        }
+    }
+    <div class="mb-2">
+        <img id="fotoPreview_@estudiante?.IdEstudiante"
+             src="@fotoPreview"
+             alt="Foto actual"
+             class="rounded-circle"
+             style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #ccc;" />
+    </div>
+
+    <input type="file"
+           class="form-control"
+           accept="image/*"
+           name="FotografiaArchivo"
+           onchange="mostrarVistaPrevia(this, 'fotoPreview_@estudiante?.IdEstudiante')" />
+
+    <input type="hidden"
+           name="estudiante.Fotografia"
+           value="@(estudiante?.Fotografia ?? "")" />
+
+    <small class="text-muted">Si seleccionas un archivo, reemplazará la foto actual.</small>
+</div>
 
                         <div class="col-md-12">
                             <label class="form-label">Dirección</label>
@@ -418,10 +459,10 @@ else
                             <label class="form-label">Apellido 2</label>
                             <input asp-for="Estudiante.Apellido2" class="form-control" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Fecha de Nacimiento</label>
-                            <input asp-for="Estudiante.FechaNacimiento" type="date" class="form-control" />
-                        </div>
+                       <div class="col-md-6">
+    <label class="form-label">Fecha de Nacimiento</label>
+    <input asp-for="Estudiante.FechaNacimiento" class="form-control" id="fechaNacimiento" />
+</div>
                         <div class="col-md-6">
                             <label class="form-label">Género</label>
                             <select asp-for="Estudiante.Genero" class="form-select">
@@ -505,6 +546,17 @@ function mostrarVistaPrevia(input, previewId) {
 </script>
 
 
-
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+    flatpickr("#fechaNacimiento", {
+        locale: "es",
+        dateFormat: "Y-m-d",
+        maxDate: "today",
+        defaultDate: "2005-01-01",
+        altInput: true,
+        altFormat: "d-m-Y",
+        allowInput: true
+    });
+</script>
 
 

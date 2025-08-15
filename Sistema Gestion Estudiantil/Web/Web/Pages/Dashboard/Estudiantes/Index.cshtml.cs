@@ -1,4 +1,4 @@
-using Abstracciones.Interfaces.Reglas;
+Ôªøusing Abstracciones.Interfaces.Reglas;
 using Abstracciones.Modelos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -43,9 +43,12 @@ namespace Web.Pages.Dashboard.Estudiantes
         [BindProperty]
         public IFormFile FotografiaArchivo { get; set; }
 
-        public IndexModel(IConfiguracion configuracion)
+        private readonly ILogger<IndexModel> _logger;
+
+        public IndexModel(IConfiguracion configuracion, ILogger<IndexModel> logger)
         {
             _configuracion = configuracion;
+            _logger = logger;
         }
 
 
@@ -60,25 +63,42 @@ namespace Web.Pages.Dashboard.Estudiantes
             string endpoint = _configuracion.ObtenerMetodo("ApiEndPoints", "BuscarEstudiantes");
 
             var queryParams = new List<string>();
+            if (!string.IsNullOrEmpty(FiltroNombre)) queryParams.Add($"nombre={Uri.EscapeDataString(FiltroNombre)}");
+            if (!string.IsNullOrEmpty(FiltroCedula)) queryParams.Add($"cedula={Uri.EscapeDataString(FiltroCedula)}");
+            if (!string.IsNullOrEmpty(FiltroGrado)) queryParams.Add($"grado={Uri.EscapeDataString(FiltroGrado)}");
+            if (!string.IsNullOrEmpty(FiltroSeccion)) queryParams.Add($"seccionNombre={Uri.EscapeDataString(FiltroSeccion)}");
 
-            if (!string.IsNullOrEmpty(FiltroNombre))
-                queryParams.Add($"nombre={Uri.EscapeDataString(FiltroNombre)}");
-            if (!string.IsNullOrEmpty(FiltroCedula))
-                queryParams.Add($"cedula={Uri.EscapeDataString(FiltroCedula)}");
-            if (!string.IsNullOrEmpty(FiltroGrado))
-                queryParams.Add($"grado={Uri.EscapeDataString(FiltroGrado)}");
-            if (!string.IsNullOrEmpty(FiltroSeccion))
-                queryParams.Add($"seccionNombre={Uri.EscapeDataString(FiltroSeccion)}");
-
-            if (queryParams.Any())
-                endpoint += "?" + string.Join("&", queryParams);
+            if (queryParams.Any()) endpoint += "?" + string.Join("&", queryParams);
 
             var client = new HttpClient();
-            var respuesta = await client.GetAsync(endpoint);
-            respuesta.EnsureSuccessStatusCode();
-            var resultado = await respuesta.Content.ReadAsStringAsync();
-            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            Estudiantes = JsonSerializer.Deserialize<List<EstudiantesResponse>>(resultado, opciones);
+
+            try
+            {
+                var respuesta = await client.GetAsync(endpoint);
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    Debug.WriteLine($"[Estudiantes] Error HTTP: {respuesta.StatusCode} - {endpoint}");
+                    Estudiantes = new List<EstudiantesResponse>();
+                    return;
+                }
+
+                var resultado = await respuesta.Content.ReadAsStringAsync();
+                Debug.WriteLine($"[Estudiantes] JSON recibido: {resultado}");
+
+                var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                Estudiantes = JsonSerializer.Deserialize<List<EstudiantesResponse>>(resultado, opciones) ?? new List<EstudiantesResponse>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Estudiantes] Excepci√≥n: {ex.Message}");
+                Estudiantes = new List<EstudiantesResponse>();
+            }
+
+            // üõ°Ô∏è Inicializaci√≥n defensiva
+            Estudiante ??= new EstudiantesRequest();
+            documento ??= new DocumentosRequest();
+            condicion ??= new CondicionesEspecialesRequest();
 
             await ObtenerSecciones();
         }
@@ -108,17 +128,17 @@ namespace Web.Pages.Dashboard.Estudiantes
                 return Page();
             }
 
-            // Validar secciÛn
+            // Validar secci√≥n
             if (!Guid.TryParse(seccionseleccionada, out var idSeccion))
             {
-                ModelState.AddModelError("seccionseleccionada", "Debe seleccionar una secciÛn v·lida.");
+                ModelState.AddModelError("seccionseleccionada", "Debe seleccionar una secci√≥n v√°lida.");
                 await ObtenerSecciones();
                 return Page();
             }
 
             Estudiante.IdSeccion = idSeccion;
 
-            // Convertir imagen a Base64 dentro del mÈtodo si el usuario subiÛ una
+            // Convertir imagen a Base64 dentro del m√©todo si el usuario subi√≥ una
             if (FotografiaArchivo != null && FotografiaArchivo.Length > 0)
             {
                 using var memoryStream = new MemoryStream();
@@ -144,15 +164,15 @@ namespace Web.Pages.Dashboard.Estudiantes
 
         public async Task<IActionResult> OnPostCrearDocumentoAsync()
         {
-            Console.WriteLine("===> EntrÛ a OnPostCrearDocumentoAsync");
+            Console.WriteLine("===> Entr√≥ a OnPostCrearDocumentoAsync");
 
-            // Mostrar valores recibidos para depuraciÛn
+            // Mostrar valores recibidos para depuraci√≥n
             Console.WriteLine($"ArchivoDocumento: {(ArchivoDocumento != null ? ArchivoDocumento.FileName : "null")}");
             Console.WriteLine($"documento.IdEstudiante: {documento?.IdEstudiante}");
             Console.WriteLine($"documento.TipoDocumento: {documento?.TipoDocumento}");
             Console.WriteLine($"documento.Descripcion: {documento?.Descripcion}");
 
-            // ConversiÛn base64 igual que en OnPostCrearAsync (fotografÌa)
+            // Conversi√≥n base64 igual que en OnPostCrearAsync (fotograf√≠a)
             if (ArchivoDocumento != null && ArchivoDocumento.Length > 0)
             {
                 using var memoryStream = new MemoryStream();
@@ -162,11 +182,11 @@ namespace Web.Pages.Dashboard.Estudiantes
                 documento.TipoArchivo = ArchivoDocumento.ContentType;
                 Console.WriteLine($"Base64 inicio: {base64.Substring(0, Math.Min(30, base64.Length))}...");
                 Console.WriteLine($"Base64 fin: ...{base64.Substring(Math.Max(0, base64.Length - 30))}");
-                Console.WriteLine($"TamaÒo base64: {base64.Length}");
+                Console.WriteLine($"Tama√±o base64: {base64.Length}");
             }
             else
             {
-                Console.WriteLine("ArchivoDocumento es null o vacÌo");
+                Console.WriteLine("ArchivoDocumento es null o vac√≠o");
                 ModelState.AddModelError("ArchivoDocumento", "Debe subir un archivo.");
             }
 
@@ -194,7 +214,7 @@ namespace Web.Pages.Dashboard.Estudiantes
             };
             var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-            // Log para depuraciÛn
+            // Log para depuraci√≥n
             Console.WriteLine("JSON enviado a la API:");
             Console.WriteLine(json);
 
@@ -206,12 +226,12 @@ namespace Web.Pages.Dashboard.Estudiantes
             try
             {
                 using var client = new HttpClient();
-                client.Timeout = TimeSpan.FromSeconds(10); // Timeout corto para depuraciÛn
+                client.Timeout = TimeSpan.FromSeconds(10); // Timeout corto para depuraci√≥n
                 Console.WriteLine("Enviando POST a la API...");
                 var response = await client.PostAsync(endpoint, new StringContent(json, Encoding.UTF8, "application/json"));
                 Console.WriteLine("POST enviado, esperando respuesta...");
                 var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"CÛdigo de respuesta: {response.StatusCode}");
+                Console.WriteLine($"C√≥digo de respuesta: {response.StatusCode}");
                 Console.WriteLine($"Respuesta: {responseContent}");
 
                 if (!response.IsSuccessStatusCode)
@@ -223,8 +243,8 @@ namespace Web.Pages.Dashboard.Estudiantes
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ExcepciÛn: {ex.GetType().Name} - {ex.Message}");
-                ModelState.AddModelError("", $"ExcepciÛn al conectar con la API: {ex.Message}");
+                Console.WriteLine($"Excepci√≥n: {ex.GetType().Name} - {ex.Message}");
+                ModelState.AddModelError("", $"Excepci√≥n al conectar con la API: {ex.Message}");
                 await ObtenerSecciones();
                 return Page();
             }
@@ -238,7 +258,7 @@ namespace Web.Pages.Dashboard.Estudiantes
 
         public async Task<IActionResult> OnPostEditarAsync(Guid idEstudiante, EstudiantesRequest estudiante)
         {
-            Debug.WriteLine("EntrÛ al handler OnPostEditarAsync");
+            Debug.WriteLine("Entr√≥ al handler OnPostEditarAsync");
 
             try
             {
@@ -269,7 +289,7 @@ namespace Web.Pages.Dashboard.Estudiantes
 
                 estudiante.IdEstudiante = idEstudiante;
 
-                // Mantener la secciÛn actual si no se selecciona una nueva
+                // Mantener la secci√≥n actual si no se selecciona una nueva
                 if (estudiante.IdSeccion == Guid.Empty && !string.IsNullOrEmpty(seccionseleccionada) && Guid.TryParse(seccionseleccionada, out var idSeccion))
                 {
                     estudiante.IdSeccion = idSeccion;
@@ -292,11 +312,11 @@ namespace Web.Pages.Dashboard.Estudiantes
                     estudiante.Fotografia = await ObtenerImagenActual(idEstudiante);
                 }
 
-                // Imprimir la imagen enviada a la API para depuraciÛn
+                // Imprimir la imagen enviada a la API para depuraci√≥n
                 Debug.WriteLine($"Imagen enviada a la API: {estudiante.Fotografia}");
 
                 string endpoint = string.Format(_configuracion.ObtenerMetodo("ApiEndPoints", "EditarEstudiante"), idEstudiante);
-                Debug.WriteLine($"Endpoint de ediciÛn: {endpoint}");
+                Debug.WriteLine($"Endpoint de edici√≥n: {endpoint}");
                 Debug.WriteLine($"Datos enviados a la API: {JsonSerializer.Serialize(estudiante)}");
 
                 var contenido = new StringContent(JsonSerializer.Serialize(estudiante), Encoding.UTF8, "application/json");
@@ -377,7 +397,7 @@ namespace Web.Pages.Dashboard.Estudiantes
 
         public async Task<IActionResult> OnPostCrearCondicionAsync()
         {
-            Debug.WriteLine("EntrÛ al handler OnPostCrearCondicionAsync");
+            Debug.WriteLine("Entr√≥ al handler OnPostCrearCondicionAsync");
 
             // Elimina errores de ModelState que no sean de condicion
             var keysToRemove = ModelState.Keys
@@ -408,7 +428,7 @@ namespace Web.Pages.Dashboard.Estudiantes
             {
                 if (string.IsNullOrWhiteSpace(condicion.TipoCondicion) || string.IsNullOrWhiteSpace(condicion.NombreCondicion))
                 {
-                    ModelState.AddModelError("", "Los campos requeridos no pueden estar vacÌos.");
+                    ModelState.AddModelError("", "Los campos requeridos no pueden estar vac√≠os.");
                     return Page();
                 }
 
@@ -443,8 +463,8 @@ namespace Web.Pages.Dashboard.Estudiantes
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERROR] Fallo al crear la condiciÛn: {ex.Message}");
-                ModelState.AddModelError("", "Error al crear la condiciÛn especial.");
+                Debug.WriteLine($"[ERROR] Fallo al crear la condici√≥n: {ex.Message}");
+                ModelState.AddModelError("", "Error al crear la condici√≥n especial.");
                 return Page();
             }
         }

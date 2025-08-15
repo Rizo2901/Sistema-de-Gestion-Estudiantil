@@ -208,7 +208,7 @@ namespace Flujo
             </div>
             
             <p>Por seguridad, te recomendamos iniciar sesión y cambiar tu contraseña en tu primer acceso.</p>
-            <p><a href='https://tuservidor.com/login' style='color: #dc3545; font-weight: bold;'>Iniciar Sesión en S.G.E</a></p>
+            <p><a href='https://sgeesccarolinadent-web-aqbqaqefhfb3atee.eastus2-01.azurewebsites.net/Cuenta/Login' style='color: #dc3545; font-weight: bold;'>Iniciar Sesión en S.G.E</a></p>
         </div>
 
         <!-- Footer -->
