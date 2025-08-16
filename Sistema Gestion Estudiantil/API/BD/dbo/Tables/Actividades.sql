@@ -4,6 +4,8 @@
     [Descripcion] TEXT             NULL,
     [Fecha]       DATE             NOT NULL,
     [Tipo]        VARCHAR (15)     NOT NULL,
+    [FechaInicio] DATETIME         NULL,
+    [FechaFin]    DATETIME         NULL,
     PRIMARY KEY CLUSTERED ([IdActividad] ASC)
 );
 

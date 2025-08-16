@@ -29,6 +29,8 @@ namespace DA
                 Descripcion = actividad.Descripcion,
                 Fecha = actividad.Fecha,
                 Tipo = actividad.Tipo,
+                FechaInicio = actividad.FechaInicio,
+                FechaFin = actividad.FechaFin
             }, commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
@@ -43,6 +45,8 @@ namespace DA
                 Descripcion = actividad.Descripcion,
                 Fecha = actividad.Fecha,
                 Tipo = actividad.Tipo,
+                FechaInicio = actividad.FechaInicio,
+                FechaFin = actividad.FechaFin
             }, commandType: System.Data.CommandType.StoredProcedure);
 
             return result;
