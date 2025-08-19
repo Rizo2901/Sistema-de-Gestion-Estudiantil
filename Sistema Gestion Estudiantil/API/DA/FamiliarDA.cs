@@ -22,20 +22,57 @@ namespace DA
         public async Task<IEnumerable<FamiliarResponse>> ObtenerFamiliares()
         {
             string query = "SP_ObtenerFamiliares";
-            var result = await _conn.QueryAsync<FamiliarResponse>(query);
+            var result = await _conn.QueryAsync<FamiliarResponse>(query, commandType: CommandType.StoredProcedure);
+
+            foreach (var f in result)
+            {
+                f.Estudiante = new EstudianteInfo
+                {
+                    IdEstudiante = f.IdEstudiante,
+                    Nombre = f.NombreEstudiante,
+                    Apellido1 = f.Apellido1Estudiante,
+                    Apellido2 = f.Apellido2Estudiante,
+                    Cedula = f.CedulaEstudiante,
+                    GradoActual = f.GradoEstudiante,
+                    IdSeccion = f.SeccionEstudiante
+                };
+            }
+
             return result;
         }
 
+
         public async Task<FamiliarResponse> ObtenerFamiliarPorId(Guid IdFamiliar)
         {
-            string query = "SP_ObtenerFamiliarPorId";
-            var result = await _conn.QueryAsync<FamiliarResponse>(query, 
-                new 
-                { 
-                    IdFamiliar = IdFamiliar
-                });
-            return result.FirstOrDefault();
+            using var multi = await _conn.QueryMultipleAsync("SP_ObtenerFamiliarPorId",
+                new { IdFamiliar },
+                commandType: CommandType.StoredProcedure);
+
+            var familiar = await multi.ReadFirstOrDefaultAsync<FamiliarResponse>();
+
+            if (familiar == null)
+                return null;
+
+            // Mapear datos del estudiante
+            familiar.Estudiante = new EstudianteInfo
+            {
+                IdEstudiante = familiar.IdEstudiante,
+                Nombre = familiar.NombreEstudiante,
+                Apellido1 = familiar.Apellido1Estudiante,
+                Apellido2 = familiar.Apellido2Estudiante,
+                Cedula = familiar.CedulaEstudiante,
+                GradoActual = familiar.GradoEstudiante,
+                IdSeccion = familiar.SeccionEstudiante
+            };
+
+            // Mapear reuniones
+            var reuniones = await multi.ReadAsync<ReunionInfo>();
+            familiar.Reuniones = reuniones.ToList();
+
+            return familiar;
         }
+
+
 
         public async Task<Guid> CrearFamiliar(FamiliarRequest familiar)
         {

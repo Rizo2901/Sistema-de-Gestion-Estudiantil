@@ -27,40 +27,35 @@ namespace Abstracciones.Modelos
         public Guid? IdCondicion { get; set; }
     }
 
-    public class CondicionesEspecialesResponse : CondicionesEspecialesBase
+    public class CondicionesEspecialesResponse
     {
         public Guid IdCondicion { get; set; }
+        public Guid IdEstudiante { get; set; }
+        public string Cedula { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido1 { get; set; }
+        public string Apellido2 { get; set; }
 
+        public Guid IdCategoria { get; set; }
         public DateTime? FechaDiagnostico { get; set; }
-
         public string? Observaciones { get; set; }
 
         public string NombreCategoria { get; set; }
         public string DescripcionCategoria { get; set; }
-
-    }
-    public class EstudianteConCondicionesRaw
-    {
-        public Guid IdEstudiante { get; set; }
-        public string NombreCompleto { get; set; }
-
-        public string Condiciones { get; set; }
     }
     public class EstudianteConCondicionesResponse
     {
         public Guid IdEstudiante { get; set; }
-        public string NombreCompleto { get; set; }
-        public List<CondicionEspecialItem> Condiciones { get; set; }
+        public string Cedula { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido1 { get; set; }
+        public string Apellido2 { get; set; }
+        public string? NombreCategoria { get; set; }
+        public string? DescripcionCategoria { get; set; }
+
+        public List<CondicionesEspecialesResponse> Condiciones { get; set; } = new();
     }
 
-    public class CondicionEspecialItem
-    {
-        public Guid IdCondicion { get; set; }
-        public DateTime? FechaDiagnostico { get; set; }
-        public string? Observaciones { get; set; }
-        public string CategoriaNombre { get; set; }
-        public string CategoriaDescripcion { get; set; }
-    }
 
 
 

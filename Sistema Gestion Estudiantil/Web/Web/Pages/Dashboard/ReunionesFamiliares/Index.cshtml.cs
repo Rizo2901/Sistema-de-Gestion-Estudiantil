@@ -33,7 +33,11 @@ namespace Web.Pages.Dashboard.ReunionesFamiliares
             string metodo = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerReunionesConPadre");
             var client = new HttpClient();
             var response = await client.GetAsync(metodo);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                await ObtenerEstudiantes();
+                return Page();
+            }
             var result = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             Reuniones = JsonSerializer.Deserialize<List<ReunionesResponse>>(result, options);

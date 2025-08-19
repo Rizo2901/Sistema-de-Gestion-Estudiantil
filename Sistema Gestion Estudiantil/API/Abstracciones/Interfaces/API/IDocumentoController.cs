@@ -17,7 +17,7 @@ namespace Abstracciones.Interfaces.API
         Task<IActionResult> ObtenerDocumentosPorEstudiante(Guid IdEstudiante);
         Task<IActionResult> ObtenerTodosLosDocumentos();
 
-        Task<IActionResult> ObtenerEstudiantesConDocumentos();
+        Task<IActionResult> ObtenerDocumentosAgrupados();
 
 
     }

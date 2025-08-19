@@ -2,6 +2,7 @@ using Abstracciones.Interfaces.Reglas;
 using Abstracciones.Modelos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
@@ -11,6 +12,12 @@ namespace Web.Pages.Dashboard.Documentos
     public class IndexModel : PageModel
     {
         private readonly IConfiguracion _confg;
+
+        public List<SelectListItem> Estudiantes { get; set; } = new List<SelectListItem>();
+
+        [BindProperty]
+        public string estudianteSeleccionado { get; set; }
+
         [BindProperty]
         public IFormFile ArchivoDocumento { get; set; }
 
@@ -20,122 +27,49 @@ namespace Web.Pages.Dashboard.Documentos
 
         public IList<DocumentosResponse> Documentos { get; set; } = new List<DocumentosResponse>();
 
-        [BindProperty]
-        public IList<EstudiantesResponse> Estudiantes { get; set; } = new List<EstudiantesResponse>();
 
         [BindProperty]
-        public IList<EstudianteConDocumentosResponse> EstudiantesConDocumentos { get; set; } = new List<EstudianteConDocumentosResponse>();
+        public IList<EstudianteConDocumentos> EstudiantesConDocumentos { get; set; } = new List<EstudianteConDocumentos>();
 
         public IndexModel(IConfiguracion confg)
         {
             _confg = confg;
         }
 
-        public async Task OnGetAsync(string filtro = "General", string IdDocumento = "", string IdEstudiante = "")
+        public async Task OnGetAsync()
         {
-            try
+            string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantesConDocumentos");
+
+            var cliente = new HttpClient();
+            var respuesta = await cliente.GetAsync(endPoint);
+            respuesta.EnsureSuccessStatusCode();
+
+            var resultado = await respuesta.Content.ReadAsStringAsync();
+            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            EstudiantesConDocumentos = JsonSerializer.Deserialize<List<EstudianteConDocumentos>>(resultado, opciones);
+            await ObtenerEstudiantes();
+
+        }
+
+
+        public async Task ObtenerEstudiantes()
+        {
+            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            using var client = new HttpClient();
+            string endpointEstudiantes = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantes");
+            var respuestaEstudiantes = await client.GetAsync(endpointEstudiantes);
+            respuestaEstudiantes.EnsureSuccessStatusCode();
+            var resultadoEstudiantes = await respuestaEstudiantes.Content.ReadAsStringAsync();
+            var estudiantesResponse = JsonSerializer.Deserialize<List<EstudiantesResponse>>(resultadoEstudiantes, opciones);
+
+            Estudiantes = estudiantesResponse.Select(s => new SelectListItem
             {
-                ViewData["Filtro"] = filtro;
-                ViewData["IdDocumento"] = IdDocumento;
-                ViewData["IdEstudiante"] = IdEstudiante;
+                Value = s.IdEstudiante.ToString(),
+                Text = $"{s.Nombre} {s.Apellido1} {s.Apellido2}"
+            }).ToList();
 
-                using var cliente = new HttpClient();
-                var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-                // Obtener lista de estudiantes
-                string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantes");
-                var respuesta = await cliente.GetAsync(endPoint);
-                respuesta.EnsureSuccessStatusCode();
-                var resultado = await respuesta.Content.ReadAsStringAsync();
-                Estudiantes = JsonSerializer.Deserialize<List<EstudiantesResponse>>(resultado, opciones) ?? new List<EstudiantesResponse>();
-
-                Console.WriteLine($"[DEBUG] Estudiantes cargados: {Estudiantes.Count}");
-
-                if (filtro == "ConLista")
-                {
-                    // Obtener estudiantes con documentos
-                    endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantesConDocumentos");
-                    respuesta = await cliente.GetAsync(endPoint);
-                    respuesta.EnsureSuccessStatusCode();
-                    resultado = await respuesta.Content.ReadAsStringAsync();
-                    EstudiantesConDocumentos = JsonSerializer.Deserialize<List<EstudianteConDocumentosResponse>>(resultado, opciones) ?? new List<EstudianteConDocumentosResponse>();
-
-                    Console.WriteLine($"[DEBUG] Estudiantes con documentos cargados: {EstudiantesConDocumentos.Count}");
-                }
-                else if (filtro == "PorDocumento" && !string.IsNullOrEmpty(IdDocumento))
-                {
-                    // Obtener un documento específico por ID
-                    endPoint = string.Format(_confg.ObtenerMetodo("ApiEndPoints", "ObtenerDocumentosPorId"), IdDocumento);
-                    Console.WriteLine($"[DEBUG] URL generada: {endPoint}");
-
-                    respuesta = await cliente.GetAsync(endPoint);
-                    if (!respuesta.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"[ERROR] Fallo al obtener documento {IdDocumento}, Status Code: {respuesta.StatusCode}");
-                        return;
-                    }
-
-                    resultado = await respuesta.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[DEBUG] JSON recibido para documento {IdDocumento}: {resultado}");
-
-                    Documentos = JsonSerializer.Deserialize<List<DocumentosResponse>>(resultado, opciones) ?? new List<DocumentosResponse>();
-
-                    Console.WriteLine($"[DEBUG] Documentos cargados para ID {IdDocumento}: {Documentos.Count}");
-                }
-                else if (filtro == "PorEstudiante" && !string.IsNullOrEmpty(IdEstudiante))
-                {
-                    // Obtener documentos por estudiante
-                    endPoint = string.Format(_confg.ObtenerMetodo("ApiEndPoints", "ObtenerDocumentosPorEstudiante"), IdEstudiante);
-                    Console.WriteLine($"[DEBUG] URL generada: {endPoint}");
-
-                    respuesta = await cliente.GetAsync(endPoint);
-                    if (!respuesta.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"[ERROR] Fallo al obtener documentos por estudiante {IdEstudiante}, Status Code: {respuesta.StatusCode}");
-                        return;
-                    }
-
-                    resultado = await respuesta.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[DEBUG] JSON recibido para estudiante {IdEstudiante}: {resultado}");
-
-                    Documentos = JsonSerializer.Deserialize<List<DocumentosResponse>>(resultado, opciones) ?? new List<DocumentosResponse>();
-
-                    Console.WriteLine($"[DEBUG] Documentos cargados para estudiante {IdEstudiante}: {Documentos.Count}");
-
-                    var estudiante = Estudiantes.FirstOrDefault(e => e.IdEstudiante.ToString() == IdEstudiante);
-
-                    if (estudiante != null)
-                    {
-                        ViewData["Nombre"] = estudiante.Nombre;
-                        ViewData["Apellido1"] = estudiante.Apellido1;
-                        ViewData["Apellido2"] = estudiante.Apellido2;
-
-                        Console.WriteLine($"[DEBUG] Nombre Completo del Estudiante: {estudiante.Nombre} {estudiante.Apellido1} {estudiante.Apellido2}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[ERROR] No se encontró el estudiante con ID {IdEstudiante}");
-                    }
-                }
-                else
-                {
-                    // Obtener lista completa de documentos
-                    endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerDocumentos");
-                    respuesta = await cliente.GetAsync(endPoint);
-                    respuesta.EnsureSuccessStatusCode();
-                    resultado = await respuesta.Content.ReadAsStringAsync();
-                    Documentos = JsonSerializer.Deserialize<List<DocumentosResponse>>(resultado, opciones) ?? new List<DocumentosResponse>();
-
-                    Console.WriteLine($"[DEBUG] Total documentos cargados: {Documentos.Count}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ERROR] Fallo en laASDA carga de documentos: {ex.Message}");
-                Documentos = new List<DocumentosResponse>();
-                Estudiantes = new List<EstudiantesResponse>();
-                EstudiantesConDocumentos = new List<EstudianteConDocumentosResponse>();
-            }
         }
 
         public async Task<IActionResult> OnPostEliminarAsync(Guid? IdDocumento)
@@ -205,14 +139,22 @@ namespace Web.Pages.Dashboard.Documentos
             if (ModelState.ContainsKey("documento.Archivo"))
                 ModelState["documento.Archivo"].Errors.Clear();
 
+            // Validaciones defensivas
+            if (!Guid.TryParse(estudianteSeleccionado, out var idEstudiante))
+            {
+                ModelState.AddModelError("estudianteSeleccionado", "Debe seleccionar un estudiante válido.");
+                await ObtenerEstudiantes();
+                return Page();
+            }
+
             // Construir JSON
             var datos = new
             {
+                IdEstudiante = idEstudiante,
                 tipoDocumento = documento.TipoDocumento,
                 descripcion = documento.Descripcion,
                 archivo = documento.Archivo,
                 tipoArchivo = documento.TipoArchivo,
-                idEstudiante = documento.IdEstudiante
             };
             var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
@@ -250,7 +192,8 @@ namespace Web.Pages.Dashboard.Documentos
             }
 
             Console.WriteLine("Documento creado correctamente.");
-            return RedirectToPage("Index", new { filtro = "General" });
+            await OnGetAsync();
+            return Page();
         }
 
 

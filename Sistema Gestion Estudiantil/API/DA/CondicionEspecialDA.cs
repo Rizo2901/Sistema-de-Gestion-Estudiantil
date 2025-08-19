@@ -36,11 +36,10 @@ namespace DA
 
         public Task<Guid> EditarCondicionEspecial(Guid Id, CondicionesEspecialesRequest condicionEspecial)
         {
-            string query = @"CondicionEspecial.SP_ActualizarCondicionEspecial";
+            string query = @"CondicionEspecial.SP_EditarCondicionEspecial";
             var result = _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdCondicion = Id,
-                IdEstudiante = condicionEspecial.IdEstudiante,
                 IdCategoria = condicionEspecial.IdCategoria,
                 FechaDiagnostico = condicionEspecial.FechaDiagnostico,
                 Observaciones = condicionEspecial.Observaciones
@@ -58,10 +57,10 @@ namespace DA
             return result;
         }
 
-        public Task<IEnumerable<CondicionesEspecialesResponse>> ObtenerCondicionesEspeciales()
+        public async Task<IEnumerable<CondicionesEspecialesResponse>> ObtenerCondicionesEspeciales()
         {
             string query = @"CondicionEspecial.SP_ObtenerCondicionesEspeciales";
-            var result = _conn.QueryAsync<CondicionesEspecialesResponse>(query);
+            var result = await _conn.QueryAsync<CondicionesEspecialesResponse>(query);
             return result;
         }
 
@@ -76,23 +75,7 @@ namespace DA
 
         }
 
-        public async Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerCondicionEspecialPorEstudiantes()
-        {
-            string query = @"CondicionEspecial.SP_ObtenerCondicionesPorEstudiante";
-
-            var rawResult = await _conn.QueryAsync<EstudianteConCondicionesRaw>(query);
-
-            var resultadoFinal = rawResult.Select(e => new EstudianteConCondicionesResponse
-            {
-                IdEstudiante = e.IdEstudiante,
-                NombreCompleto = e.NombreCompleto,
-                Condiciones = string.IsNullOrWhiteSpace(e.Condiciones)
-                    ? new List<CondicionEspecialItem>()
-                    : JsonSerializer.Deserialize<List<CondicionEspecialItem>>(e.Condiciones)
-            });
-
-            return resultadoFinal;
-        }
+        
 
 
     }

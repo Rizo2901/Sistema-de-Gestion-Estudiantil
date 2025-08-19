@@ -87,6 +87,13 @@ namespace API.Controllers
             return Ok(resultados);
         }
 
+        [HttpGet("resumen")]
+        public async Task<IActionResult> ObtenerEstudiantesResumen()
+        {
+            var result = await _estudianteFlujo.ObtenerEstudiantesResumen();
+            return Ok(result);
+        }
+
 
         #region Helpers
         private async Task<bool> VerificarEstudianteExiste(Guid Id)
@@ -99,6 +106,8 @@ namespace API.Controllers
         }
 
         
+
+
         #endregion
     }
 }

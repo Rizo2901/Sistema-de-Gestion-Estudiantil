@@ -5,6 +5,8 @@ namespace Abstracciones.Modelos
 {
     public class EstudiantesBase
     {
+        public Guid IdEstudiante { get; set; }
+
         [Required]
         [MaxLength(20)]
         public string Cedula { get; set; }
@@ -36,7 +38,7 @@ namespace Abstracciones.Modelos
 
         public string? HistorialAcademico { get; set; }
 
-       
+        [Required]
         public string? Fotografia { get; set; }
 
 
@@ -53,7 +55,7 @@ namespace Abstracciones.Modelos
 
     public class EstudiantesRequest : EstudiantesBase
     {
-        public Guid IdEstudiante { get; set; }
+
         public Guid IdSeccion { get; set; }
 
         public Guid? IdUsuario { get; set; }
@@ -67,4 +69,17 @@ namespace Abstracciones.Modelos
 
         public string? NombreUsuario { get; set; }
     }
+    public class EstudiantesResumenResponse : EstudiantesResponse
+    {
+        public int Documentos { get; set; }
+        public int Alergias { get; set; }
+        public int Discapacidades { get; set; }
+        public int Enfermedades { get; set; }
+        public int Medicamentos { get; set; }
+        public int CondicionesEspeciales { get; set; }
+        public int SituacionesFamiliares { get; set; }
+        public int AdaptacionesCurriculares { get; set; }
+        public int AtencionesMedicas { get; set; }
+    }
+
 }

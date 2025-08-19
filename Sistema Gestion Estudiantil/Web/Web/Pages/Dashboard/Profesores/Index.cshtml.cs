@@ -322,7 +322,7 @@ namespace Web.Pages.Dashboard.Profesores
 
         public async Task<IActionResult> OnPostCrearUsuarioAutoAsync()
         {
-            _logger.LogDebug("🚀 Iniciando creación de usuario institucional desde entidad…");
+            _logger.LogDebug("Iniciando creación de usuario institucional desde entidad…");
 
             using var reader = new StreamReader(Request.Body);
             var body = await reader.ReadToEndAsync();

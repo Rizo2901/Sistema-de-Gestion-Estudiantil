@@ -38,9 +38,45 @@ namespace Flujo
             return await _condEspecDA.ObtenerCondicionesEspeciales();
         }
 
-        public async Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerCondicionEspecialPorEstudiantes()
+        public async Task<List<EstudianteConCondicionesResponse>> ObtenerCondicionesAgrupadas()
         {
-            return await _condEspecDA.ObtenerCondicionEspecialPorEstudiantes();
+            var condicionesPlanas = await _condEspecDA.ObtenerCondicionesEspeciales();
+
+            var agrupado = condicionesPlanas
+                .GroupBy(c => new
+                {
+                    c.IdEstudiante,
+                    c.Cedula,
+                    c.Nombre,
+                    c.Apellido1,
+                    c.Apellido2
+                })
+                .Select(g => new EstudianteConCondicionesResponse
+                {
+                    IdEstudiante = g.Key.IdEstudiante,
+                    Cedula = g.Key.Cedula?.Trim(),
+                    Nombre = g.Key.Nombre?.Trim(),
+                    Apellido1 = g.Key.Apellido1?.Trim(),
+                    Apellido2 = g.Key.Apellido2?.Trim(),
+                    Condiciones = g
+                        .Where(c => c.IdCondicion != Guid.Empty)
+                        .Select(c => new CondicionesEspecialesResponse
+                        {
+                            IdCondicion = c.IdCondicion,
+                            IdCategoria = c.IdCategoria,
+                            FechaDiagnostico = c.FechaDiagnostico,
+                            Observaciones = c.Observaciones?.Trim(),
+                            NombreCategoria = c.NombreCategoria?.Trim(),
+                            DescripcionCategoria = c.DescripcionCategoria?.Trim()
+                        })
+                        .OrderBy(c => c.FechaDiagnostico)
+                        .ToList()
+                })
+                .OrderBy(e => e.Apellido1)
+                .ThenBy(e => e.Apellido2)
+                .ToList();
+
+            return agrupado;
         }
 
         public async Task<CondicionesEspecialesResponse> ObtenerCondicionEspecial(Guid Id)

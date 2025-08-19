@@ -1,4 +1,414 @@
 ﻿@page
 @model Web.Pages.Dashboard.Familiares.IndexModel
 @{
+    ViewData["Title"] = "Familiares";
+    Layout = "_Layout";
 }
+
+@if (Model.Familiares == null || !Model.Familiares.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay familiares registrados.
+    </div>
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarFamiliarModal" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Familiar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#agregarFamiliarModal" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Familiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4 text-center text-md-start">Listado de Familiares</h2>
+
+    <div class="container-fluid px-0 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title mb-3"><i class="bi bi-funnel-fill me-2"></i>Filtros</h5>
+                <div class="row g-2">
+                    <div class="col-12 col-md-4">
+                        <input type="text" id="filtroNombre" class="form-control" placeholder="Buscar por nombre...">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input type="text" id="filtroTelefono" class="form-control" placeholder="Buscar por teléfono...">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input type="text" id="filtroCedula" class="form-control" placeholder="Buscar por cédula...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid px-0">
+        <div class="d-flex flex-column gap-3">
+            @foreach (var familiar in Model.Familiares)
+            {
+                <div class="bg-white shadow rounded p-3 mx-2 familiar-card">
+                    <div class="row gy-3 align-items-start">
+
+                        <!-- 🧑 Familiar -->
+                        <div class="col-12 col-md-4">
+                            <div class="fw-bold fs-5">@familiar.Nombre @familiar.Apellido1 @familiar.Apellido2</div>
+                            <div><i class="bi bi-envelope me-1"></i> @familiar.CorreoElectronico</div>
+                            <div class="text-muted"><i class="bi bi-house-door me-1"></i> @familiar.Direccion</div>
+                            <div class="text-muted"><i class="bi bi-telephone me-1"></i> @familiar.TelefonoCelular</div>
+                            <div class="small text-muted">Parentesco: @familiar.Parentesco</div>
+                            <div class="d-none familiar-cedula">@familiar.Cedula</div>
+                        </div>
+
+                        <!-- 🎓 Estudiante relacionado -->
+                        <div class="col-12 col-md-5">
+                            <div class="fw-semibold text-muted mb-2">
+                                <i class="bi bi-person-bounding-box me-1"></i> Estudiante relacionado
+                            </div>
+                            <div class="ps-3">
+                                <div><strong>Nombre:</strong> @familiar.Estudiante?.Nombre @familiar.Estudiante?.Apellido1 @familiar.Estudiante?.Apellido2</div>
+                                <div><strong>Cédula:</strong> @familiar.Estudiante?.Cedula</div>
+                                <div><strong>Grado:</strong> @familiar.Estudiante?.GradoActual</div>
+                                <div><strong>Sección:</strong> @familiar.Estudiante?.NombreSeccion</div>
+                            </div>
+                        </div>
+
+                        <!-- ⚙️ Acciones -->
+                        <div class="col-12 col-md-3 text-md-end">
+                            <div class="d-flex flex-wrap justify-content-start justify-content-md-end gap-2">
+                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalDetalles_@familiar.IdFamiliar" title="Detalles">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@familiar.IdFamiliar" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarFamiliar_@familiar.IdFamiliar" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        @if (familiar.IdUsuario == null)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario_@familiar.IdFamiliar">
+                                                    <i class="bi bi-person-plus-fill me-1"></i> Crear Usuario
+                                                </a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <a class="dropdown-item text-primary" href="/Dashboard/Usuarios/Ver?IdUsuario=@familiar.IdUsuario">
+                                                    <i class="bi bi-person-check-fill me-1"></i> Ver Usuario
+                                                </a>
+                                            </li>
+                                        }
+                                        <li><a class="dropdown-item"><i class="bi bi-briefcase me-1"></i> Ocupación: @familiar.Ocupacion</a></li>
+                                        <li><a class="dropdown-item"><i class="bi bi-people me-1"></i> Estado Civil: @familiar.EstadoCivil</a></li>
+                                        <li><a class="dropdown-item"><i class="bi bi-person-hearts me-1"></i> Hijos: @familiar.CantidadHijos</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+
+
+                <!-- Modal Eliminar Familiar -->
+                <div class="modal fade" id="modalEliminarFamiliar_@familiar.IdFamiliar" tabindex="-1" aria-labelledby="modalEliminarFamiliarLabel_@familiar.IdFamiliar" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-danger">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title" id="modalEliminarFamiliarLabel_@familiar.IdFamiliar">
+                                    <i class="bi bi-trash-fill me-2"></i>Eliminar Familiar
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <form method="post" asp-page-handler="EliminarFamiliar">
+                                <input type="hidden" name="IdFamiliar" value="@familiar.IdFamiliar" />
+                                <div class="modal-body">
+                                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                        <i class="bi bi-exclamation-triangle-fill me-2 fs-4 text-danger"></i>
+                                        <div>
+                                            Esta acción no se puede deshacer. ¿Estás seguro que deseas eliminar al familiar <strong>@familiar.Nombre @familiar.Apellido1 @familiar.Apellido2</strong>?
+                                        </div>
+                                    </div>
+                                    <p class="mb-0 text-muted">
+                                        Se eliminará la relación con el estudiante <strong>@familiar.Estudiante?.Nombre @familiar.Estudiante?.Apellido1</strong> y cualquier dato asociado.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-trash me-1"></i> Eliminar definitivamente
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal Editar -->
+                <div class="modal fade" id="modalEditar_@familiar.IdFamiliar" tabindex="-1" aria-labelledby="modalEditarLabel_@familiar.IdFamiliar" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title" id="modalEditarLabel_@familiar.IdFamiliar">Editar Familiar</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <form method="post" asp-page-handler="EditarFamiliar">
+                                <input type="hidden" name="IdFamiliar" value="@familiar.IdFamiliar" />
+                                <div class="modal-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nombre</label>
+                                            <input name="FamiliarForm.Nombre" class="form-control" value="@familiar.Nombre" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Apellido 1</label>
+                                            <input name="FamiliarForm.Apellido1" class="form-control" value="@familiar.Apellido1" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Apellido 2</label>
+                                            <input name="FamiliarForm.Apellido2" class="form-control" value="@familiar.Apellido2" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Cédula</label>
+                                            <input name="FamiliarForm.Cedula" class="form-control" value="@familiar.Cedula" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Parentesco</label>
+                                            <input name="FamiliarForm.Parentesco" class="form-control" value="@familiar.Parentesco" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Estado Civil</label>
+                                            <input name="FamiliarForm.EstadoCivil" class="form-control" value="@familiar.EstadoCivil" required />
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Dirección</label>
+                                            <textarea name="FamiliarForm.Direccion" class="form-control" required>@familiar.Direccion</textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Teléfono Celular</label>
+                                            <input name="FamiliarForm.TelefonoCelular" class="form-control" value="@familiar.TelefonoCelular" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Correo Electrónico</label>
+                                            <input name="FamiliarForm.CorreoElectronico" class="form-control" value="@familiar.CorreoElectronico" type="email" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ocupación</label>
+                                            <input name="FamiliarForm.Ocupacion" class="form-control" value="@familiar.Ocupacion" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Cantidad de Hijos</label>
+                                            <input name="FamiliarForm.CantidadHijos" class="form-control" type="number" value="@familiar.CantidadHijos" min="0" />
+                                        </div>
+                                        <div class="col-md-6 form-check mt-4">
+                                            <input class="form-check-input" type="checkbox" name="FamiliarForm.ViveConEstudiante" @(familiar.ViveConEstudiante ? "checked" : "") />
+                                            <label class="form-check-label">¿Vive con el estudiante?</label>
+                                        </div>
+                                        <div class="col-md-6 form-check mt-4">
+                                            <input class="form-check-input" type="checkbox" name="FamiliarForm.EsResponsableLegal" @(familiar.EsResponsableLegal ? "checked" : "") />
+                                            <label class="form-check-label">¿Es responsable legal?</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal Detalles -->
+                <div class="modal fade" id="modalDetalles_@familiar.IdFamiliar" tabindex="-1" aria-labelledby="modalDetallesLabel_@familiar.IdFamiliar" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-dark text-white">
+                                <h5 class="modal-title" id="modalDetallesLabel_@familiar.IdFamiliar">Detalles del Familiar</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h6 class="fw-bold mb-3">🧑 Familiar</h6>
+                                <ul class="list-group mb-4">
+                                    <li class="list-group-item"><strong>Nombre:</strong> @familiar.Nombre @familiar.Apellido1 @familiar.Apellido2</li>
+                                    <li class="list-group-item"><strong>Cédula:</strong> @familiar.Cedula</li>
+                                    <li class="list-group-item"><strong>Parentesco:</strong> @familiar.Parentesco</li>
+                                    <li class="list-group-item"><strong>Teléfono:</strong> @familiar.TelefonoCelular</li>
+                                    <li class="list-group-item"><strong>Correo:</strong> @familiar.CorreoElectronico</li>
+                                    <li class="list-group-item"><strong>Dirección:</strong> @familiar.Direccion</li>
+                                    <li class="list-group-item"><strong>Ocupación:</strong> @familiar.Ocupacion</li>
+                                    <li class="list-group-item"><strong>Estado Civil:</strong> @familiar.EstadoCivil</li>
+                                    <li class="list-group-item"><strong>Hijos:</strong> @familiar.CantidadHijos</li>
+                                    <li class="list-group-item"><strong>Vive con estudiante:</strong> @(familiar.ViveConEstudiante ? "Sí" : "No")</li>
+                                    <li class="list-group-item"><strong>Responsable legal:</strong> @(familiar.EsResponsableLegal ? "Sí" : "No")</li>
+                                </ul>
+
+                                <h6 class="fw-bold mb-3">🎓 Estudiante</h6>
+                                <ul class="list-group mb-4">
+                                    <li class="list-group-item"><strong>Nombre:</strong> @familiar.Estudiante?.Nombre @familiar.Estudiante?.Apellido1 @familiar.Estudiante?.Apellido2</li>
+                                    <li class="list-group-item"><strong>Cédula:</strong> @familiar.Estudiante?.Cedula</li>
+                                    <li class="list-group-item"><strong>Grado:</strong> @familiar.Estudiante?.GradoActual</li>
+                                    <li class="list-group-item"><strong>Sección:</strong> @familiar.Estudiante?.NombreSeccion</li>
+                                </ul>
+
+                                <h6 class="fw-bold mb-3">📅 Reuniones</h6>
+                                @if (familiar.Reuniones != null && familiar.Reuniones.Any())
+                                {
+                                    <ul class="list-group">
+                                        @foreach (var reunion in familiar.Reuniones)
+                                        {
+                                            <li class="list-group-item">
+                                                <strong>Fecha:</strong> @reunion.Fecha.ToString("dd/MM/yyyy")<br />
+                                                <strong>Motivo:</strong> @reunion.Motivo
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No hay reuniones registradas.</div>
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div> 
+    </div> 
+}
+
+<!-- Modal Crear -->
+<!-- Modal Agregar Familiar -->
+<div class="modal fade" id="agregarFamiliarModal" tabindex="-1" aria-labelledby="agregarFamiliarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarFamiliarLabel">Agregar Familiar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <form method="post" asp-page-handler="Crear">
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <!-- Dropdown Estudiante -->
+                        <div class="col-md-12">
+                            <label class="form-label">Estudiante</label>
+                            <select asp-for="estudianteSeleccionado" asp-items="Model.Estudiantes" class="form-control">
+                                <option value="">Seleccione el estudiante del que es pariente el familiar</option>
+                            </select>
+                            <span asp-validation-for="estudianteSeleccionado" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input asp-for="Familiar.Nombre" class="form-control" required />
+                            <span asp-validation-for="Familiar.Nombre" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 1</label>
+                            <input asp-for="Familiar.Apellido1" class="form-control" required />
+                            <span asp-validation-for="Familiar.Apellido1" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido 2</label>
+                            <input asp-for="Familiar.Apellido2" class="form-control" />
+                            <span asp-validation-for="Familiar.Apellido2" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Cédula</label>
+                            <input asp-for="Familiar.Cedula" class="form-control" required />
+                            <span asp-validation-for="Familiar.Cedula" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Parentesco</label>
+                            <input asp-for="Familiar.Parentesco" class="form-control" required />
+                            <span asp-validation-for="Familiar.Parentesco" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Estado Civil</label>
+                            <input asp-for="Familiar.EstadoCivil" class="form-control" required />
+                            <span asp-validation-for="Familiar.EstadoCivil" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Dirección</label>
+                            <textarea asp-for="Familiar.Direccion" class="form-control" required></textarea>
+                            <span asp-validation-for="Familiar.Direccion" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono Celular</label>
+                            <input asp-for="Familiar.TelefonoCelular" class="form-control" />
+                            <span asp-validation-for="Familiar.TelefonoCelular" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input asp-for="Familiar.CorreoElectronico" class="form-control" type="email" />
+                            <span asp-validation-for="Familiar.CorreoElectronico" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Ocupación</label>
+                            <input asp-for="Familiar.Ocupacion" class="form-control" />
+                            <span asp-validation-for="Familiar.Ocupacion" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Cantidad de Hijos</label>
+                            <input asp-for="Familiar.CantidadHijos" class="form-control" type="number" min="0" />
+                            <span asp-validation-for="Familiar.CantidadHijos" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 form-check mt-4">
+                            <input class="form-check-input" asp-for="Familiar.ViveConEstudiante" />
+                            <label class="form-check-label">¿Vive con el estudiante?</label>
+                        </div>
+
+                        <div class="col-md-6 form-check mt-4">
+                            <input class="form-check-input" asp-for="Familiar.EsResponsableLegal" />
+                            <label class="form-check-label">¿Es responsable legal?</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear Familiar</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+

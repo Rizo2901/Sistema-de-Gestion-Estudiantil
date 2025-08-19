@@ -11,7 +11,6 @@ namespace Abstracciones.Interfaces.DA
     {
     
         Task<IEnumerable<CondicionesEspecialesResponse>> ObtenerCondicionesEspeciales();
-        Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerCondicionEspecialPorEstudiantes();
         Task<CondicionesEspecialesResponse> ObtenerCondicionEspecial(Guid Id);
         Task<Guid> CrearCondicionEspecial(CondicionesEspecialesRequest condicionEspecial);
         Task<Guid> EditarCondicionEspecial(Guid Id, CondicionesEspecialesRequest condicionEspecial);

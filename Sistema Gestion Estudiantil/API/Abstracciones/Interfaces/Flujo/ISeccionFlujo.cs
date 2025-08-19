@@ -10,6 +10,7 @@ namespace Abstracciones.Interfaces.Flujo
     public interface ISeccionFlujo
     {
         Task<IEnumerable<SeccionesResponse>> ObtenerSecciones();
+        Task<IEnumerable<EstudianteSeccionesRespone>> ObtenerEstudiantesSeccion(Guid IdSeccion);
 
         Task<SeccionesResponse> ObtenerSeccionPorId(Guid Id);
 

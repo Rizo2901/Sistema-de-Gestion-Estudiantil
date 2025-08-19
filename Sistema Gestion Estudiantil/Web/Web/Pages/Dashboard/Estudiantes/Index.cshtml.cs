@@ -14,13 +14,9 @@ namespace Web.Pages.Dashboard.Estudiantes
     {
         private readonly IConfiguracion _configuracion;
 
-        public string? FiltroNombre { get; set; }
-        public string? FiltroCedula { get; set; }  
-        public string? FiltroGrado { get; set; }
-        public string? FiltroSeccion { get; set; }
 
 
-        public IList<EstudiantesResponse> Estudiantes { get; set; }
+        public IList<EstudiantesResumenResponse> Estudiantes { get; set; } = new List<EstudiantesResumenResponse>();
         public List<SelectListItem> Secciones { get; set; } = new List<SelectListItem>();
 
         [BindProperty]
@@ -53,57 +49,52 @@ namespace Web.Pages.Dashboard.Estudiantes
 
 
 
-        public async Task OnGetAsync(string? filtroNombre, string? filtroCedula, string? filtroGrado, string? filtroSeccion)
+        public async Task OnGetAsync()
         {
-            FiltroNombre = filtroNombre;
-            FiltroCedula = filtroCedula;
-            FiltroGrado = filtroGrado;
-            FiltroSeccion = filtroSeccion;
+            // Obtener endpoint desde configuración
+            string endPoint = _configuracion.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantesResumen");
 
-            string endpoint = _configuracion.ObtenerMetodo("ApiEndPoints", "BuscarEstudiantes");
+            if (string.IsNullOrWhiteSpace(endPoint))
+            {
+                _logger.LogError("[Estudiantes] Endpoint no configurado correctamente.");
+                Estudiantes = new List<EstudiantesResumenResponse>();
+                return;
+            }
 
-            var queryParams = new List<string>();
-            if (!string.IsNullOrEmpty(FiltroNombre)) queryParams.Add($"nombre={Uri.EscapeDataString(FiltroNombre)}");
-            if (!string.IsNullOrEmpty(FiltroCedula)) queryParams.Add($"cedula={Uri.EscapeDataString(FiltroCedula)}");
-            if (!string.IsNullOrEmpty(FiltroGrado)) queryParams.Add($"grado={Uri.EscapeDataString(FiltroGrado)}");
-            if (!string.IsNullOrEmpty(FiltroSeccion)) queryParams.Add($"seccionNombre={Uri.EscapeDataString(FiltroSeccion)}");
-
-            if (queryParams.Any()) endpoint += "?" + string.Join("&", queryParams);
-
-            var client = new HttpClient();
+            using var client = new HttpClient();
 
             try
             {
-                var respuesta = await client.GetAsync(endpoint);
+                var response = await client.GetAsync(endPoint);
 
-                if (!respuesta.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    Debug.WriteLine($"[Estudiantes] Error HTTP: {respuesta.StatusCode} - {endpoint}");
-                    Estudiantes = new List<EstudiantesResponse>();
+                    _logger.LogError("[Estudiantes] Error HTTP {StatusCode} al acceder a {Url}", response.StatusCode, endPoint);
+                    Estudiantes = new List<EstudiantesResumenResponse>();
                     return;
                 }
 
-                var resultado = await respuesta.Content.ReadAsStringAsync();
-                Debug.WriteLine($"[Estudiantes] JSON recibido: {resultado}");
+                var result = await response.Content.ReadAsStringAsync();
+                _logger.LogDebug("[Estudiantes] JSON recibido: {Json}", result);
 
-                var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                Estudiantes = JsonSerializer.Deserialize<List<EstudiantesResponse>>(resultado, opciones) ?? new List<EstudiantesResponse>();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                Estudiantes = JsonSerializer.Deserialize<List<EstudiantesResumenResponse>>(result, options) ?? new List<EstudiantesResumenResponse>();
+
+                _logger.LogDebug("[Estudiantes] Estudiantes cargados: {Count}", Estudiantes.Count);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Estudiantes] Excepción: {ex.Message}");
-                Estudiantes = new List<EstudiantesResponse>();
+                _logger.LogError(ex, "[Estudiantes] Excepción al obtener estudiantes desde {Url}", endPoint);
+                Estudiantes = new List<EstudiantesResumenResponse>();
             }
 
-            // 🛡️ Inicialización defensiva
+            // Inicialización defensiva de modelos vinculados
             Estudiante ??= new EstudiantesRequest();
             documento ??= new DocumentosRequest();
             condicion ??= new CondicionesEspecialesRequest();
 
             await ObtenerSecciones();
         }
-
-
 
         public async Task<IActionResult> OnPostCrearAsync()
         {
@@ -368,106 +359,80 @@ namespace Web.Pages.Dashboard.Estudiantes
             }).ToList();
         }
 
-        public async Task OnPostBuscarAsync()
-        {
-            string endpoint = _configuracion.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantes");
+       
+        //public async Task<IActionResult> OnPostCrearCondicionAsync()
+        //{
+        //    Debug.WriteLine("Entró al handler OnPostCrearCondicionAsync");
 
-            var queryParameters = new Dictionary<string, string>();
+        //    // Elimina errores de ModelState que no sean de condicion
+        //    var keysToRemove = ModelState.Keys
+        //        .Where(k => !k.StartsWith("condicion.") && k != nameof(ArchivoDocumento))
+        //        .ToList();
 
-            if (!string.IsNullOrEmpty(FiltroNombre)) queryParameters.Add("nombre", FiltroNombre); 
-            if (!string.IsNullOrEmpty(FiltroCedula)) queryParameters.Add("cedula", FiltroCedula);
-            if (!string.IsNullOrEmpty(FiltroGrado)) queryParameters.Add("grado", FiltroGrado);
-            if (!string.IsNullOrEmpty(FiltroSeccion)) queryParameters.Add("seccion", FiltroSeccion);
+        //    foreach (var key in keysToRemove)
+        //        ModelState.Remove(key);
 
-            string queryString = string.Join("&", queryParameters.Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value)}"));
-            string url = string.IsNullOrWhiteSpace(queryString) ? endpoint : $"{endpoint}?{queryString}";
+        //    // Elimina el error de ArchivoDocumento si existe
+        //    if (ModelState.ContainsKey(nameof(ArchivoDocumento)))
+        //        ModelState.Remove(nameof(ArchivoDocumento));
 
-            using var client = new HttpClient();
+        //    if (!ModelState.IsValid)
+        //    {
+        //        foreach (var key in ModelState.Keys)
+        //        {
+        //            var errors = ModelState[key].Errors;
+        //            foreach (var error in errors)
+        //            {
+        //                Debug.WriteLine($"ModelState error for '{key}': {error.ErrorMessage}");
+        //            }
+        //        }
+        //        return Page();
+        //    }
 
-            var response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
+        //    try
+        //    {
+        //        if (string.IsNullOrWhiteSpace(condicion.TipoCondicion) || string.IsNullOrWhiteSpace(condicion.NombreCondicion))
+        //        {
+        //            ModelState.AddModelError("", "Los campos requeridos no pueden estar vacíos.");
+        //            return Page();
+        //        }
 
-            var json = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            Estudiantes = JsonSerializer.Deserialize<List<EstudiantesResponse>>(json, options);
+        //        // Generar GUID si es nulo
+        //        condicion.IdCondicion ??= Guid.NewGuid();
 
-            await ObtenerSecciones();
-        }
+        //        // Convertir GUID a string antes de serializar
+        //        var datos = new
+        //        {
+        //            IdCondicion = condicion.IdCondicion.ToString(),
+        //            IdEstudiante = condicion.IdEstudiante.ToString(),
+        //            TipoCondicion = condicion.TipoCondicion,
+        //            NombreCondicion = condicion.NombreCondicion,
+        //            FechaDiagnostico = condicion.FechaDiagnostico,
+        //            Observaciones = condicion.Observaciones
+        //        };
 
+        //        string jsonCondicionEspecial = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
+        //        Debug.WriteLine($"[DEBUG] JSON enviado:\n{jsonCondicionEspecial}");
 
-        public async Task<IActionResult> OnPostCrearCondicionAsync()
-        {
-            Debug.WriteLine("Entró al handler OnPostCrearCondicionAsync");
+        //        string endPoint = _configuracion.ObtenerMetodo("ApiEndPoints", "CrearCondicion");
+        //        using var cliente = new HttpClient();
+        //        var contenido = new StringContent(jsonCondicionEspecial, Encoding.UTF8, "application/json");
 
-            // Elimina errores de ModelState que no sean de condicion
-            var keysToRemove = ModelState.Keys
-                .Where(k => !k.StartsWith("condicion.") && k != nameof(ArchivoDocumento))
-                .ToList();
+        //        var respuesta = await cliente.PostAsync(endPoint, contenido);
+        //        var responseContent = await respuesta.Content.ReadAsStringAsync();
+        //        Debug.WriteLine($"[DEBUG] Respuesta API: {responseContent}");
 
-            foreach (var key in keysToRemove)
-                ModelState.Remove(key);
+        //        respuesta.EnsureSuccessStatusCode();
 
-            // Elimina el error de ArchivoDocumento si existe
-            if (ModelState.ContainsKey(nameof(ArchivoDocumento)))
-                ModelState.Remove(nameof(ArchivoDocumento));
-
-            if (!ModelState.IsValid)
-            {
-                foreach (var key in ModelState.Keys)
-                {
-                    var errors = ModelState[key].Errors;
-                    foreach (var error in errors)
-                    {
-                        Debug.WriteLine($"ModelState error for '{key}': {error.ErrorMessage}");
-                    }
-                }
-                return Page();
-            }
-
-            try
-            {
-                if (string.IsNullOrWhiteSpace(condicion.TipoCondicion) || string.IsNullOrWhiteSpace(condicion.NombreCondicion))
-                {
-                    ModelState.AddModelError("", "Los campos requeridos no pueden estar vacíos.");
-                    return Page();
-                }
-
-                // Generar GUID si es nulo
-                condicion.IdCondicion ??= Guid.NewGuid();
-
-                // Convertir GUID a string antes de serializar
-                var datos = new
-                {
-                    IdCondicion = condicion.IdCondicion.ToString(),
-                    IdEstudiante = condicion.IdEstudiante.ToString(),
-                    TipoCondicion = condicion.TipoCondicion,
-                    NombreCondicion = condicion.NombreCondicion,
-                    FechaDiagnostico = condicion.FechaDiagnostico,
-                    Observaciones = condicion.Observaciones
-                };
-
-                string jsonCondicionEspecial = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
-                Debug.WriteLine($"[DEBUG] JSON enviado:\n{jsonCondicionEspecial}");
-
-                string endPoint = _configuracion.ObtenerMetodo("ApiEndPoints", "CrearCondicion");
-                using var cliente = new HttpClient();
-                var contenido = new StringContent(jsonCondicionEspecial, Encoding.UTF8, "application/json");
-
-                var respuesta = await cliente.PostAsync(endPoint, contenido);
-                var responseContent = await respuesta.Content.ReadAsStringAsync();
-                Debug.WriteLine($"[DEBUG] Respuesta API: {responseContent}");
-
-                respuesta.EnsureSuccessStatusCode();
-
-                return RedirectToPage();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[ERROR] Fallo al crear la condición: {ex.Message}");
-                ModelState.AddModelError("", "Error al crear la condición especial.");
-                return Page();
-            }
-        }
+        //        return RedirectToPage();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"[ERROR] Fallo al crear la condición: {ex.Message}");
+        //        ModelState.AddModelError("", "Error al crear la condición especial.");
+        //        return Page();
+        //    }
+        //}
 
         #region Helpers
         private async Task<string> ObtenerImagenActual(Guid idEstudiante)

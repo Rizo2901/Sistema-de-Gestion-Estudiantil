@@ -2,6 +2,8 @@ using Abstracciones.Interfaces.Reglas;
 using Abstracciones.Modelos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -10,130 +12,138 @@ namespace Web.Pages.Dashboard.CondicionesEspeciales
 {
     public class IndexModel : PageModel
     {
+        public List<SelectListItem> Estudiantes { get; set; } = new List<SelectListItem>();
+
+        [BindProperty]
+        public string estudianteSeleccionado { get; set; }
+
+
+        public List<SelectListItem> Categorias { get; set; } = new List<SelectListItem>();
+
+        [BindProperty]
+        public string categoriaSeleccionada { get; set; }
+
         private readonly IConfiguracion _confg;
+        private readonly ILogger<IndexModel> _logger;
 
-        public IList<CondicionesEspecialesResponse> CondicionesEspeciales { get; set; } = new List<CondicionesEspecialesResponse>();
+        [BindProperty]
         public IList<EstudianteConCondicionesResponse> EstudiantesConCondiciones { get; set; } = new List<EstudianteConCondicionesResponse>();
-        public IList<EstudiantesResponse> Estudiantes { get; set; } = new List<EstudiantesResponse>();
 
-        public IndexModel(IConfiguracion confg)
+        [BindProperty]
+        public CondicionesEspecialesRequest condicion { get; set; }
+        public IndexModel(IConfiguracion confg, ILogger<IndexModel> logger)
         {
             _confg = confg;
+            _logger = logger;
         }
 
-        public async Task OnGet(string filtro = "General", string IdEstudiante = "")
+        public async Task OnGet()
         {
-            try
-            {
-                ViewData["Filtro"] = filtro;
-                ViewData["IdEstudiante"] = IdEstudiante;
-                CondicionesEspeciales = new List<CondicionesEspecialesResponse>();
 
-                string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantes");
-                using var cliente = new HttpClient();
-                var respuesta = await cliente.GetAsync(endPoint);
-                respuesta.EnsureSuccessStatusCode();
-                var resultado = await respuesta.Content.ReadAsStringAsync();
-                var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                Estudiantes = JsonSerializer.Deserialize<List<EstudiantesResponse>>(resultado, opciones) ?? new List<EstudiantesResponse>();
+            string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerCondicionesEstudiantes");
+            using var cliente = new HttpClient();
+            var respuesta = await cliente.GetAsync(endPoint);
+            respuesta.EnsureSuccessStatusCode();
+            var resultado = await respuesta.Content.ReadAsStringAsync();
+            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            EstudiantesConCondiciones = JsonSerializer.Deserialize<List<EstudianteConCondicionesResponse>>(resultado, opciones);
+            await ObtenerEstudiantes();
+            await ObtenerCategorias();
 
-                Console.WriteLine($"[DEBUG] Estudiantes cargados: {Estudiantes.Count}");
 
-                if (filtro == "ConLista")
-                {
-                    endPoint = _confg.ObtenerMetodo("ApiEndPoints", "EstudiantesConCondiciones");
-                    respuesta = await cliente.GetAsync(endPoint);
-                    respuesta.EnsureSuccessStatusCode();
-                    resultado = await respuesta.Content.ReadAsStringAsync();
-                    EstudiantesConCondiciones = JsonSerializer.Deserialize<List<EstudianteConCondicionesResponse>>(resultado, opciones) ?? new List<EstudianteConCondicionesResponse>();
 
-                    Console.WriteLine($"[DEBUG] Estudiantes con Condiciones cargados: {EstudiantesConCondiciones.Count}");
-                }
-                else if (filtro == "PorEstudiante" && !string.IsNullOrEmpty(IdEstudiante))
-                {
-                    endPoint = string.Format(_confg.ObtenerMetodo("ApiEndPoints", "ObtenerCondicionesPorEstudiante"), IdEstudiante);
-                    Console.WriteLine($"[DEBUG] URL generada: {endPoint}");
-
-                    respuesta = await cliente.GetAsync(endPoint);
-                    if (!respuesta.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"[ERROR] Fallo al obtener condiciones por estudiante {IdEstudiante}, Status Code: {respuesta.StatusCode}");
-                        return;
-                    }
-
-                    resultado = await respuesta.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[DEBUG] JSON recibido para estudiante {IdEstudiante}: {resultado}");
-
-                    CondicionesEspeciales = JsonSerializer.Deserialize<List<CondicionesEspecialesResponse>>(resultado, opciones) ?? new List<CondicionesEspecialesResponse>();
-
-                    Console.WriteLine($"[DEBUG] Condiciones cargadas para estudiante {IdEstudiante}: {CondicionesEspeciales.Count}");
-                }
-                else
-                {
-                    endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerCondiciones");
-                    respuesta = await cliente.GetAsync(endPoint);
-                    respuesta.EnsureSuccessStatusCode();
-                    resultado = await respuesta.Content.ReadAsStringAsync();
-                    CondicionesEspeciales = JsonSerializer.Deserialize<List<CondicionesEspecialesResponse>>(resultado, opciones) ?? new List<CondicionesEspecialesResponse>();
-
-                    Console.WriteLine($"[DEBUG] Total condiciones cargadas: {CondicionesEspeciales.Count}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ERROR] Fallo en la carga de datos: {ex.Message}");
-                CondicionesEspeciales = new List<CondicionesEspecialesResponse>();
-            }
         }
 
-        public async Task<IActionResult> OnPostAsync(CondicionesEspecialesRequest condicionEspecial)
+        public async Task ObtenerEstudiantes()
         {
-            try
+            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            using var client = new HttpClient();
+            string endpointEstudiantes = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerEstudiantes");
+            var respuestaEstudiantes = await client.GetAsync(endpointEstudiantes);
+            respuestaEstudiantes.EnsureSuccessStatusCode();
+            var resultadoEstudiantes = await respuestaEstudiantes.Content.ReadAsStringAsync();
+            var estudiantesResponse = JsonSerializer.Deserialize<List<EstudiantesResponse>>(resultadoEstudiantes, opciones);
+
+            Estudiantes = estudiantesResponse.Select(s => new SelectListItem
             {
-                if (string.IsNullOrWhiteSpace(condicionEspecial.TipoCondicion) || string.IsNullOrWhiteSpace(condicionEspecial.NombreCondicion))
-                {
-                    ModelState.AddModelError("", "Los campos requeridos no pueden estar vacíos.");
-                    return Page();
-                }
+                Value = s.IdEstudiante.ToString(),
+                Text = $"{s.Nombre} {s.Apellido1} {s.Apellido2}"
+            }).ToList();
 
-                // Generar GUID si es nulo
-                condicionEspecial.IdCondicion ??= Guid.NewGuid();
+        }
 
-                // Convertir GUID a string antes de serializar
-                var datos = new
-                {
-                    IdCondicion = condicionEspecial.IdCondicion.ToString(),
-                    IdEstudiante = condicionEspecial.IdEstudiante.ToString(),
-                    TipoCondicion = condicionEspecial.TipoCondicion,
-                    NombreCondicion = condicionEspecial.NombreCondicion,
-                    FechaDiagnostico = condicionEspecial.FechaDiagnostico,
-                    Observaciones = condicionEspecial.Observaciones
-                };
 
-                string jsonCondicionEspecial = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
-                Console.WriteLine($"[DEBUG] JSON enviado:\n{jsonCondicionEspecial}");
+        public async Task ObtenerCategorias()
+        {
+            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearCondicion");
-                using var cliente = new HttpClient();
-                var contenido = new StringContent(jsonCondicionEspecial, Encoding.UTF8, "application/json");
+            using var client = new HttpClient();
+            string endpointCategorias = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerCategoriasCondiciones");
+            var respuestaCategorias = await client.GetAsync(endpointCategorias);
+            respuestaCategorias.EnsureSuccessStatusCode();
+            var resultadoCategorias = await respuestaCategorias.Content.ReadAsStringAsync();
+            var categoriasResponse = JsonSerializer.Deserialize<List<CategoriasCondicionEspecialResponse>>(resultadoCategorias, opciones);
 
-                var respuesta = await cliente.PostAsync(endPoint, contenido);
-                respuesta.EnsureSuccessStatusCode();
-
-                var resultado = await respuesta.Content.ReadAsStringAsync();
-                var idCondicion = JsonSerializer.Deserialize<Guid>(resultado);
-
-                Console.WriteLine($"[DEBUG] Condición creada con ID: {idCondicion}");
-
-                return RedirectToPage(new { filtro = "PorEstudiante", IdEstudiante = condicionEspecial.IdEstudiante });
-            }
-            catch (Exception ex)
+            Categorias = categoriasResponse.Select(s => new SelectListItem
             {
-                Console.WriteLine($"[ERROR] Fallo al crear la condición: {ex.Message}");
-                ModelState.AddModelError("", "Error al crear la condición especial.");
+                Value = s.IdCategoria.ToString(),
+                Text = $"{s.Nombre} {s.Descripcion} "
+            }).ToList();
+
+        }
+
+
+        public async Task<IActionResult> OnPostCrearAsync()
+        {
+            // Validaciones defensivas
+            if (!Guid.TryParse(estudianteSeleccionado, out var IdEstudiante))
+            {
+                ModelState.AddModelError("estudianteSeleccionado", "Debe seleccionar un estudiante válido.");
+                await ObtenerEstudiantes();
+                await ObtenerCategorias();
                 return Page();
             }
+
+            if (!Guid.TryParse(categoriaSeleccionada, out var IdCategoria))
+            {
+                ModelState.AddModelError("categoriaSeleccionada", "Debe seleccionar una categoría válida.");
+                await ObtenerEstudiantes();
+                await ObtenerCategorias();
+                return Page();
+            }
+
+            var datos = new
+            {
+                IdEstudiante = IdEstudiante,
+                IdCategoria = IdCategoria,
+                FechaDiagnostico = condicion.FechaDiagnostico,
+                Observaciones = condicion.Observaciones?.Trim()
+            };
+
+            var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
+            using var cliente = new HttpClient();
+            string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearCondicion");
+            var contenido = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var respuesta = await cliente.PostAsync(endPoint, contenido);
+
+            if (!respuesta.IsSuccessStatusCode)
+            {
+                string contenidoError = await respuesta.Content.ReadAsStringAsync();
+                _logger.LogError("[ERROR] Fallo al crear la condición especial: {Error}", contenidoError);
+                ModelState.AddModelError("", "Error al crear la condición especial.");
+                await ObtenerEstudiantes();
+                await ObtenerCategorias();
+                return Page();
+            }
+
+            _logger.LogInformation("Condición especial creada exitosamente para estudiante {IdEstudiante}", IdEstudiante);
+
+            await OnGet();
+            return Page();
         }
+
 
         public async Task<IActionResult> OnPostEliminarAsync(Guid? IdCondicion)
         {
@@ -162,16 +172,24 @@ namespace Web.Pages.Dashboard.CondicionesEspeciales
         }
 
 
-        public async Task<IActionResult> OnPostEditarAsync(Guid IdCondicion, Guid IdEstudiante, CondicionesEspecialesRequest condicionEspecial)
+
+        public async Task<IActionResult> OnPostEditarAsync(Guid IdCondicion, CondicionesEspecialesRequest condicion)
         {
             try
             {
-                if (IdCondicion == Guid.Empty || IdEstudiante == Guid.Empty ||
-                    string.IsNullOrWhiteSpace(condicionEspecial.TipoCondicion) ||
-                    string.IsNullOrWhiteSpace(condicionEspecial.NombreCondicion))
+                condicion.IdCondicion = IdCondicion;
+
+                // Validación defensiva de categoría
+                if (condicion.IdCategoria == Guid.Empty)
                 {
-                    ModelState.AddModelError("", "El ID del estudiante es inválido o los campos requeridos están vacíos.");
-                    return Page();
+                    if (!string.IsNullOrEmpty(categoriaSeleccionada) && Guid.TryParse(categoriaSeleccionada, out var idCategoria))
+                    {
+                        condicion.IdCategoria = idCategoria;
+                    }
+                    else
+                    {
+                        condicion.IdCategoria = await ObtenerCategoriaActual(IdCondicion);
+                    }
                 }
 
                 string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "EditarCondicion");
@@ -179,32 +197,71 @@ namespace Web.Pages.Dashboard.CondicionesEspeciales
                 var datos = new
                 {
                     IdCondicion = IdCondicion,
-                    IdEstudiante = IdEstudiante, // Verificar que sea correcto
-                    TipoCondicion = condicionEspecial.TipoCondicion,
-                    NombreCondicion = condicionEspecial.NombreCondicion,
-                    FechaDiagnostico = condicionEspecial.FechaDiagnostico,
-                    Observaciones = condicionEspecial.Observaciones
+                    IdCategoria = condicion.IdCategoria,
+                    FechaDiagnostico = condicion.FechaDiagnostico,
+                    Observaciones = condicion.Observaciones?.Trim()
                 };
 
-                string jsonCondicionEspecial = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
-                Console.WriteLine($"[DEBUG] JSON enviado:\n{jsonCondicionEspecial}");
+                var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
+                _logger.LogDebug("[DEBUG] JSON enviado para edición:\n{Json}", json);
 
                 using var cliente = new HttpClient();
-                var contenido = new StringContent(jsonCondicionEspecial, Encoding.UTF8, "application/json");
+                var contenido = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var respuesta = await cliente.PutAsync(string.Format(endPoint, IdCondicion), contenido);
-                respuesta.EnsureSuccessStatusCode();
 
-                Console.WriteLine($"[DEBUG] Condición editada con ID: {IdCondicion}");
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    string contenidoError = await respuesta.Content.ReadAsStringAsync();
+                    _logger.LogError("[ERROR] Fallo al editar condición especial: {Error}", contenidoError);
+                    ModelState.AddModelError("", "Error al editar la condición especial.");
+                    await ObtenerEstudiantes();
+                    await ObtenerCategorias();
+                    await OnGet();
+                    return Page();
+                }
 
-                return RedirectToPage(new { filtro = "PorEstudiante", IdEstudiante });
+                _logger.LogInformation("Condición especial editada exitosamente. ID: {IdCondicion}", IdCondicion);
+
+                // Validación defensiva antes de redirigir
+                if (condicion.IdEstudiante == Guid.Empty)
+                {
+                    _logger.LogWarning("IdEstudiante vacío tras edición. Redirigiendo sin filtro.");
+                    return RedirectToPage("/Dashboard/CondicionesEspeciales/Index");
+                }
+
+                return RedirectToPage("/Dashboard/CondicionesEspeciales/Index", new { filtro = "PorEstudiante", IdEstudiante = condicion.IdEstudiante });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Fallo al actualizar la condición: {ex.Message}");
-                ModelState.AddModelError("", "Error al actualizar la condición especial.");
+                _logger.LogError(ex, "[EXCEPTION] Error al actualizar la condición especial.");
+                ModelState.AddModelError("", "Error inesperado al actualizar la condición especial.");
+                await ObtenerEstudiantes();
+                await ObtenerCategorias();
+                await OnGet();
                 return Page();
             }
         }
+
+
+        private async Task<Guid> ObtenerCategoriaActual(Guid idCondicion)
+        {
+            string endpoint = string.Format(_confg.ObtenerMetodo("ApiEndPoints", "ObtenerCondicion"), idCondicion);
+
+            using var client = new HttpClient();
+            var respuesta = await client.GetAsync(endpoint);
+
+            if (!respuesta.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("[WARN] No se pudo obtener la condición con ID {IdCondicion}. Status: {StatusCode}", idCondicion, respuesta.StatusCode);
+                return Guid.Empty;
+            }
+
+            var resultado = await respuesta.Content.ReadAsStringAsync();
+            var condicion = JsonSerializer.Deserialize<CondicionesEspecialesResponse>(resultado, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return condicion?.IdCategoria ?? Guid.Empty;
+        }
+
     }
 }

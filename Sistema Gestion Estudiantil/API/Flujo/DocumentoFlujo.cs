@@ -43,14 +43,51 @@ namespace Flujo
             return await _documentoDA.ObtenerDocumentosPorEstudiante(IdEstudiante);
         }
 
-        public async Task<IEnumerable<EstudianteConDocumentosResponse>> ObtenerEstudiantesConDocumentos()
-        {
-            return await _documentoDA.ObtenerEstudiantesConDocumentos();
-        }
 
         public async Task<IEnumerable<DocumentosResponse>> ObtenerTodosLosDocumentos()
         {
             return await _documentoDA.ObtenerTodosLosDocumentos();
+        }
+
+        public async Task<List<EstudianteConDocumentos>> ObtenerDocumentosAgrupados()
+        {
+            var documentosPlanos = await _documentoDA.ObtenerTodosLosDocumentos();
+
+            var resultado = documentosPlanos
+                .GroupBy(d => new
+                {
+                    d.IdEstudiante,
+                    d.Cedula,
+                    d.Nombre,
+                    d.Apellido1,
+                    d.Apellido2
+                })
+                .Select(gEst => new EstudianteConDocumentos
+                {
+                    IdEstudiante = gEst.Key.IdEstudiante,
+                    Cedula = gEst.Key.Cedula?.Trim(),
+                    Nombre = gEst.Key.Nombre?.Trim(),
+                    Apellido1 = gEst.Key.Apellido1?.Trim(),
+                    Apellido2 = gEst.Key.Apellido2?.Trim(),
+
+                    Documentos = gEst
+                        .Where(doc => doc.IdDocumento != Guid.Empty && !string.IsNullOrWhiteSpace(doc.TipoDocumento))
+                        .Select(doc => new DocumentoDetalle
+                        {
+                            IdDocumento = doc.IdDocumento,
+                            TipoDocumento = doc.TipoDocumento,
+                            Descripcion = doc.Descripcion,
+                            Archivo = doc.Archivo,
+                            TipoArchivo = doc.TipoArchivo
+                        })
+                        .OrderBy(d => d.TipoDocumento)
+                        .ToList()
+                })
+                .OrderBy(e => e.Apellido1)
+                .ThenBy(e => e.Apellido2)
+                .ToList();
+
+            return resultado;
         }
     }
 }

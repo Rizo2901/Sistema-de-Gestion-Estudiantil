@@ -1,4 +1,5 @@
 ﻿using Abstracciones.Modelos;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Abstracciones.Interfaces.DA
     public interface IEstudianteDA
     {
         Task<IEnumerable<EstudiantesResponse>> ObtenerEstudiantes();
+        Task<IEnumerable<EstudiantesResumenResponse>> ObtenerEstudiantesResumen();
 
         Task<IEnumerable<EstudiantesResponse>> BuscarEstudiantes(string? nombre = null, string? cedula = null, string? grado = null, string? seccionNombre = null);
 

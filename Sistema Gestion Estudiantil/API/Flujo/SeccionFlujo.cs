@@ -33,6 +33,11 @@ namespace Flujo
             return await _seccDa.EliminarSeccion(Id);
         }
 
+        public async Task<IEnumerable<EstudianteSeccionesRespone>> ObtenerEstudiantesSeccion(Guid IdSeccion)
+        {
+            return await _seccDa.ObtenerEstudiantesSeccion(IdSeccion);
+        }
+
         public async Task<IEnumerable<SeccionesResponse>> ObtenerSecciones()
         {
             return await _seccDa.ObtenerSecciones();

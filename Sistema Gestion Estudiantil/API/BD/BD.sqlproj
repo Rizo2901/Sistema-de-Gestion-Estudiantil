@@ -393,8 +393,12 @@
     <Build Include="AsistenciaProfesor\Stored Procedures\SP_ObtenerAsistenciasProfesor.sql" />
     <Build Include="AsistenciaProfesor\Stored Procedures\SP_CrearAsistenciaProfesor.sql" />
     <Build Include="Security\AsistenciaProfesor.sql" />
+    <Build Include="Seccion\Stored Procedures\sp_ObtenerEstudiantesPorSeccion.sql" />
+    <Build Include="dbo\Stored Procedures\sp_ResumenEstudiantes.sql" />
+    <Build Include="CondicionEspecial\Stored Procedures\SP_ObtenerCondicionEspecialPorId.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BD.publish.xml" />
+    <None Include="BD_1.publish.xml" />
   </ItemGroup>
 </Project>

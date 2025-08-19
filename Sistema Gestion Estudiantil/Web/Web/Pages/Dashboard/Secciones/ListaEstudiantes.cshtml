@@ -1,0 +1,89 @@
+﻿@page
+@model Web.Pages.Dashboard.Secciones.ListaEstudiantesModel
+@{
+    ViewData["Title"] = "Estudiantes de la Sección";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid px-0">
+    <div class="row mb-3">
+        <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+            <!-- Botón para registrar nuevo estudiante -->
+            <button class="btn text-white w-100 w-md-auto" style="background-color: #343a40" data-bs-toggle="modal" data-bs-target="#modalCrear">
+                <i class="bi bi-plus-lg"></i> Registrar Estudiante
+            </button>
+        </div>
+    </div>
+
+    <h2 class="mb-4 text-center text-md-start">
+        Estudiantes de la Sección: <span class="fw-bold">@Model.NombreSeccion</span>
+    </h2>
+
+
+    @if (Model.EstudianteSecciones == null || !Model.EstudianteSecciones.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            ℹ️ No hay estudiantes registrados en esta sección.
+        </div>
+    }
+    else
+    {
+        <div class="container-fluid px-0">
+            <div class="d-flex flex-column gap-3">
+                @foreach (var estudiante in Model.EstudianteSecciones)
+                {
+                    <div class="bg-white shadow-sm rounded-3 p-3 mx-2 estudiante-card">
+                        <div class="row align-items-center gy-2 gx-3">
+
+                            <!-- Foto -->
+                            <div class="col-auto">
+                                @{
+                                    var foto = string.IsNullOrWhiteSpace(estudiante?.Fotografia)
+                                    ? "/img/user-default.png"
+                                    : estudiante.Fotografia;
+                                }
+
+                                <img src="@foto"
+                                     alt="Foto"
+                                     class="rounded-circle"
+                                     style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ccc;" />
+                            </div>
+
+                            <!-- Nombre y datos -->
+                            <div class="col flex-grow-1">
+                                <h6 class="mb-1 fw-bold estudiante-nombre">
+                                    @(estudiante?.Nombre ?? "") @(estudiante?.Apellido1 ?? "") @(estudiante?.Apellido2 ?? "")
+                                </h6>
+                                <p class="mb-0 text-muted small estudiante-cedula">
+                                    <i class="bi bi-person-vcard"></i>Cedúla: @(estudiante?.Cedula ?? "")
+                                </p>
+                            </div>
+
+                            <!-- Acciones -->
+                            <div class="col-12 col-md-auto d-flex flex-wrap justify-content-md-end gap-2 mt-2 mt-md-0">
+                                <button class="btn btn-outline-primary btn-sm square-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#detalleModal_@estudiante?.IdEstudiante"
+                                        title="Detalles">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm square-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editarModal_@estudiante?.IdEstudiante"
+                                        title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm square-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#eliminarModal_@estudiante?.IdEstudiante"
+                                        title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

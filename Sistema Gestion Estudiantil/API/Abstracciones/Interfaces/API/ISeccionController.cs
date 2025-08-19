@@ -11,6 +11,8 @@ namespace Abstracciones.Interfaces.API
     public interface ISeccionController
     {
         Task<IActionResult> ObtenerSecciones();
+
+        Task<IActionResult> ObtenerEstudiantesSeccion(Guid IdSeccion);
         Task<IActionResult> ObtenerSeccion(Guid Id);
 
         Task<IActionResult> CrearSeccion(SeccionesRequest seccion);

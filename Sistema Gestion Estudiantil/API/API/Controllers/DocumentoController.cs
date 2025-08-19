@@ -72,6 +72,18 @@ namespace API.Controllers
             return Ok(resultado);
         }
 
+        [HttpGet("obtenerDocumentosEstudiantes")]
+        public async Task<IActionResult> ObtenerDocumentosAgrupados()
+        {
+            var result = await _docFlj.ObtenerDocumentosAgrupados();
+            if (result == null || !result.Any())
+            {
+                _logger.LogWarning("No se encontraron documentos agrupados por estudiante");
+                return NotFound("No se encontraron documentos agrupados por estudiante");
+            }
+            return Ok(result);
+        }
+
         [HttpGet("Estudiante/{IdEstudiante}")]
         public async Task<IActionResult> ObtenerDocumentosPorEstudiante([FromRoute]Guid IdEstudiante)
         {
@@ -84,17 +96,7 @@ namespace API.Controllers
             return Ok(resultado);
         }
 
-        [HttpGet("estudianteConDocumentos")]
-        public async Task<IActionResult> ObtenerEstudiantesConDocumentos()
-        {
-            var result = await _docFlj.ObtenerEstudiantesConDocumentos();
-            if (result == null || !result.Any())
-            {
-                _logger.LogWarning("No se encontraron documentos para el estudiante");
-                return NotFound("No se encontraron documentos para el estudiante");
-            }
-            return Ok(result);
-        }
+        
 
         [HttpGet]
         public async Task<IActionResult> ObtenerTodosLosDocumentos()

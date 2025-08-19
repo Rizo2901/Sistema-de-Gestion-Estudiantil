@@ -186,10 +186,15 @@ namespace DA
             var result = _conn.QueryAsync<EstudiantesResponse>(query);
             return result;
         }
-    
 
+        public async Task<IEnumerable<EstudiantesResumenResponse>> ObtenerEstudiantesResumen()
+        {
+            string query = @"sp_ResumenEstudiantes";
+            var result =  await _conn.QueryAsync<EstudiantesResumenResponse>(query);
+            return result;
+        }
 
-    private async Task verificarEstudianteExiste(Guid Id)
+        private async Task verificarEstudianteExiste(Guid Id)
         {
             EstudiantesResponse? resultadoConsulta = await ObtenerEstudiantePorId(Id);
             if (resultadoConsulta == null)

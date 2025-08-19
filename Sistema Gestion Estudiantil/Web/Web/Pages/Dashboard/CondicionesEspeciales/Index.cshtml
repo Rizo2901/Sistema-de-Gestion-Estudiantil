@@ -4,335 +4,306 @@
     ViewData["Title"] = "Condiciones Especiales";
     Layout = "_Layout";
 }
-@if (Model.CondicionesEspeciales == null || !Model.CondicionesEspeciales.Any())
+
+@if (Model.EstudiantesConCondiciones == null || !Model.EstudiantesConCondiciones.Any())
 {
     <div class="alert alert-warning" role="alert">
-        ⚠️ No hay condiciones registradas.
+        ⚠️ No hay condiciones especiales registradas.
     </div>
-
     <div class="container-fluid px-0">
         <div class="row mb-3">
             <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
-                <!-- Botón que abre el modal de creación -->
-                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCondicionEspecial" style="background-color: #343a40">
-                    <i class="bi bi-plus-lg"></i> Crear Condición Especial
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#ModalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Condición
                 </button>
             </div>
         </div>
     </div>
-
 }
-<div class="container-fluid px-0">
-    <div class="row mb-3">
-        <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
-            <!-- Botón que abre el modal de creación -->
-            <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCondicionEspecial" style="background-color: #343a40">
-                <i class="bi bi-plus-lg"></i> Crear Condición Especial
-            </button>
+else
+{
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#ModalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Condición
+                </button>
+            </div>
         </div>
-    </div>
-</div>
 
-<!-- Dropdown alineado a la derecha -->
-<div class="text-end mt-2">
-    <div class="dropdown">
-        <button class="btn btn-dark btn-sm dropdown-toggle" type="button" id="dropdownCondiciones" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-            Filtrar
-        </button>
-        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end p-3 rounded">
-            <li><a class="dropdown-item text-white" href="#" onclick="cambiarVista('General')">Ver Condiciones Generales</a></li>
-            <li><a class="dropdown-item text-white" href="#" onclick="cambiarVista('ConLista')">Ver Estudiantes con Condiciones</a></li>
-            <li class="px-3 py-2">
-                <label class="text-white fw-bold mb-1">Seleccionar Estudiante</label>
-                <select id="seleccionarEstudiante" class="form-select form-select-sm bg-dark text-white border-light" onchange="cambiarVista('PorEstudiante', this.value)">
-                    <option value="">Seleccionar...</option>
-                    @foreach (var estudiante in Model.Estudiantes)
-                    {
-                        <option value="@estudiante.IdEstudiante">@estudiante.Nombre @estudiante.Apellido1</option>
-                    }
-                </select>
-            </li>
-        </ul>
-    </div>
-</div>
+        <h2 class="mb-4 text-center text-md-start">Condiciones Especiales por Estudiante</h2>
+        <div class="container-fluid px-0 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="bi bi-funnel-fill me-2"></i>Filtros</h5>
+                    <div class="row g-2">
+                        <!-- Filtro por nombre -->
+                        <div class="col-12 col-md-4">
+                            <input type="text" id="filtroNombre" class="form-control" placeholder="Buscar por nombre...">
+                        </div>
+                        <!-- Filtro por cédula -->
+                        <div class="col-12 col-md-4">
+                            <input type="text" id="filtroCedula" class="form-control" placeholder="Buscar por cédula...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid px-0">
+            <div class="d-flex flex-column gap-3">
+                @foreach (var est in Model.EstudiantesConCondiciones)
+                {
+                    <div class="bg-white shadow rounded p-3 mx-2 estudiante-card">
+                        <div class="row align-items-center gy-3"
+                             role="button"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#condiciones_@est.IdEstudiante"
+                             aria-expanded="false"
+                             aria-controls="condiciones_@est.IdEstudiante"
+                             style="cursor: pointer;">
+                            <div class="col flex-grow-1">
+                                <h6 class="mb-1 fw-bold estudiante-nombre">
+                                    @($"{est.Nombre} {est.Apellido1} {est.Apellido2}") — Cédula: <span class="estudiante-cedula">@est.Cedula</span>
+                                </h6>
+                                <span class="d-none estudiante-cedula">@est.Cedula</span>
+                            </div>
+                        </div>
 
-<!-- Modal para agregar condiciones -->
-<div class="modal fade" id="modalCondicionEspecial" tabindex="-1" aria-labelledby="modalCondicionLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content text-black">
-            <form method="post">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title">Condición Especial</h5>
-                    <button type="button" class="btn-close btn-close-black" data-bs-dismiss="modal"></button>
+                        <!-- Acordeón de condiciones -->
+                        <div class="collapse mt-3" id="condiciones_@est.IdEstudiante">
+                            @if (est.Condiciones?.Any() == true)
+                            {
+                                <ul class="list-group">
+                                    @foreach (var cond in est.Condiciones)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <strong>Categoría:</strong> @cond.NombreCategoria <br />
+                                                <strong>Fecha diagnóstico:</strong> @cond.FechaDiagnostico?.ToShortDateString() <br />
+                                                <strong>Observaciones:</strong> @cond.Observaciones
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalEditar_@cond.IdCondicion" title="Editar">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar_@cond.IdCondicion" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </li>
+
+
+                                        <!-- Modal Eliminar -->
+                                        <div class="modal fade" id="modalEliminar_@cond.IdCondicion" tabindex="-1" aria-labelledby="modalEliminarLabel_@cond.IdCondicion" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content rounded-4 shadow">
+                                                    <form method="post" asp-page-handler="Eliminar">
+                                                        <div class="modal-header border-bottom-0">
+                                                            <h5 class="modal-title" id="modalEliminarLabel_@cond.IdCondicion">Confirmar eliminación</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>¿Estás seguro que deseas eliminar la condición <strong>@cond.NombreCategoria</strong>?</p>
+                                                            <p>Descripción: <strong>@cond.DescripcionCategoria</strong></p>
+                                                            <input type="hidden" name="IdEstudiante" value="@cond.IdEstudiante" />
+                                                            <input type="hidden" name="IdCondicion" value="@cond.IdCondicion" />
+                                                        </div>
+                                                        <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+<!-- Modal Editar Condición -->
+<div class="modal fade" id="modalEditar_@cond.IdCondicion" tabindex="-1" aria-labelledby="modalEditarLabel_@cond.IdCondicion" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <form method="post" asp-page-handler="Editar">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title" id="modalEditarLabel_@cond.IdCondicion">Editar Condición</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="idCondicion" name="idCondicion" value="@Guid.NewGuid()" />
+                    <input type="hidden" name="IdCondicion" value="@cond.IdCondicion" />
+                    <input type="hidden" name="IdEstudiante" value="@cond.IdEstudiante" />
 
                     <div class="mb-3">
-                        <label class="form-label">Estudiante</label>
-                        <select class="form-select bg-secondary text-white border-light" id="idEstudiante" name="IdEstudiante" required>
-                            <option value="">Seleccionar Estudiante...</option>
-                            @foreach (var estudiante in Model.Estudiantes)
+
+                        <select name="IdCategoria" class="form-select">
+                            <option value="">Seleccione una categoria</option>
+                            @foreach (var categoria in Model.Categorias)
                             {
-                                <option value="@estudiante.IdEstudiante">@estudiante.Nombre @estudiante.Apellido1</option>
+@:                              <option value="@categoria.Value" @(cond.IdCategoria != Guid.Empty && cond.IdCategoria.ToString() == categoria.Value ? "selected" : "")>
+@:                                  @categoria.Text
+@:                              </option>
                             }
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Tipo de Condición</label>
-                        <input type="text" class="form-control bg-secondary text-white border-light" id="tipoCondicion" name="TipoCondicion" required>
+                        <label for="FechaDiagnostico_@cond.IdCondicion" class="form-label">Fecha Diagnóstico</label>
+                        <input type="date" class="form-control" id="FechaDiagnostico_@cond.IdCondicion" name="FechaDiagnostico" value="@cond.FechaDiagnostico?.ToString("yyyy-MM-dd")" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Nombre de la Condición</label>
-                        <input type="text" class="form-control bg-secondary text-white border-light" id="nombreCondicion" name="NombreCondicion" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Fecha Diagnóstico</label>
-                        <input type="date" class="form-control bg-secondary text-white border-light" id="fechaDiagnostico" name="FechaDiagnostico">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Observaciones</label>
-                        <textarea class="form-control bg-secondary text-white border-light" id="observaciones" name="Observaciones"></textarea>
+                        <label for="Observaciones_@cond.IdCondicion" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="Observaciones_@cond.IdCondicion" name="Observaciones">@cond.Observaciones</textarea>
                     </div>
                 </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Guardar</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-@if (ViewData["Filtro"]?.ToString() == "PorEstudiante" && !string.IsNullOrEmpty(ViewData["IdEstudiante"]?.ToString()))
-{
-    <h2>Condiciones del Estudiante</h2>
-    <p><strong>Estudiante ID:</strong> @ViewData["IdEstudiante"]</p> <!-- Mostrar ID para depuración -->
-    <p><strong>Total Condiciones Cargadas:</strong> @Model.CondicionesEspeciales.Count</p> <!-- Verificar si hay datos -->
 
-    <div class="row g-3">
-        @if (Model.CondicionesEspeciales != null && Model.CondicionesEspeciales.Any())
-        {
-            @foreach (var condicion in Model.CondicionesEspeciales)
-            {
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="card shadow-lg" style="border-color:#343a40 ">
-                        <div class="card-header text-white" style="background-color:#343a40 ">
-                            <h5 class="card-title">Tipo: <strong>@condicion.TipoCondicion</strong></h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="fw-bold">Nombre: @condicion.NombreCondicion</p>
-                            <p>Fecha Diagnóstico: @(condicion.FechaDiagnostico.HasValue ? condicion.FechaDiagnostico.Value.ToString("yyyy-MM-dd") : "No registrada")</p>
-                            <p>Observaciones: @condicion.Observaciones</p>
-                        </div>
-                        <div class="card-footer text-end">
-                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerDetalles_@condicion.IdCondicion">
-                                <i class="bi bi-eye"></i> Ver Detalles
-                            </button>
-                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@condicion.IdCondicion">
-                                <i class="bi bi-pencil"></i> Editar
-                            </button>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@condicion.IdCondicion">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </div>
+                                    }
+                                </ul>
 
-                    </div>
-                </div>
-            }
-        }
-        else
-        {
-            <div class="alert alert-warning">⚠️ No hay condiciones registradas para este estudiante.</div>
-        }
-    </div>
 
-}
-
-<!-- Mostrar Condiciones Generales -->
-@if (ViewData["Filtro"]?.ToString() == "General")
-{
-    <h2>Listado de Condiciones Especiales</h2>
-    <div class="row g-3">
-        @if (Model.CondicionesEspeciales != null && Model.CondicionesEspeciales.Any())
-        {
-            @foreach (var condicion in Model.CondicionesEspeciales)
-            {
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="card shadow-lg">
-                        <div class="card-header  text-white" style="background-color:#343a40 ">
-                            <h5 class="card-title">Tipo: <strong>@condicion.TipoCondicion</strong></h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="fw-bold">Nombre: @condicion.NombreCondicion</p>
-                            <p>Fecha Diagnóstico: @(condicion.FechaDiagnostico.HasValue ? condicion.FechaDiagnostico.Value.ToString("yyyy-MM-dd") : "No registrada")</p>
-                            <p>Observaciones: @condicion.Observaciones</p>
-                        </div>
-                        <div class="card-footer text-end">
-                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerDetalles_@condicion.IdCondicion">
-                                <i class="bi bi-eye"></i> Ver Detalles
-                            </button>
-                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@condicion.IdCondicion">
-                                <i class="bi bi-pencil"></i> Editar
-                            </button>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@condicion.IdCondicion">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            }
-        }
-        else
-        {
-            <div class="alert alert-warning">⚠️ No hay condiciones registradas.</div>
-        }
-    </div>
-}
-
-<!-- Estudiantes con Condiciones Asociadas -->
-@if (ViewData["Filtro"]?.ToString() == "ConLista")
-{
-    <h2>Listado de Estudiantes con Condiciones</h2>
-    <div class="row g-3">
-        @foreach (var estudiante in Model.EstudiantesConCondiciones)
-        {
-            <div class="col-12">
-                <div class="card shadow-lg ">
-                    <div class="card-header text-white" style="background-color:#343a40 ">
-                        <h5 class="card-title">Estudiante: @estudiante.Nombre @estudiante.Apellido1</h5>
-                    </div>
-                    <div class="card-body">
-                        <h6>Condiciones Asociadas:</h6>
-                        <div class="row g-3">
-                            @foreach (var condicion in estudiante.Condiciones)
+                            }
+                            else
                             {
-                                <div class="col-12 col-sm-6 col-lg-4">
-                                    <div class="card border-secondary">
-                                        <div class="card-body">
-                                            <h6 class="fw-bold">Tipo: @condicion.TipoCondicion</h6>
-                                            <p>Nombre: @condicion.NombreCondicion</p>
-                                            <p>Fecha Diagnóstico: @(condicion.FechaDiagnostico.HasValue ? condicion.FechaDiagnostico.Value.ToString("yyyy-MM-dd") : "No registrada")</p>
-                                        </div>
-                                        <div class="card-footer text-end">
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerDetalles_@condicion.IdCondicion">
-                                                <i class="bi bi-eye"></i> Ver Detalles
-                                            </button>
-                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar_@condicion.IdCondicion">
-                                                <i class="bi bi-pencil"></i> Editar
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar_@condicion.IdCondicion">
-                                                <i class="bi bi-trash"></i> Eliminar
-                                            </button>
-                                        </div>
-
-                                    </div>
-                                </div>
+                                <div class="alert alert-info">Este estudiante no tiene condiciones especiales registradas.</div>
                             }
                         </div>
                     </div>
+
+
+                   
+
+@* 
+                    
+@* 
+                    <!-- Modal Ver Detalles -->
+                    <div class="modal fade" id="modalVerDetalles_@condicion.IdCondicion" tabindex="-1" aria-labelledby="modalVerDetallesLabel_@condicion.IdCondicion" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content rounded-4 shadow" style="background-color: #343a40; color: white;">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title" id="modalVerDetallesLabel_@condicion.IdCondicion">Detalles de la Condición</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Tipo:</strong> @condicion.TipoCondicion</p>
+                                    <p><strong>Nombre:</strong> @condicion.NombreCondicion</p>
+                                    <p><strong>Fecha Diagnóstico:</strong> @(condicion.FechaDiagnostico.HasValue? condicion.FechaDiagnostico.Value.ToString("yyyy-MM-dd") : "No registrada")</p>
+                                    <p><strong>Observaciones:</strong> @condicion.Observaciones</p>
+                                </div>
+                                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div> *@
+
+                 
+
+
+                }
+               
+
+
+                <!-- Modal para agregar condiciones -->
+                <div class="modal fade" id="ModalCrear" tabindex="-1" aria-labelledby="ModalCrearLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 shadow">
+                            <form method="post" asp-page-handler="Crear">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title">Condición Especial</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" id="idCondicion" name="idCondicion" value="@Guid.NewGuid()" />
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Seleccionar Estudiante</label>
+                                        <select asp-for="estudianteSeleccionado" asp-items="Model.Estudiantes" class="form-select">
+                                            <option value="">Seleccione el estudiante al que va registrarle una condición especial</option>
+                                        </select>
+                                        <span asp-validation-for="estudianteSeleccionado" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Seleccionar Categoría</label>
+                                        <select asp-for="categoriaSeleccionada" asp-items="Model.Categorias" class="form-select">
+                                            <option value="">Seleccione la categoría de la condición especial del estudiante</option>
+                                        </select>
+                                        <span asp-validation-for="categoriaSeleccionada" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha Diagnóstico</label>
+                                        <input type="date" class="form-control" id="fechaDiagnostico" name="FechaDiagnostico">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Observaciones</label>
+                                        <textarea class="form-control" id="observaciones" name="Observaciones"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="submit" class="btn btn-success">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+              
+
+
+
             </div>
-        }
+        </div>
     </div>
+
+
+
 }
-@foreach (var condicion in Model.CondicionesEspeciales)
-{
-    <!-- Modal Editar -->
-    <div class="modal fade" id="modalEditar_@condicion.IdCondicion" tabindex="-1" aria-labelledby="modalEditarLabel_@condicion.IdCondicion" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow" style="background-color: #343a40; color: white;">
-                <form method="post" asp-page-handler="Editar">
-                    <div class="modal-header border-bottom-0">
-                        <h5 class="modal-title" id="modalEditarLabel_@condicion.IdCondicion">Editar Condición</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="IdCondicion" value="@condicion.IdCondicion" />
-                        <input type="hidden" name="IdEstudiante" value="@condicion.IdEstudiante" />
 
-                        <div class="mb-3">
-                            <label for="TipoCondicion_@condicion.IdCondicion" class="form-label">Tipo de Condición</label>
-                            <input type="text" class="form-control bg-secondary text-white border-light" id="TipoCondicion_@condicion.IdCondicion" name="TipoCondicion" value="@condicion.TipoCondicion" required />
-                        </div>
-                        <div class="mb-3">
-                            <label for="NombreCondicion_@condicion.IdCondicion" class="form-label">Nombre de la Condición</label>
-                            <input type="text" class="form-control bg-secondary text-white border-light" id="NombreCondicion_@condicion.IdCondicion" name="NombreCondicion" value="@condicion.NombreCondicion" required />
-                        </div>
-                        <div class="mb-3">
-                            <label for="FechaDiagnostico_@condicion.IdCondicion" class="form-label">Fecha Diagnóstico</label>
-                            <input type="date" class="form-control bg-secondary text-white border-light" id="FechaDiagnostico_@condicion.IdCondicion" name="FechaDiagnostico" value="@condicion.FechaDiagnostico?.ToString("yyyy-MM-dd")" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="Observaciones_@condicion.IdCondicion" class="form-label">Observaciones</label>
-                            <textarea class="form-control bg-secondary text-white border-light" id="Observaciones_@condicion.IdCondicion" name="Observaciones">@condicion.Observaciones</textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-top-0 d-flex justify-content-between">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal Ver Detalles -->
-    <div class="modal fade" id="modalVerDetalles_@condicion.IdCondicion" tabindex="-1" aria-labelledby="modalVerDetallesLabel_@condicion.IdCondicion" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow" style="background-color: #343a40; color: white;">
-                <div class="modal-header border-bottom-0">
-                    <h5 class="modal-title" id="modalVerDetallesLabel_@condicion.IdCondicion">Detalles de la Condición</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Tipo:</strong> @condicion.TipoCondicion</p>
-                    <p><strong>Nombre:</strong> @condicion.NombreCondicion</p>
-                    <p><strong>Fecha Diagnóstico:</strong> @(condicion.FechaDiagnostico.HasValue ? condicion.FechaDiagnostico.Value.ToString("yyyy-MM-dd") : "No registrada")</p>
-                    <p><strong>Observaciones:</strong> @condicion.Observaciones</p>
-                </div>
-                <div class="modal-footer border-top-0 d-flex justify-content-between">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal Eliminar -->
-    <div class="modal fade" id="modalEliminar_@condicion.IdCondicion" tabindex="-1" aria-labelledby="modalEliminarLabel_@condicion.IdCondicion" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow" style="background-color: #343a40; color: white;">
-                <form method="post" asp-page-handler="Eliminar">
-                    <div class="modal-header border-bottom-0">
-                        <h5 class="modal-title" id="modalEliminarLabel_@condicion.IdCondicion">Confirmar eliminación</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>¿Estás seguro que deseas eliminar la condición <strong>@condicion.NombreCondicion</strong>?</p>
-                        <input type="hidden" name="IdEstudiante" value="@condicion.IdEstudiante" />
-                        <input type="hidden" name="IdCondicion" value="@condicion.IdCondicion" />
-                    </div>
-                    <div class="modal-footer border-top-0 d-flex justify-content-between">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const filtroNombre = document.getElementById("filtroNombre");
+            const filtroCedula = document.getElementById("filtroCedula");
+
+            if (filtroNombre && filtroCedula) {
+                const tarjetasEstudiantes = document.querySelectorAll(".estudiante-card");
+
+                function aplicarFiltros() {
+                    const nombre = filtroNombre.value.toLowerCase();
+                    const cedula = filtroCedula.value.toLowerCase();
+
+                    tarjetasEstudiantes.forEach(card => {
+                        const nombreText = card.querySelector(".estudiante-nombre")?.textContent.toLowerCase() || "";
+                        const cedulaText = card.querySelector(".estudiante-cedula")?.textContent.toLowerCase() || "";
+
+                        const coincideNombre = nombreText.includes(nombre);
+                        const coincideCedula = cedulaText.includes(cedula);
+
+                        card.style.display = (coincideNombre && coincideCedula) ? "" : "none";
+                    });
+                }
+
+                [filtroNombre, filtroCedula].forEach(input => {
+                    input.addEventListener("input", aplicarFiltros);
+                });
+            } else {
+                console.warn("[Filtros] No se encontraron los campos de filtro en esta vista.");
+            }
+        });
+    </script>
+
+
 }
-<script>
-    function cambiarVista(tipoFiltro, idEstudiante = "") {
-        let url = `/Dashboard/CondicionesEspeciales?filtro=` + tipoFiltro;
-        if (tipoFiltro === "PorEstudiante" && idEstudiante) {
-            url += `&IdEstudiante=` + idEstudiante;
-        }
-        window.location.replace(url);
-    }
-</script>

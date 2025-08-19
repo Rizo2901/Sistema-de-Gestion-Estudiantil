@@ -29,7 +29,7 @@ namespace Web.Pages.Dashboard.ReunionesAdministrativas
             var respuesta = await cliente.GetAsync(endPoint);
             if (!respuesta.IsSuccessStatusCode)
             {
-                return StatusCode((int)respuesta.StatusCode, "Error al obtener las reuniones.");
+                return Page();
             }
             var resultado = await respuesta.Content.ReadAsStringAsync();
             var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };

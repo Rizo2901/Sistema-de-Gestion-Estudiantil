@@ -58,6 +58,17 @@ namespace API.Controllers
             return Ok("Condicion eliminada correctamente");
 
         }
+        [HttpGet("obtenerCondicionesEstudiantes")]
+        public async Task<IActionResult> ObtenerCondicionesAgrupadas()
+        {
+            var result =  await _condicionEspecialFlujo.ObtenerCondicionesAgrupadas();
+            if (result == null || !result.Any())
+            {
+                _logger.LogWarning("No se encontraron condiciones especiales");
+                return NotFound("No se encontraron condiciones especiales");
+            }
+            return Ok(result);
+        }
 
         [HttpGet]
         public async Task<IActionResult> ObtenerCondicionesEspeciales()
@@ -71,18 +82,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("obtenerPorEstudiante")]
-
-        public async Task<IActionResult> ObtenerCondicionesEspecialesPorEstudiantes()
-        {
-            var result = await _condicionEspecialFlujo.ObtenerCondicionEspecialPorEstudiantes();
-            if (result == null || !result.Any())
-            {
-                _logger.LogWarning($"No se encontraron condiciones especiales para el estudiante ");
-                return NotFound($"No se encontraron condiciones especiales para el estudiante");
-            }
-            return Ok(result);
-        }
+        
 
         
 

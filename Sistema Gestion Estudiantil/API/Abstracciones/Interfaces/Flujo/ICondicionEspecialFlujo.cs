@@ -10,7 +10,7 @@ namespace Abstracciones.Interfaces.Flujo
     public interface ICondicionEspecialFlujo
     {
         Task<IEnumerable<CondicionesEspecialesResponse>> ObtenerCondicionesEspeciales();
-        Task<IEnumerable<EstudianteConCondicionesResponse>> ObtenerCondicionEspecialPorEstudiantes();
+        Task<List<EstudianteConCondicionesResponse>> ObtenerCondicionesAgrupadas();
         Task<CondicionesEspecialesResponse> ObtenerCondicionEspecial(Guid Id);
         Task<Guid> CrearCondicionEspecial(CondicionesEspecialesRequest condicionEspecial);
         Task<Guid> EditarCondicionEspecial(Guid Id, CondicionesEspecialesRequest condicionEspecial);

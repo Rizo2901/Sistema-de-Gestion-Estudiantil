@@ -12,6 +12,10 @@
     </div>
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/calendar.css" />
+}
+
 <div class="container-fluid px-0">
     <div class="row mb-3">
         <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
@@ -25,7 +29,7 @@
 <h2 class="mb-4 text-center text-md-start">Calendario de Actividades</h2>
 
 <div class="w-100 px-2 px-lg-3 d-flex justify-content-center">
-    <div class="bg-white shadow rounded p-3 w-100" style="max-width: 1200px;">
+    <div class="bg-white shadow rounded p-3" style="overflow-x:auto; width:100%;">
         <div id="calendarioActividades"></div>
     </div>
 </div>
@@ -38,48 +42,7 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/es.global.min.js"></script>
 
-<!-- Estilo -->
-<style>
-    #calendarioActividades {
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08);
-        font-family: 'Poppins', sans-serif;
-        overflow-x: auto;
-        width: 100%;
-        margin: 0 auto;
-    }
 
-    .fc-toolbar-title {
-        font-size: 1.6rem;
-        font-weight: 600;
-    }
-
-    .fc-button {
-        border-radius: 6px !important;
-        padding: 5px 12px !important;
-        background-color: #343a40 !important;
-        border: none !important;
-        font-weight: 500;
-        font-size: 0.85rem !important;
-        color: #fff !important;
-    }
-
-    .fc-button:hover {
-        background-color: #23272b !important;
-    }
-
-    .fc-event {
-        border-radius: 6px;
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        color: #ffffff !important;
-        background-color: #198754 !important;
-        border: none;
-        font-weight: 500;
-    }
-</style>
 
 <!-- Modal Crear Actividad -->
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
@@ -240,102 +203,86 @@
     </div>
 }
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const inicio = document.querySelector("#Actividad_FechaInicio");
-        const fin = document.querySelector("#Actividad_FechaFin");
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const inicio = document.querySelector("#Actividad_FechaInicio");
+    const fin = document.querySelector("#Actividad_FechaFin");
+    if (inicio && fin) {
         inicio.addEventListener("change", function () {
             fin.min = inicio.value;
         });
-    });
-</script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendarioActividades');
+    }
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: window.innerWidth < 768 ? 'dayGridMonth' : 'timeGridWeek',
-                locale: 'es',
-                height: 'auto',
-                contentHeight: 'auto',
-                slotMinTime: "07:00:00",
-                slotMaxTime: "20:00:00",
-                slotLabelFormat: {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                },
-                eventTimeFormat: {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                },
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listWeek'
-                },
-                events: [
-                    @if (Model.Actividades != null)
-                    {
-                        foreach (var act in Model.Actividades)
-                        {
-                            @Html.Raw("{" +
-                                $"id: '{act.IdActividad}'," +
-                                $"title: '{act.Titulo?.Replace("'", "\\'")}'," +
-                                $"start: '{act.FechaInicio:yyyy-MM-ddTHH:mm}'," +
-                                $"end: '{act.FechaFin:yyyy-MM-ddTHH:mm}'," +
-                                $"description: '{act.Descripcion?.Replace("'", "\\'")}'," +
-                                "extendedProps: {" +
-                                    $"tipo: '{act.Tipo?.Replace("'", "\\'")}'," +
-                                    $"idActividad: '{act.IdActividad}'" +
-                                "}" +
-                            "},")
-                        }
-                    }
-                ],
-                eventDidMount: function (info) {
-                    const id = info.event.extendedProps.idActividad;
-                    const titulo = info.event.title;
-                    const tipo = info.event.extendedProps.tipo;
-                    const descripcion = info.event.extendedProps.description;
+    var calendarEl = document.getElementById('calendarioActividades');
 
-                    const content = `
-                        <strong>${titulo}</strong><br>
-                        <em>${tipo}</em><br>
-                        ${descripcion}<br><br>
-                        <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#modalEditar_${id}">Editar</button>
-<button class="btn btn-sm btn-danger me-1" data-bs-toggle="modal" data-bs-target="#modalEliminar_${id}">Eliminar</button>
-<button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalDetalles_${id}">Detalles</button>
-                    `;
+    function getInitialView() {
+        const w = window.innerWidth;
+        if (w < 576) return 'listDay';
+        if (w < 768) return 'listWeek';
+        return 'dayGridMonth';
+    }
 
-                    tippy(info.el, {
-                        content: content,
-                        allowHTML: true,
-                        theme: 'light-border',
-                        interactive: true
-                    });
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'es',
+        initialView: getInitialView(),
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        height: 'auto',
+        contentHeight: 'auto',
+        slotMinTime: "07:00:00",
+        slotMaxTime: "20:00:00",
+        slotLabelFormat: { hour: 'numeric', minute: '2-digit', hour12: true },
+        eventTimeFormat: { hour: 'numeric', minute: '2-digit', hour12: true },
+        nowIndicator: true,
+        editable: false,
+        eventDisplay: 'block',
+        dayMaxEvents: true,
+
+        events: [
+            @if (Model.Actividades != null)
+            {
+                foreach (var act in Model.Actividades)
+                {
+                    @Html.Raw("{" +
+                        $"id: '{act.IdActividad}'," +
+                        $"title: '{act.Titulo?.Replace("'", "\\'")}'," +
+                        $"start: '{act.FechaInicio:yyyy-MM-ddTHH:mm}'," +
+                        $"end: '{act.FechaFin:yyyy-MM-ddTHH:mm}'," +
+                        $"description: '{act.Descripcion?.Replace("'", "\\'")}'," +
+                        "extendedProps: {" +
+                            $"tipo: '{act.Tipo?.Replace("'", "\\'")}'," +
+                            $"idActividad: '{act.IdActividad}'" +
+                        "}" +
+                    "},")
                 }
-            });
-
-            calendar.render();
-        });
-
-        function editarActividad(id) {
-            window.location.href = `/Dashboard/Actividades/Editar?id=${id}`;
-        }
-
-        function eliminarActividad(id) {
-            if (confirm("¿Estás seguro de que deseas eliminar esta actividad?")) {
-                window.location.href = `/Dashboard/Actividades/Eliminar?id=${id}`;
             }
-        }
+        ],
 
-        function verDetalles(id) {
-            window.location.href = `/Dashboard/Actividades/Detalles?id=${id}`;
+        eventDidMount: function(info) {
+            const id = info.event.extendedProps.idActividad;
+            const titulo = info.event.title;
+            const tipo = info.event.extendedProps.tipo;
+            const descripcion = info.event.extendedProps.description;
+
+            const content = `
+                <strong>${titulo}</strong><br>
+                <em>${tipo}</em><br>
+                ${descripcion}<br><br>
+                <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#modalEditar_${id}">Editar</button>
+                <button class="btn btn-sm btn-danger me-1" data-bs-toggle="modal" data-bs-target="#modalEliminar_${id}">Eliminar</button>
+                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalDetalles_${id}">Detalles</button>
+            `;
+            tippy(info.el, { content: content, allowHTML: true, theme: 'light-border', interactive: true });
         }
-    </script>
+    });
+
+    calendar.render();
+});
+</script>
 }

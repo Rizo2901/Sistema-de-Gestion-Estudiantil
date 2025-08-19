@@ -19,7 +19,6 @@ namespace Abstracciones.Interfaces.DA
         Task<Guid> EditarDocumento(Guid Id, DocumentosRequest documento);
         Task<Guid> EliminarDocumento(Guid Id);
 
-        Task<IEnumerable<EstudianteConDocumentosResponse>> ObtenerEstudiantesConDocumentos();
 
     }
 }

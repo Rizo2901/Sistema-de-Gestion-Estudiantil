@@ -1,25 +1,25 @@
-﻿CREATE PROCEDURE [CondicionEspecial].[SP_ObtenerCondicionesEspeciales]
+﻿
+
+CREATE PROCEDURE [CondicionEspecial].[SP_ObtenerCondicionesEspeciales]
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
-        CE.IdCondicion,
-        CE.FechaDiagnostico,
-        CE.Observaciones,
-        
-        -- Datos del estudiante
-        E.IdEstudiante,
-        E.Nombre,
-        E.Apellido1,
-        E.Apellido2,
+    SELECT
+        e.IdEstudiante,
+        e.Cedula,
+        e.Nombre,
+        e.Apellido1,
+        e.Apellido2,
 
-        -- Datos de la categoría
-        C.IdCategoria,
-        C.Nombre,
-        C.Descripcion
-    FROM CondicionesEspeciales CE
-    INNER JOIN Estudiantes E ON CE.IdEstudiante = E.IdEstudiante
-    INNER JOIN CategoriasCondicionEspecial C ON CE.IdCategoria = C.IdCategoria
-    ORDER BY E.Apellido1, E.Apellido2, E.Nombre;
+        c.IdCondicion,
+        c.IdCategoria,
+        cat.Nombre AS NombreCategoria,
+        cat.Descripcion AS DescripcionCategoria,
+        c.FechaDiagnostico,
+        c.Observaciones
+    FROM Estudiantes e
+    LEFT JOIN CondicionesEspeciales c ON e.IdEstudiante = c.IdEstudiante
+    LEFT JOIN CategoriasCondicionEspecial cat ON c.IdCategoria = cat.IdCategoria
+    ORDER BY e.Apellido1, e.Apellido2;
 END;

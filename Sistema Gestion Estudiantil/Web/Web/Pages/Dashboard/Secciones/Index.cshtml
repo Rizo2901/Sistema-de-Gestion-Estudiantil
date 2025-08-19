@@ -55,6 +55,11 @@ else
                                 <button class="btn btn-outline-danger btn-sm square-btn" data-bs-toggle="modal" data-bs-target="#modalEliminar_@seccion.IdSeccion" title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
+                                <button class="btn btn-outline-dark btn-sm square-btn"
+                                        title="Ver estudiantes"
+                                        onclick="location.href='@Url.Page("/Dashboard/Secciones/ListaEstudiantes", new { idSeccion = seccion.IdSeccion, nombre = seccion.Nombre })'">
+                                    <i class="bi bi-people-fill"></i> Ver lista de estudiantes
+                                </button>
                             </div>
                         </div>
                     </div>

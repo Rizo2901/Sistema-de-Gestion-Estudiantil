@@ -74,6 +74,16 @@ namespace API.Controllers
             return Ok("La seccion se elimino correctamente");
         }
 
+        [HttpGet("obtenerEstudiantesSeccion/{IdSeccion}")]
+        public async Task<IActionResult> ObtenerEstudiantesSeccion(Guid IdSeccion)
+        {
+            var result = await _seccionFlujo.ObtenerEstudiantesSeccion(IdSeccion);
+            if (result == null || !result.Any())
+            {
+                return NotFound("No se encontraron estudiantes en esta sección");
+            }
+            return Ok(result);
+        }
         #region Helpers
         private async Task<bool> VerificarSeccionExiste(Guid Id)
         {
@@ -83,6 +93,8 @@ namespace API.Controllers
                 resultadoValidacion = true;
             return resultadoValidacion;
         }
+
+       
         #endregion
 
     }

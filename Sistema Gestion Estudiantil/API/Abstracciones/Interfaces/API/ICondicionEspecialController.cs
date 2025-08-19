@@ -13,8 +13,7 @@ namespace Abstracciones.Interfaces.API
         Task<IActionResult> ObtenerCondicionesEspeciales();
 
         Task<IActionResult> ObtenerCondicionEspecial(Guid Id);
-
-        Task<IActionResult> ObtenerCondicionesEspecialesPorEstudiantes();
+        Task<IActionResult> ObtenerCondicionesAgrupadas();
 
         Task<IActionResult> CrearCondicionEspecial(CondicionesEspecialesRequest condicionEspecial);
 

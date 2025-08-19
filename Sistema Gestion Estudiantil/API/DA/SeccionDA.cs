@@ -4,6 +4,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,18 @@ namespace DA
             {
                 IdSeccion = Id
             });
+            return result;
+        }
+
+        public async Task<IEnumerable<EstudianteSeccionesRespone>> ObtenerEstudiantesSeccion(Guid IdSeccion)
+        {
+            string query = @"Seccion.sp_ObtenerEstudiantesPorSeccion";
+
+            var result = await _sqlConn.QueryAsync<EstudianteSeccionesRespone>(query,new 
+            { 
+                IdSeccion 
+            });
+
             return result;
         }
 

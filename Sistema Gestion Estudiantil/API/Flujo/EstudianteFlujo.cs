@@ -43,5 +43,10 @@ namespace Flujo
         {
            return await _estudianteDA.ObtenerEstudiantes();
         }
+
+        public async Task<IEnumerable<EstudiantesResumenResponse>> ObtenerEstudiantesResumen()
+        {
+            return await _estudianteDA.ObtenerEstudiantesResumen();
+        }
     }
 }

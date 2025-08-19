@@ -67,4 +67,17 @@ namespace Abstracciones.Modelos
 
         public string? NombreUsuario { get; set; }
     }
+    public class EstudiantesResumenResponse : EstudiantesResponse
+    {
+        public int Documentos { get; set; }
+        public int Alergias { get; set; }
+        public int Discapacidades { get; set; }
+        public int Enfermedades { get; set; }
+        public int Medicamentos { get; set; }
+        public int CondicionesEspeciales { get; set; }
+        public int SituacionesFamiliares { get; set; }
+        public int AdaptacionesCurriculares { get; set; }
+        public int AtencionesMedicas { get; set; }
+    }
+
 }

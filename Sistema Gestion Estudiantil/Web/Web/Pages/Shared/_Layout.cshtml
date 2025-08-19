@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
@@ -161,6 +163,7 @@
                                 <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Horarios/Index"><i class="bi bi-card-list me-2"></i>Horarios</a></li>
                                 <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Documentos/Index"><i class="bi bi-file-earmark me-2"></i>Documentos</a></li>
                                 <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/CondicionesEspeciales/Index"><i class="bi bi-person-lines-fill me-2"></i>Condiciones Especiales</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Familiares/Index"><i class="bi bi-building me-2"></i>Padres de familia</a></li>
                                 <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Reuniones familiares</a></li>
                                 <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Reuniones administrativas</a></li>
                                 <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Actividades/Index"><i class="bi bi-kanban me-2"></i>Actividades</a></li>

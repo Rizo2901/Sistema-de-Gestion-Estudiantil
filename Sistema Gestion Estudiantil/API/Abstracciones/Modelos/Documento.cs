@@ -27,31 +27,39 @@ namespace Abstracciones.Modelos
 
     }
 
-    public class DocumentosResponse : DocumentosBase
+    public class DocumentosResponse
+    {
+        public Guid IdEstudiante { get; set; }
+        public string Cedula { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido1 { get; set; }
+        public string Apellido2 { get; set; }
+
+        // Y los campos del documento:
+        public Guid IdDocumento { get; set; }
+        public string TipoDocumento { get; set; }
+        public string Descripcion { get; set; }
+        public string Archivo { get; set; }
+        public string TipoArchivo { get; set; }
+    }
+    public class EstudianteConDocumentos
+{
+    public Guid IdEstudiante { get; set; }
+    public string Cedula { get; set; }
+    public string Nombre { get; set; }
+    public string Apellido1 { get; set; }
+    public string Apellido2 { get; set; }
+
+    public List<DocumentoDetalle> Documentos { get; set; }
+}
+
+    public class DocumentoDetalle
     {
         public Guid IdDocumento { get; set; }
-    }
-
-    public class EstudianteConDocumentosResponse
-    {
-        public Guid IdEstudiante { get; set; }
-        public string Nombre { get; set; }
-        public string Apellido1 { get; set; }
-        public string Apellido2 { get; set; }
-
-        public List<DocumentosResponse> Documentos { get; set; } = new List<DocumentosResponse>();
-
-    }
-
-    public class EstudianteConDocumentosRaw
-    {
-        public Guid IdEstudiante { get; set; }
-        public string Nombre { get; set; }
-        public string Apellido1 { get; set; }
-        public string Apellido2 { get; set; }
-
-        [Column("Documentos")] // Dapper necesita este nombre exacto para mapear correctamente
-        public string? Documentos { get; set; }
+        public string TipoDocumento { get; set; }
+        public string Descripcion { get; set; }
+        public string Archivo { get; set; }
+        public string TipoArchivo { get; set; }
     }
 
 }
