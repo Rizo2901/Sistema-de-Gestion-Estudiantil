@@ -23,6 +23,7 @@
 
 }
 
+else{
 <div class="container-fluid px-0 mb-3">
     <div class="row">
         <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
@@ -252,6 +253,9 @@ else
         }
     </div>
 }
+
+
+}
 <!-- Modal Crear Horario -->
 <div class="modal fade" id="modalCrearHorario" tabindex="-1" aria-labelledby="modalCrearHorarioLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -281,16 +285,16 @@ else
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="horario.HoraInicio" class="form-label">Hora Inicio</label>
-                        <input asp-for="horario.HoraInicio" class="form-control" />
-                        <span asp-validation-for="horario.HoraInicio" class="text-danger"></span>
-                    </div>
+    <label asp-for="horario.HoraInicio" class="form-label">Hora Inicio</label>
+    <input asp-for="horario.HoraInicio" type="time" class="form-control" />
+    <span asp-validation-for="horario.HoraInicio" class="text-danger"></span>
+</div>
 
-                    <div class="mb-3">
-                        <label asp-for="horario.HoraFin" class="form-label">Hora Fin</label>
-                        <input asp-for="horario.HoraFin" class="form-control" />
-                        <span asp-validation-for="horario.HoraFin" class="text-danger"></span>
-                    </div>
+<div class="mb-3">
+    <label asp-for="horario.HoraFin" class="form-label">Hora Fin</label>
+    <input asp-for="horario.HoraFin" type="time" class="form-control" />
+    <span asp-validation-for="horario.HoraFin" class="text-danger"></span>
+</div>
 
                     <div class="mb-3">
                         <label asp-for="horario.Dia" class="form-label">Día</label>
@@ -313,8 +317,6 @@ else
     </div>
 </div>
 
-
-
 @section Scripts {
 <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -322,29 +324,29 @@ else
         const filtroProfesor = document.getElementById("filtroProfesor");
         const filtroSeccion = document.getElementById("filtroSeccion");
 
-        const tarjetasHorarios = document.querySelectorAll(".horario-card");
+        if (!filtroMateria || !filtroProfesor || !filtroSeccion) return;
 
-        function aplicarFiltros() {
+        const aplicarFiltros = () => {
             const materia = filtroMateria.value.toLowerCase();
             const profesor = filtroProfesor.value.toLowerCase();
             const seccion = filtroSeccion.value.toLowerCase();
 
+            const tarjetasHorarios = document.querySelectorAll(".horario-card");
+
+            if (!tarjetasHorarios.length) return;
+
             tarjetasHorarios.forEach(card => {
-                const materiaText = card.dataset.materia;
-                const profesorText = card.dataset.profesor;
-                const seccionText = card.dataset.seccion;
+                const materiaText = (card.dataset.materia || "").toLowerCase();
+                const profesorText = (card.dataset.profesor || "").toLowerCase();
+                const seccionText = (card.dataset.seccion || "").toLowerCase();
 
                 const coincideMateria = materiaText.includes(materia);
                 const coincideProfesor = profesorText.includes(profesor);
                 const coincideSeccion = seccionText.includes(seccion);
 
-                if (coincideMateria && coincideProfesor && coincideSeccion) {
-                    card.style.display = "";
-                } else {
-                    card.style.display = "none";
-                }
+                card.style.display = (coincideMateria && coincideProfesor && coincideSeccion) ? "" : "none";
             });
-        }
+        };
 
         [filtroMateria, filtroProfesor, filtroSeccion].forEach(input => {
             input.addEventListener("input", aplicarFiltros);

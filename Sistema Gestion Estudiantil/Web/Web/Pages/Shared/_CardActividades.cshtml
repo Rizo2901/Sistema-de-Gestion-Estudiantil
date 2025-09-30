@@ -1,0 +1,38 @@
+﻿@using Abstracciones.Modelos
+@model List<ActividadResponse>
+
+<div class="card dashboard-card shadow rounded-4 mb-4 w-100 h-100">
+    <div class="card-body">
+        <h5 class="card-title">Actividades Generales</h5>
+        <div style="max-height: 200px; overflow-y: auto;">
+            <ul class="list-group list-group-flush">
+                @foreach (var actividad in Model)
+                {
+                    <li class="list-group-item rounded-3 mb-1">@actividad.Titulo (@actividad.Fecha.ToShortDateString())</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-card {
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+        background: #fff;
+        transition: box-shadow 0.2s;
+    }
+
+        .dashboard-card:hover {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.16), 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+    .card-header {
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+    }
+
+    .list-group-item {
+        border-radius: 0.75rem !important;
+    }
+</style>

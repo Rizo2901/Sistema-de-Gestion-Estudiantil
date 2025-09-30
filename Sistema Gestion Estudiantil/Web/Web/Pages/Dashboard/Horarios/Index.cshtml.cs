@@ -39,18 +39,34 @@ namespace Web.Pages.Dashboard.Horarios
             _logger = logger;
         }
 
-        // ? Carga inicial de la página
         public async Task OnGet()
         {
-            string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerHorariosPorSeccion");
-            using var cliente = new HttpClient();
-            var respuesta = await cliente.GetAsync(endPoint);
-            respuesta.EnsureSuccessStatusCode();
+            try
+            {
+                string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "ObtenerHorariosPorSeccion");
+                using var cliente = new HttpClient();
+                var respuesta = await cliente.GetAsync(endPoint);
+                respuesta.EnsureSuccessStatusCode();
 
-            var resultado = await respuesta.Content.ReadAsStringAsync();
-            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            Horarios = JsonSerializer.Deserialize<List<HorarioPorSeccion>>(resultado, opciones);
+                var resultado = await respuesta.Content.ReadAsStringAsync();
 
+                if (!string.IsNullOrWhiteSpace(resultado))
+                {
+                    var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    Horarios = JsonSerializer.Deserialize<List<HorarioPorSeccion>>(resultado, opciones) ?? new List<HorarioPorSeccion>();
+                }
+                else
+                {
+                    Horarios = new List<HorarioPorSeccion>();
+                }
+
+                await RecargarListasAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener los horarios por sección");
+                Horarios = new List<HorarioPorSeccion>(); // fallback defensivo
+            }
             await RecargarListasAsync();
         }
 
@@ -94,8 +110,10 @@ namespace Web.Pages.Dashboard.Horarios
                 return Page();
             }
 
-            // Construcción del objeto para enviar
-            var datos = new
+            using var client = new HttpClient();
+
+            // Crear horario
+            var datosHorario = new
             {
                 IdSeccion = idSeccion,
                 IdMateria = idMateria,
@@ -106,13 +124,27 @@ namespace Web.Pages.Dashboard.Horarios
                 Aula = horario.Aula
             };
 
-            var json = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
+            var jsonHorario = JsonSerializer.Serialize(datosHorario, new JsonSerializerOptions { WriteIndented = true });
+            string endpointHorario = _confg.ObtenerMetodo("ApiEndPoints", "CrearHorario");
 
-            string endpoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearHorario");
+            var responseHorario = await client.PostAsync(endpointHorario, new StringContent(jsonHorario, Encoding.UTF8, "application/json"));
+            responseHorario.EnsureSuccessStatusCode();
 
-            using var client = new HttpClient();
-            var response = await client.PostAsync(endpoint, new StringContent(json, Encoding.UTF8, "application/json"));
-            response.EnsureSuccessStatusCode();
+            // Crear vínculo en MateriaProfesor
+            var datosMateria = new { IdProfesor = idProfesor, IdMateria = idMateria };
+            var jsonMateria = JsonSerializer.Serialize(datosMateria);
+            string endpointMateria = _confg.ObtenerMetodo("ApiEndPoints", "CrearMateriaProfesor");
+
+            var responseMateria = await client.PostAsync(endpointMateria, new StringContent(jsonMateria, Encoding.UTF8, "application/json"));
+            responseMateria.EnsureSuccessStatusCode();
+
+            // Crear vínculo en SeccionProfesor
+            var datosSeccion = new { IdProfesor = idProfesor, IdSeccion = idSeccion };
+            var jsonSeccion = JsonSerializer.Serialize(datosSeccion);
+            string endpointSeccion = _confg.ObtenerMetodo("ApiEndPoints", "CrearSeccionProfesor");
+
+            var responseSeccion = await client.PostAsync(endpointSeccion, new StringContent(jsonSeccion, Encoding.UTF8, "application/json"));
+            responseSeccion.EnsureSuccessStatusCode();
 
             return RedirectToPage();
         }

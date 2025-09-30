@@ -5,55 +5,52 @@
     Layout = "_Layout";
 }
 
-<div class="container-fluid">
-    <div class="row h-100">
-
-        <!-- Contenido principal (a la derecha del menú lateral) -->
-        <div class="col-md-9 col-lg-10 p-4 bg-light overflow-auto">
-            <h2 class="mb-4">Resumen</h2>
-
-            <div class="row g-3">
-                <!-- Card 1 -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow rounded-4 h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Total Estudiantes</h5>
-                            <p class="card-text display-6">120</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow rounded-4 h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Profesores Activos</h5>
-                            <p class="card-text display-6">35</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="col-md-12 col-lg-4">
-                    <div class="card shadow rounded-4 h-100 bg-primary text-white">
-                        <div class="card-body">
-                            <h5 class="card-title">Promedio General</h5>
-                            <p class="card-text display-6">8.7</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4 (más grande) -->
-                <div class="col-12">
-                    <div class="card shadow rounded-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Notas recientes</h5>
-                            <p class="card-text">Últimas evaluaciones registradas...</p>
-                        </div>
-                    </div>
-                </div>
+<div class="container-fluid py-4">
+    @if (Model.RolUsuario == "Administrador")
+    {
+        <!-- Fila 1: Estudiantes (más ancho) y Profesores (más estrecho), pegados -->
+        <div class="row mb-3 gx-2">
+            <div class="col-12 col-md-8 d-flex">
+                <partial name="_CardCircularEstudiantesActivos" model="Model.TotalEstudiantes" />
+            </div>
+            <div class="col-12 col-md-4 d-flex">
+                <partial name="_CardCircularProfesoresActivos" model="Model.TotalProfesores" />
             </div>
         </div>
-
-    </div>
+        <!-- Fila 2: Actividades (más ancho) y Secciones (más estrecho), pegados -->
+        <div class="row gx-2">
+            <div class="col-12 col-md-8 d-flex">
+                <partial name="_CardActividades" model="Model.Actividades" />
+            </div>
+            <div class="col-12 col-md-4 d-flex">
+                <partial name="_CardSecciones" model="Model.Secciones" />
+            </div>
+        </div>
+    }
 </div>
+
+<style>
+    .dashboard-card {
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+        background: #fff;
+        transition: box-shadow 0.2s;
+    }
+
+        .dashboard-card:hover {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.16), 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+    .card-header {
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+    }
+
+    .list-group-item {
+        border-radius: 0.75rem !important;
+    }
+    /* Cards pegados sin espacio extra */
+    .row.gx-2 > [class^='col-'] {
+        margin-bottom: 0 !important;
+    }
+</style>

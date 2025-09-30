@@ -1,0 +1,46 @@
+﻿@model int
+
+@{
+    var maxEstudiantes = 1000; // Ajusta según tu lógica
+    var porcentaje = Model * 100 / maxEstudiantes;
+    var dasharray = 440 * porcentaje / 100.0;
+}
+
+<div class="card dashboard-card shadow rounded-4 mb-4 w-100 h-100">
+    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+        <h6 class="mb-3">Estudiantes Activos</h6>
+        <div class="progress-circle" style="width: 120px; height: 120px;">
+            <svg width="120" height="120">
+                <circle cx="60" cy="60" r="55" fill="none" stroke="#e9ecef" stroke-width="10" />
+                <circle cx="60" cy="60" r="55" fill="none" stroke="#28a745" stroke-width="10"
+                        stroke-dasharray="@dasharray,440"
+                        stroke-linecap="round"
+                        style="transition: stroke-dasharray 1s;" />
+                <text x="60" y="70" text-anchor="middle" font-size="28" fill="#28a745">@Model</text>
+            </svg>
+        </div>
+        <div class="mt-2 text-muted" style="font-size: 0.9em;">Máximo: @maxEstudiantes</div>
+    </div>
+</div>
+
+<style>
+    .dashboard-card {
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+        background: #fff;
+        transition: box-shadow 0.2s;
+    }
+
+        .dashboard-card:hover {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.16), 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+    .card-header {
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+    }
+
+    .list-group-item {
+        border-radius: 0.75rem !important;
+    }
+</style>
