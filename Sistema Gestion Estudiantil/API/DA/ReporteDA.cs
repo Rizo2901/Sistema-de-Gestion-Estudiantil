@@ -1,15 +1,17 @@
 ﻿using Abstracciones.Interfaces.DA;
+using Abstracciones.Modelos;
 using Abstracciones.Modelos.Abstracciones.Modelos;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DA
 {
     public class ReporteDA : IReporteDA
     {
-        private SqlConnection _conn;
-        private IRepositorioDapper _repDapp;
+        private readonly SqlConnection _conn;
+        private readonly IRepositorioDapper _repDapp;
 
         public ReporteDA(IRepositorioDapper repDapp)
         {
@@ -19,25 +21,9 @@ namespace DA
 
         public async Task<IEnumerable<ReporteEstudiantilResponse>> ObtenerDatosReporte(ReporteEstudiantilRequest filtros)
         {
-            string query = @"Reporte.SP_ReporteEstudiantilAvanzado";
-
-            var parametros = new
-            {
-                Alergia = filtros.Alergia,
-                Discapacidad = filtros.Discapacidad,
-                CondicionEspecial = filtros.CondicionEspecial,
-                Enfermedad = filtros.Enfermedad,
-                Medicamento = filtros.Medicamento,
-                Seccion = filtros.Seccion,
-                CategoriaAlergia = filtros.CategoriaAlergia,
-                CategoriaDiscapacidad = filtros.CategoriaDiscapacidad,
-                CategoriaCondicionEspecial = filtros.CategoriaCondicionEspecial,
-                CategoriaSituacionFamiliar = filtros.CategoriaSituacionFamiliar,
-                FechaDesde = filtros.FechaDesde,
-                FechaHasta = filtros.FechaHasta
-            };
-
-            var resultado = await _conn.QueryAsync<ReporteEstudiantilResponse>(query, parametros, commandType: CommandType.StoredProcedure);
+            // Obtenemos todos los datos de la vista
+            var sql = "SELECT * FROM vw_PerfilEstudiantilCompleto";
+            var resultado = await _conn.QueryAsync<ReporteEstudiantilResponse>(sql);
             return resultado;
         }
     }

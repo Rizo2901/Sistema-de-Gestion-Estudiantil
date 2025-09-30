@@ -16,5 +16,6 @@ namespace Abstracciones.Interfaces.DA
         Task<Guid> CrearSeccion(SeccionesRequest seccion);
         Task<Guid> EditarSeccion(Guid Id, SeccionesRequest seccion);
         Task<Guid> EliminarSeccion(Guid Id);
+
     }
 }

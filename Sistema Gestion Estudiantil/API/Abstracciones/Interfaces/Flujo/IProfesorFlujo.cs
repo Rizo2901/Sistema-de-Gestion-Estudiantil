@@ -16,5 +16,7 @@ namespace Abstracciones.Interfaces.Flujo
 
         Task<IEnumerable<ProfesorResponse>> ObtenerProfesores();
         Task<ProfesorResponse> ObtenerProfesor(Guid Id);
+
+        Task<int> ObtenerProfesoresTotal();
     }
 }

@@ -1,15 +1,19 @@
 ﻿using Abstracciones.Interfaces.DA;
 using Abstracciones.Interfaces.Flujo;
+using Abstracciones.Modelos;
 using Abstracciones.Modelos.Abstracciones.Modelos;
-using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
+using CsvHelper;
+using CsvHelper.Configuration;
+using FastReport;
+using FastReport.Export.PdfSimple;
+using FastReport.Utils;
+using OfficeOpenXml;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
-using System.Drawing;
-using System.Text;
-using Colors = QuestPDF.Helpers.Colors;
-using QuestContainer = QuestPDF.Infrastructure.IContainer;
-using QuestDocument = QuestPDF.Fluent.Document;
+using System.Data;
+using System.Globalization;
+
+
 
 namespace Flujo
 {
@@ -24,211 +28,202 @@ namespace Flujo
 
         public async Task<object> GenerarReporteUniversal(ReporteEstudiantilRequest filtros)
         {
+            // 1️⃣ Obtener datos crudos desde DA
             var datos = await _reporteDA.ObtenerDatosReporte(filtros);
 
-            // Calcula EstadoGeneral si aplica
-            foreach (var estudiante in datos)
-                estudiante.EstadoGeneral = CalcularEstado(estudiante);
+            // 2️⃣ Filtrar en memoria (AsEnumerable en lugar de AsQueryable)
+            var datosFiltrados = datos.AsEnumerable();
 
-            object resultado = datos;
+            if (!string.IsNullOrEmpty(filtros.Alergia))
+                datosFiltrados = datosFiltrados.Where(x => x.Alergia == filtros.Alergia);
 
-            // Aplica operación avanzada si se solicita
-            switch (filtros.Operacion?.ToLower())
-            {
-                case "conteo":
-                    if (!string.IsNullOrEmpty(filtros.CampoAgrupacion))
-                    {
-                        resultado = datos
-                            .GroupBy(e => e.GetType().GetProperty(filtros.CampoAgrupacion)?.GetValue(e, null))
-                            .Select(g => new { Categoria = g.Key, Cantidad = g.Count() })
-                            .ToList();
-                    }
-                    else
-                    {
-                        resultado = new { Total = datos.Count() };
-                    }
-                    break;
-                case "porcentaje_menor_calificacion":
-                    double limite = filtros.CalificacionLimite ?? 60;
-                    int total = datos.Count();
-                    int menores = datos.Count(e => e.Calificacion.HasValue && (double)e.Calificacion.Value < limite);
-                    double porcentaje = total > 0 ? (menores * 100.0 / total) : 0;
-                    resultado = new { Total = total, Menores = menores, Porcentaje = porcentaje };
-                    break;
-                case "promedio":
-                    double promedio = datos.Any(e => e.Calificacion.HasValue)
-                        ? datos.Where(e => e.Calificacion.HasValue).Average(e => (double)e.Calificacion.Value)
-                        : 0;
-                    resultado = new { Promedio = promedio };
-                    break;
-                    // Puedes agregar más operaciones aquí
-            }
+            if (!string.IsNullOrEmpty(filtros.Seccion))
+                datosFiltrados = datosFiltrados.Where(x => x.Seccion == filtros.Seccion);
 
-            // Si no se solicita exportar, retorna el resultado como JSON
-            if (string.IsNullOrWhiteSpace(filtros.ExportarComo))
-                return resultado;
+            if (!string.IsNullOrEmpty(filtros.Discapacidad))
+                datosFiltrados = datosFiltrados.Where(x => x.Discapacidad == filtros.Discapacidad);
 
-            // Si se solicita exportar, genera el archivo en el formato solicitado
-            var extension = filtros.ExportarComo.ToLower();
-            byte[] archivo;
-            switch (extension)
+            // 3️⃣ Selección de columnas dinámicas
+            var propiedades = typeof(ReporteEstudiantilResponse).GetProperties();
+            var columnas = filtros.ColumnasSeleccionadas ?? propiedades.Select(p => p.Name).ToList();
+
+            // 4️⃣ Exportación según el formato
+            var exportar = filtros.ExportarComo?.ToLower() ?? "pdf";
+
+            switch (exportar)
             {
                 case "pdf":
-                    archivo = GenerarPDFUniversal(resultado, filtros);
-                    break;
+                    return GenerarPdf(datosFiltrados.ToList(), columnas);
+
                 case "excel":
-                    archivo = GenerarExcelUniversal(resultado, filtros);
-                    break;
+                    return GenerarExcel(datosFiltrados.ToList(), columnas);
+
                 case "csv":
-                    archivo = GenerarCSVUniversal(resultado, filtros);
-                    break;
+                    return GenerarCsv(datosFiltrados.ToList(), columnas);
+
                 default:
-                    throw new NotSupportedException("Formato de exportación no soportado.");
+                    throw new ArgumentException("Formato de exportación no soportado. Solo pdf, excel o csv.");
             }
-            return archivo;
         }
 
-        private string CalcularEstado(ReporteEstudiantilResponse e)
+        // ================= PDF con FastReport
+
+        private byte[] GenerarPdf(List<ReporteEstudiantilResponse> datos, List<string> columnas)
         {
-            if (!string.IsNullOrEmpty(e.Enfermedad) || !string.IsNullOrEmpty(e.CondicionEspecial))
-                return "Vigilado";
-            if (!string.IsNullOrEmpty(e.Alergia) || !string.IsNullOrEmpty(e.Medicamento))
-                return "Estable";
-            return "Sin registrar";
-        }
-
-        // Helpers universales para exportación (puedes mejorarlos según tus necesidades)
-        private byte[] GenerarExcelUniversal(object resultado, ReporteEstudiantilRequest filtros)
-        {
-            using var wb = new XLWorkbook();
-            var hoja = wb.Worksheets.Add("Reporte");
-
-            // Header
-            hoja.Cell("A1").Value = "Escuela Carolina Dent Alvarado";
-            hoja.Range("A1:B1").Merge().Style
-                .Font.SetBold()
-                .Font.SetFontSize(16)
-                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
-                .Fill.SetBackgroundColor(XLColor.LightGray);
-
-            hoja.Cell("A2").Value = $"Reporte de: {filtros.Operacion ?? "Listado"}";
-            hoja.Range("A2:B2").Merge().Style
-                .Font.SetItalic()
-                .Font.SetFontSize(12)
-                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
-                .Fill.SetBackgroundColor(XLColor.LightBlue);
-
-            int fila = 4;
-            if (resultado is IEnumerable<object> lista && lista.Any())
-            {
-                var props = lista.First().GetType().GetProperties();
-                for (int i = 0; i < props.Length; i++)
-                {
-                    hoja.Cell(fila, i + 1).Value = props[i].Name;
-                    hoja.Cell(fila, i + 1).Style.Font.SetBold();
-                }
-                fila++;
-                foreach (var item in lista)
-                {
-                    for (int i = 0; i < props.Length; i++)
-                        hoja.Cell(fila, i + 1).Value = props[i].GetValue(item)?.ToString() ?? string.Empty;
-                    fila++;
-                }
-            }
-            else if (resultado is not string && resultado is not byte[])
-            {
-                hoja.Cell(fila, 1).Value = "Resultado";
-                hoja.Cell(fila, 2).Value = resultado.ToString();
-            }
-
-            hoja.Columns().AdjustToContents();
-            using var stream = new MemoryStream();
-            wb.SaveAs(stream);
-            return stream.ToArray();
-        }
-
-        private byte[] GenerarCSVUniversal(object resultado, ReporteEstudiantilRequest filtros)
-        {
-            var sb = new StringBuilder();
-            if (resultado is IEnumerable<object> lista && lista.Any())
-            {
-                var props = lista.First().GetType().GetProperties();
-                sb.AppendLine(string.Join(",", props.Select(p => p.Name)));
-                foreach (var item in lista)
-                    sb.AppendLine(string.Join(",", props.Select(p => $"\"{p.GetValue(item)}\"")));
-            }
-            else if (resultado is not string && resultado is not byte[])
-            {
-                sb.AppendLine("Resultado");
-                sb.AppendLine($"\"{resultado}\"");
-            }
-            return Encoding.UTF8.GetBytes(sb.ToString());
-        }
-
-        private byte[] GenerarPDFUniversal(object resultado, ReporteEstudiantilRequest filtros)
-        {
-            var fecha = DateTime.Now.ToString("dd/MM/yyyy");
-            var colorVino = "#800000";
-            var titulo = $"Reporte de: {filtros.Operacion ?? "Listado"}";
-
-            var documento = QuestDocument.Create(container =>
+            var documento = Document.Create(container =>
             {
                 container.Page(page =>
                 {
-                    page.Size(PageSizes.A4);
                     page.Margin(20);
 
-                    page.Header().Background(colorVino).Padding(10).Column(col =>
+                    // 🎨 Encabezado institucional ancho completo
+                    page.Header().Element(header =>
                     {
-                        col.Item().Text("Escuela Carolina Dent Alvarado")
-                            .FontSize(18).Bold().FontColor(Colors.White).AlignCenter();
-                        col.Item().Text(titulo)
-                            .FontSize(12).FontColor(Colors.White).AlignCenter();
-                        col.Item().Text($"Fecha: {fecha}")
-                            .FontSize(10).FontColor(Colors.White).AlignCenter();
+                        header.Background("#b12b38")
+                              .PaddingVertical(10)
+                              .PaddingHorizontal(15)
+                              .Row(row =>
+                              {
+                                  row.RelativeColumn().Text("S.G.E Escuela Carolina Dent")
+                              .FontSize(18).FontColor(Colors.White).Bold();
+
+                                  row.ConstantColumn(120).AlignRight().Text($"Fecha: {DateTime.Now:dd/MM/yyyy}")
+                              .FontSize(10).FontColor(Colors.White);
+                              });
                     });
 
-                    page.Content().PaddingTop(20).Element(c =>
+                    // 📊 Tabla de datos con líneas separadoras
+                    page.Content().Element(content =>
                     {
-                        if (resultado is IEnumerable<object> lista && lista.Any())
+                        content.Column(col =>
                         {
-                            c.Table(tabla =>
+                            col.Item().Table(table =>
                             {
-                                var props = lista.First().GetType().GetProperties();
-                                tabla.ColumnsDefinition(def =>
+                                table.ColumnsDefinition(columnsDef =>
                                 {
-                                    for (int i = 0; i < props.Length; i++)
-                                        def.RelativeColumn();
+                                    foreach (var _ in columnas)
+                                        columnsDef.RelativeColumn();
                                 });
-                                tabla.Header(header =>
+
+                                // Encabezados
+                                table.Header(header =>
                                 {
-                                    foreach (var p in props)
-                                        header.Cell().Element(CellEstilo).Text(p.Name);
+                                    foreach (var col in columnas)
+                                    {
+                                        header.Cell().Background("#eeeeee").Padding(5)
+                                            .BorderBottom(1).BorderColor(Colors.Grey.Lighten2)
+                                            .Text(col).Bold().FontSize(10);
+                                    }
                                 });
-                                foreach (var item in lista)
+
+                                // Filas con línea inferior
+                                foreach (var item in datos)
                                 {
-                                    foreach (var p in props)
-                                        tabla.Cell().Element(CellEstilo).Text(p.GetValue(item)?.ToString() ?? "");
+                                    foreach (var col in columnas)
+                                    {
+                                        var valor = item.GetType().GetProperty(col)?.GetValue(item)?.ToString() ?? "";
+
+                                        table.Cell().PaddingVertical(5).PaddingHorizontal(3)
+                                            .BorderBottom(1).BorderColor(Colors.Grey.Lighten2)
+                                            .Text(valor).FontSize(10);
+                                    }
                                 }
                             });
-                        }
-                        else
-                        {
-                            c.Text(resultado?.ToString() ?? "Sin datos").FontSize(14);
-                        }
+
+                            // 🧮 Total de registros
+                            col.Item().PaddingTop(15).Text(
+                                $"Total de registros: {datos.Count}"
+                            ).FontSize(12).Bold().FontColor(Colors.Black);
+                        });
                     });
+
+                    // 📝 Pie institucional
+                    page.Footer().AlignCenter().Text("Reporte generado automáticamente por el sistema S.G.E")
+                        .FontSize(9).FontColor(Colors.Grey.Darken2);
                 });
             });
 
             return documento.GeneratePdf();
         }
 
-        private QuestContainer CellEstilo(QuestContainer container)
+
+
+        // ================= Excel con EPPlus
+        private byte[] GenerarExcel(List<ReporteEstudiantilResponse> datos, List<string> columnas)
         {
-            return container
-                .Padding(5)
-                .BorderBottom(1)
-                .BorderColor(Colors.Grey.Lighten2);
+            using var package = new ExcelPackage();
+            var ws = package.Workbook.Worksheets.Add("Estudiantes");
+
+            // Encabezados
+            for (int i = 0; i < columnas.Count; i++)
+                ws.Cells[1, i + 1].Value = columnas[i];
+
+            // Datos
+            for (int r = 0; r < datos.Count; r++)
+            {
+                var item = datos[r];
+                for (int c = 0; c < columnas.Count; c++)
+                {
+                    var prop = item.GetType().GetProperty(columnas[c]);
+                    ws.Cells[r + 2, c + 1].Value = prop?.GetValue(item);
+                }
+            }
+
+            return package.GetAsByteArray();
+        }
+
+        // ================= CSV con CsvHelper
+        private byte[] GenerarCsv(List<ReporteEstudiantilResponse> datos, List<string> columnas)
+        {
+            using var ms = new MemoryStream();
+            using var sw = new StreamWriter(ms);
+            using var csv = new CsvWriter(sw, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = ",",
+                HasHeaderRecord = true
+            });
+
+            // Encabezados
+            foreach (var col in columnas)
+                csv.WriteField(col);
+            csv.NextRecord();
+
+            // Datos
+            foreach (var item in datos)
+            {
+                foreach (var col in columnas)
+                {
+                    var prop = item.GetType().GetProperty(col);
+                    csv.WriteField(prop?.GetValue(item));
+                }
+                csv.NextRecord();
+            }
+
+            sw.Flush();
+            ms.Position = 0;
+            return ms.ToArray();
+        }
+
+        // ================= Helper: crear DataTable dinámico
+        private DataTable CrearDataTable(List<ReporteEstudiantilResponse> datos, List<string> columnas)
+        {
+            var dt = new DataTable("Estudiantes");
+            var propiedades = typeof(ReporteEstudiantilResponse).GetProperties()
+                                .Where(p => columnas.Contains(p.Name))
+                                .ToList();
+
+            foreach (var prop in propiedades)
+                dt.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+
+            foreach (var item in datos)
+            {
+                var row = dt.NewRow();
+                foreach (var prop in propiedades)
+                    row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
+                dt.Rows.Add(row);
+            }
+
+            return dt;
         }
     }
 }

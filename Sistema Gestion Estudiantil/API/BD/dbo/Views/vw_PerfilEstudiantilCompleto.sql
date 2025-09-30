@@ -1,4 +1,5 @@
-﻿CREATE VIEW [dbo].[vw_PerfilEstudiantilCompleto] AS
+﻿-- VISTA SIMPLIFICADA: elimina subconsultas y usa agregaciones previas
+CREATE VIEW [dbo].[vw_PerfilEstudiantilCompleto] AS
 SELECT 
     E.IdEstudiante,
     E.Nombre,
@@ -8,58 +9,70 @@ SELECT
     -- Alergias
     ISNULL(A.Nombre, 'Sin Asignar') AS Alergia,
     ISNULL(CA.Nombre, 'Sin Asignar') AS CategoriaAlergia,
-    (SELECT COUNT(*) FROM Estudiante_Alergia EA2 WHERE EA2.IdEstudiante = E.IdEstudiante) AS CantidadAlergias,
+    ISNULL(FAM_AL.CantidadAlergias, 0) AS CantidadAlergias,
 
     -- Discapacidad
     ISNULL(D.Nombre, 'Sin Asignar') AS Discapacidad,
     ISNULL(CD.Nombre, 'Sin Asignar') AS CategoriaDiscapacidad,
-    (SELECT COUNT(*) FROM Estudiante_Discapacidad ED2 WHERE ED2.IdEstudiante = E.IdEstudiante) AS CantidadDiscapacidades,
+    ISNULL(FAM_DIS.CantidadDiscapacidades, 0) AS CantidadDiscapacidades,
 
     -- Enfermedades
     ISNULL(EN.Nombre, 'Sin Asignar') AS Enfermedad,
-    (SELECT COUNT(*) FROM Estudiante_Enfermedad EE2 WHERE EE2.IdEstudiante = E.IdEstudiante) AS CantidadEnfermedades,
+    ISNULL(FAM_ENF.CantidadEnfermedades, 0) AS CantidadEnfermedades,
 
     -- Medicamentos
     ISNULL(AM.Nombre, 'Sin Asignar') AS Medicamento,
-    (SELECT COUNT(*) FROM Estudiante_Medicamento EM2 WHERE EM2.IdEstudiante = E.IdEstudiante) AS CantidadMedicamentos,
+    ISNULL(FAM_MED.CantidadMedicamentos, 0) AS CantidadMedicamentos,
 
     -- Familiares
-    (SELECT COUNT(*) FROM Familiares F WHERE F.IdEstudiante = E.IdEstudiante) AS CantidadFamiliares,
-    (SELECT COUNT(*) FROM Familiares F WHERE F.IdEstudiante = E.IdEstudiante AND F.Parentesco = 'Padre') AS CantidadPadres,
-    (SELECT COUNT(*) FROM Familiares F WHERE F.IdEstudiante = E.IdEstudiante AND F.Parentesco = 'Madre') AS CantidadMadres,
+    ISNULL(FAM.CantidadFamiliares, 0) AS CantidadFamiliares,
+    ISNULL(FAM_PAD.CantidadPadres, 0) AS CantidadPadres,
+    ISNULL(FAM_MAD.CantidadMadres, 0) AS CantidadMadres,
     CASE 
-        WHEN (SELECT COUNT(*) FROM Familiares F WHERE F.IdEstudiante = E.IdEstudiante AND F.Parentesco = 'Padre') > 0
-         AND (SELECT COUNT(*) FROM Familiares F WHERE F.IdEstudiante = E.IdEstudiante AND F.Parentesco = 'Madre') > 0
-        THEN 1 ELSE 0 END AS ViveConAmbosPadres,
+        WHEN ISNULL(FAM_PAD.CantidadPadres, 0) > 0 AND ISNULL(FAM_MAD.CantidadMadres, 0) > 0 THEN 1 ELSE 0 END AS ViveConAmbosPadres,
     CASE 
-        WHEN (SELECT COUNT(*) FROM Familiares F WHERE F.IdEstudiante = E.IdEstudiante AND F.Parentesco IN ('Padre','Madre')) = 1
-        THEN 1 ELSE 0 END AS ViveConUnPadre,
+        WHEN ISNULL(FAM_PAD.CantidadPadres, 0) + ISNULL(FAM_MAD.CantidadMadres, 0) = 1 THEN 1 ELSE 0 END AS ViveConUnPadre,
 
     -- Situación familiar
-    ISNULL(SF.Descripcion, 'Sin Asignar') AS SituacionFamiliar,
+    CAST(SF.Descripcion AS NVARCHAR(MAX)) AS SituacionFamiliar,
     ISNULL(CSF.Nombre, 'Sin Asignar') AS CategoriaSituacionFamiliar,
-    ISNULL(SF.FechaRegistro, NULL) AS FechaRegistroSituacionFamiliar,
+    SF.FechaRegistro AS FechaRegistroSituacionFamiliar,
 
     -- Condición especial
-    ISNULL(CE.Observaciones, 'Sin Asignar') AS CondicionEspecial,
+    CAST(CE.Observaciones AS NVARCHAR(MAX)) AS CondicionEspecial,
     ISNULL(CCE.Nombre, 'Sin Asignar') AS CategoriaCondicionEspecial,
-    ISNULL(CE.FechaDiagnostico, NULL) AS FechaDiagnosticoCondicion,
+    CE.FechaDiagnostico AS FechaDiagnosticoCondicion,
 
     -- Calificación
     ISNULL(C.Calificacion, 0) AS Calificacion,
 
     -- Asistencia
-    (SELECT COUNT(*) FROM Asistencia ASIS2 WHERE ASIS2.IdEstudiante = E.IdEstudiante AND ASIS2.Estado = 'Ausente') AS CantidadAusencias,
-    (SELECT COUNT(*) FROM Asistencia ASIS2 WHERE ASIS2.IdEstudiante = E.IdEstudiante AND ASIS2.Estado = 'Presente') AS CantidadAsistencias,
+    ISNULL(ASIS_AUS.CantidadAusencias, 0) AS CantidadAusencias,
+    ISNULL(ASIS_PRE.CantidadAsistencias, 0) AS CantidadAsistencias,
     ASIS.Fecha AS FechaAsistencia,
+    ASIS.Estado AS EstadoAsistencia,
 
     -- Comportamiento
-    ISNULL(COM.Observacion, 'Sin Asignar') AS ObservacionComportamiento,
-    ISNULL(COM.AccionTomada, 'Sin Asignar') AS AccionTomadaComportamiento,
+    CAST(COM.Observacion AS NVARCHAR(MAX)) AS ObservacionComportamiento,
+    CAST(COM.AccionTomada AS NVARCHAR(MAX)) AS AccionTomadaComportamiento,
     COM.Fecha AS FechaAccionComportamiento,
 
     -- Atención médica
-    ATM.Fecha AS FechaAtencionMedica
+    ATM.Fecha AS FechaAtencionMedica,
+
+    -- Documentos
+    DOC.TipoDocumento,
+
+    -- Adaptaciones
+    ADAP.Tipo AS TipoAdaptacion,
+    ADAP.FechaInicio AS FechaAdaptacion,
+
+    -- Reuniones
+    REU.Motivo AS MotivoReunion,
+    REU.Fecha AS FechaReunion,
+
+    -- Promedio
+    PRO.Promedio
 
 FROM Estudiantes E
 LEFT JOIN Secciones S ON E.IdSeccion = S.IdSeccion
@@ -80,4 +93,37 @@ LEFT JOIN CategoriasCondicionEspecial CCE ON CE.IdCategoria = CCE.IdCategoria
 LEFT JOIN Calificaciones C ON E.IdEstudiante = C.IdEstudiante
 LEFT JOIN Asistencia ASIS ON E.IdEstudiante = ASIS.IdEstudiante
 LEFT JOIN Comportamiento COM ON E.IdEstudiante = COM.IdEstudiante
-LEFT JOIN AtencionesMedicas ATM ON E.IdEstudiante = ATM.IdEstudiante;
+LEFT JOIN AtencionesMedicas ATM ON E.IdEstudiante = ATM.IdEstudiante
+LEFT JOIN Documentos DOC ON E.IdEstudiante = DOC.IdEstudiante
+LEFT JOIN AdaptacionesCurriculares ADAP ON E.IdEstudiante = ADAP.IdEstudiante
+LEFT JOIN Reuniones REU ON E.IdEstudiante = REU.IdEstudiante
+LEFT JOIN Promedios PRO ON E.IdEstudiante = PRO.IdEstudiante
+
+-- Agregaciones previas para conteos
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadAlergias FROM Estudiante_Alergia GROUP BY IdEstudiante
+) FAM_AL ON FAM_AL.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadDiscapacidades FROM Estudiante_Discapacidad GROUP BY IdEstudiante
+) FAM_DIS ON FAM_DIS.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadEnfermedades FROM Estudiante_Enfermedad GROUP BY IdEstudiante
+) FAM_ENF ON FAM_ENF.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadMedicamentos FROM Estudiante_Medicamento GROUP BY IdEstudiante
+) FAM_MED ON FAM_MED.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadFamiliares FROM Familiares GROUP BY IdEstudiante
+) FAM ON FAM.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadPadres FROM Familiares WHERE Parentesco = 'Padre' GROUP BY IdEstudiante
+) FAM_PAD ON FAM_PAD.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadMadres FROM Familiares WHERE Parentesco = 'Madre' GROUP BY IdEstudiante
+) FAM_MAD ON FAM_MAD.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadAusencias FROM Asistencia WHERE Estado = 'Ausente' GROUP BY IdEstudiante
+) ASIS_AUS ON ASIS_AUS.IdEstudiante = E.IdEstudiante
+LEFT JOIN (
+    SELECT IdEstudiante, COUNT(*) AS CantidadAsistencias FROM Asistencia WHERE Estado = 'Presente' GROUP BY IdEstudiante
+) ASIS_PRE ON ASIS_PRE.IdEstudiante = E.IdEstudiante

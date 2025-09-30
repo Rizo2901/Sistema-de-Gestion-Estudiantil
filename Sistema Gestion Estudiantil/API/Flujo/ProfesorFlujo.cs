@@ -42,5 +42,10 @@ namespace Flujo
         {
             return await _profesorDA.ObtenerProfesores();
         }
+
+        public async Task<int> ObtenerProfesoresTotal()
+        {
+            return await _profesorDA.ObtenerProfesoresTotal();
+        }
     }
 }

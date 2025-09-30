@@ -14,6 +14,8 @@ namespace Abstracciones.Interfaces.API
 
         Task<IActionResult> ObtenerEstudiantesResumen();
 
+        Task<IActionResult> ObtenerTotalEstudiantesActivos();
+
         Task<IActionResult> BuscarEstudiantes(string? nombre = null, string? cedula = null, string? grado = null, string? seccionNombre = null);
 
 

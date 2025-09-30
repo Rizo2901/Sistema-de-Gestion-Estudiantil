@@ -105,7 +105,15 @@ namespace API.Controllers
             return resultadoValidacion;
         }
 
-        
+        [HttpGet("totalActivos")]
+        public async Task<IActionResult> ObtenerTotalEstudiantesActivos()
+        {
+            var result = await _estudianteFlujo.ObtenerTotalEstudiantesActivos();
+            return Ok(result);
+
+        }
+
+
 
 
         #endregion

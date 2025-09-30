@@ -1,97 +1,160 @@
 ﻿namespace Abstracciones.Modelos
 {
     // =============================
-    // BASE: estructura común
+    // BASE: estructura común (campos del estudiante)
+    // =============================
+    public class ReporteEstudiantilBase
+    {
+        public Guid IdEstudiante { get; set; }
+        public string Nombre { get; set; }
+        public string Apellidos { get; set; }
+        public string Seccion { get; set; }
+
+        public string? Alergia { get; set; }
+        public string? CategoriaAlergia { get; set; }
+
+        public string? Discapacidad { get; set; }
+        public string? CategoriaDiscapacidad { get; set; }
+
+        public string? CondicionEspecial { get; set; }
+        public string? CategoriaCondicionEspecial { get; set; }
+        public DateTime? FechaDiagnosticoCondicion { get; set; }
+
+        public string? Enfermedad { get; set; }
+        public string? Medicamento { get; set; }
+
+        public string? TipoAdaptacion { get; set; }
+        public DateTime? FechaAdaptacion { get; set; }
+
+        public string? TipoDocumento { get; set; }
+
+        public string? MotivoReunion { get; set; }
+        public DateTime? FechaReunion { get; set; }
+
+        public string? SituacionFamiliar { get; set; }
+        public string? CategoriaSituacionFamiliar { get; set; }
+        public DateTime? FechaRegistroSituacionFamiliar { get; set; }
+
+        public decimal? Calificacion { get; set; }
+        public decimal? Promedio { get; set; }
+
+        public DateTime? FechaAsistencia { get; set; }
+        public string? EstadoAsistencia { get; set; }
+
+        public string? ObservacionComportamiento { get; set; }
+        public string? AccionTomadaComportamiento { get; set; }
+        public DateTime? FechaAccionComportamiento { get; set; }
+
+        public DateTime? FechaAtencionMedica { get; set; }
+    }
+
+    // =============================
+    // RESPONSE: lo que devuelve la API
     // =============================
     namespace Abstracciones.Modelos
     {
-        public class ReporteEstudiantilBase
+        public class ReporteEstudiantilResponse
         {
             public Guid IdEstudiante { get; set; }
             public string Nombre { get; set; }
             public string Apellidos { get; set; }
             public string Seccion { get; set; }
 
+            // Alergias
             public string? Alergia { get; set; }
-            public string? DescripcionAlergia { get; set; }
             public string? CategoriaAlergia { get; set; }
-            public string? DescripcionCategoriaAlergia { get; set; }
+            public int CantidadAlergias { get; set; }
 
+            // Discapacidad
             public string? Discapacidad { get; set; }
-            public string? DescripcionDiscapacidad { get; set; }
             public string? CategoriaDiscapacidad { get; set; }
-            public string? DescripcionCategoriaDiscapacidad { get; set; }
+            public int CantidadDiscapacidades { get; set; }
 
-            public string? CondicionEspecial { get; set; }
-            public string? ObservacionCondicion { get; set; }
-            public DateTime? FechaDiagnosticoCondicion { get; set; }
-            public string? CategoriaCondicionEspecial { get; set; }
-            public string? DescripcionCategoriaCondicion { get; set; }
-
+            // Enfermedades
             public string? Enfermedad { get; set; }
-            public string? DescripcionEnfermedad { get; set; }
+            public int CantidadEnfermedades { get; set; }
 
+            // Medicamentos
             public string? Medicamento { get; set; }
-            public string? DescripcionMedicamento { get; set; }
+            public int CantidadMedicamentos { get; set; }
 
-            public string? TipoAdaptacion { get; set; }
+            // Familiares
+            public int CantidadFamiliares { get; set; }
+            public int CantidadPadres { get; set; }
+            public int CantidadMadres { get; set; }
+            public int ViveConAmbosPadres { get; set; }
+            public int ViveConUnPadre { get; set; }
 
+            // Situación familiar
             public string? SituacionFamiliar { get; set; }
-            public string? DescripcionSituacionFamiliar { get; set; }
             public string? CategoriaSituacionFamiliar { get; set; }
-            public string? DescripcionCategoriaSituacionFamiliar { get; set; }
             public DateTime? FechaRegistroSituacionFamiliar { get; set; }
 
+            // Condición especial
+            public string? CondicionEspecial { get; set; }
+            public string? CategoriaCondicionEspecial { get; set; }
+            public DateTime? FechaDiagnosticoCondicion { get; set; }
+
+            // Calificación
             public decimal? Calificacion { get; set; }
 
+            // Asistencia
+            public int CantidadAusencias { get; set; }
+            public int CantidadAsistencias { get; set; }
             public DateTime? FechaAsistencia { get; set; }
             public string? EstadoAsistencia { get; set; }
 
+            // Comportamiento
             public string? ObservacionComportamiento { get; set; }
             public string? AccionTomadaComportamiento { get; set; }
             public DateTime? FechaAccionComportamiento { get; set; }
 
+            // Atención médica
             public DateTime? FechaAtencionMedica { get; set; }
-        }
 
-        // =============================
-        // REQUEST: filtros para el reporte
-        // =============================
-        public class ReporteEstudiantilRequest
-        {
-            public string? Alergia { get; set; }
-            public string? Discapacidad { get; set; }
-            public string? Enfermedad { get; set; }
-            public string? Medicamento { get; set; }
-            public string? Seccion { get; set; }
-            public string? CondicionEspecial { get; set; }
-            public string? SituacionFamiliar { get; set; }
+            // Documentos
+            public string? TipoDocumento { get; set; }
 
-            public bool SoloConAlergia { get; set; } = false;
-            public bool SoloConDiscapacidad { get; set; } = false;
-            public bool SoloConEnfermedad { get; set; } = false;
-            public bool SoloConMedicamento { get; set; } = false;
+            // Adaptaciones
+            public string? TipoAdaptacion { get; set; }
+            public DateTime? FechaAdaptacion { get; set; }
 
-            public DateTime? FechaDesde { get; set; }
-            public DateTime? FechaHasta { get; set; }
-            public string? CategoriaAlergia { get; set; }
-            public string? CategoriaDiscapacidad { get; set; }
-            public string? CategoriaCondicionEspecial { get; set; }
-            public string? CategoriaSituacionFamiliar { get; set; }
-            public string? ExportarComo { get; set; } // "pdf", "excel", "csv"
+            // Reuniones
+            public string? MotivoReunion { get; set; }
+            public DateTime? FechaReunion { get; set; }
 
-            public string? Operacion { get; set; } // Ej: "conteo", "porcentaje", "promedio", "agrupado"
-            public string? CampoAgrupacion { get; set; } // Ej: "Seccion", "CategoriaAlergia", etc.
-            public double? CalificacionLimite { get; set; } // Para porcentajes
-        }
+            // Promedio
+            public decimal? Promedio { get; set; }
 
-        // =============================
-        // RESPONSE: datos del reporte
-        // =============================
-        public class ReporteEstudiantilResponse : ReporteEstudiantilBase
-        {
-
-            public string? EstadoGeneral { get; set; } // ej: "Estable", "Crítico"
+            // Campo adicional calculado (si lo usás)
+            public string? EstadoGeneral { get; set; }
         }
     }
+
+    // =============================
+    // REQUEST: entrada dinámica para reportes
+    // =============================
+    public class ReporteEstudiantilRequest
+    {
+        public string? Alergia { get; set; }
+        public string? CategoriaAlergia { get; set; }
+        public string? Discapacidad { get; set; }
+        public string? CategoriaDiscapacidad { get; set; }
+        public string? CondicionEspecial { get; set; }
+        public string? CategoriaCondicionEspecial { get; set; }
+        public string? Enfermedad { get; set; }
+        public string? Medicamento { get; set; }
+        public string? Seccion { get; set; }                 // <-- aquí
+        public string? CategoriaSituacionFamiliar { get; set; }
+        public string? EstadoAsistencia { get; set; }
+        public string? TipoDocumento { get; set; }
+        public string? TipoAdaptacion { get; set; }
+        public string? MotivoReunion { get; set; }
+        public DateTime? FechaDesde { get; set; }
+        public DateTime? FechaHasta { get; set; }
+        public double? CalificacionLimite { get; set; }
+        public string? ExportarComo { get; set; }           // PDF, Excel, CSV
+        public List<string>? ColumnasSeleccionadas { get; set; }  // columnas que admin quiere ver
+    }
+
 }

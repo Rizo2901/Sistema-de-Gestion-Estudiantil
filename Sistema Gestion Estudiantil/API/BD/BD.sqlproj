@@ -107,6 +107,8 @@
     <Folder Include="Horario\Stored Procedures\" />
     <Folder Include="AsistenciaProfesor\" />
     <Folder Include="AsistenciaProfesor\Stored Procedures\" />
+    <Folder Include="Estudiante\" />
+    <Folder Include="Estudiante\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Usuarios.sql" />
@@ -396,6 +398,8 @@
     <Build Include="Seccion\Stored Procedures\sp_ObtenerEstudiantesPorSeccion.sql" />
     <Build Include="dbo\Stored Procedures\sp_ResumenEstudiantes.sql" />
     <Build Include="CondicionEspecial\Stored Procedures\SP_ObtenerCondicionEspecialPorId.sql" />
+    <Build Include="Estudiante\Stored Procedures\Sp_ObtenerTotalEstudiantesActivos.sql" />
+    <Build Include="dbo\Stored Procedures\Sp_ObtenerProfesoresTotal.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BD.publish.xml" />

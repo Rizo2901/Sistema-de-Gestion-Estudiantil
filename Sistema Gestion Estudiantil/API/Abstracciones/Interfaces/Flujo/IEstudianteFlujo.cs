@@ -12,6 +12,7 @@ namespace Abstracciones.Interfaces.Flujo
         Task<IEnumerable<EstudiantesResponse>> ObtenerEstudiantes();
         Task<IEnumerable<EstudiantesResumenResponse>> ObtenerEstudiantesResumen();
 
+        Task<int> ObtenerTotalEstudiantesActivos();
         Task<IEnumerable<EstudiantesResponse>> BuscarEstudiantes(string? nombre = null, string? cedula = null, string? grado = null, string? seccionNombre = null);
 
         Task<EstudiantesResponse> ObtenerEstudiantePorId(Guid Id);

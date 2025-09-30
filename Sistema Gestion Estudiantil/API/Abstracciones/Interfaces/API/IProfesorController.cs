@@ -17,7 +17,9 @@ namespace Abstracciones.Interfaces.API
         Task<IActionResult> ObtenerProfesor(Guid Id);
         Task<IActionResult> ObtenerProfesores();
 
-        
+        Task<IActionResult> ObtenerProfesoresTotal();
+
+
 
 
     }

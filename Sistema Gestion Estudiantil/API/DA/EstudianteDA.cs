@@ -4,6 +4,7 @@ using Abstracciones.Modelos;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 
 
 namespace DA
@@ -191,6 +192,13 @@ namespace DA
         {
             string query = @"sp_ResumenEstudiantes";
             var result =  await _conn.QueryAsync<EstudiantesResumenResponse>(query);
+            return result;
+        }
+
+        public async Task<int> ObtenerTotalEstudiantesActivos()
+        {
+            string query = @"Estudiante.Sp_ObtenerTotalEstudiantesActivos";
+            var result = await _conn.QuerySingleAsync<int>(query);
             return result;
         }
 

@@ -83,5 +83,12 @@ namespace DA
             var result = _conn.QueryAsync<ProfesorResponse>(query, commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
+
+        public async Task<int> ObtenerProfesoresTotal()
+        {
+            string query = @"Sp_ObtenerProfesoresTotal";
+            var result = await _conn.QuerySingleAsync<int>(query);
+            return result;
+        }
     }
 }

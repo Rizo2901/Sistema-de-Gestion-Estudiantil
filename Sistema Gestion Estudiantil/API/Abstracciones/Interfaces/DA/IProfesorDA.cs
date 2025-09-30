@@ -1,4 +1,5 @@
 ﻿using Abstracciones.Modelos;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace Abstracciones.Interfaces.DA
         Task<IEnumerable<ProfesorResponse>> ObtenerProfesores ();
         Task<ProfesorResponse> ObtenerProfesor(Guid Id);
 
+        Task<int> ObtenerProfesoresTotal();
 
     }
 }

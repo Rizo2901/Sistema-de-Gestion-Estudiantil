@@ -85,6 +85,17 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("totalProfesores")]
+        public async Task<IActionResult> ObtenerProfesoresTotal()
+        {
+            var result = await _profFlujo.ObtenerProfesoresTotal();
+            if (result == null)
+            {
+                return NotFound("No se encontraron profesores");
+            }
+            return Ok(result);
+        }
+
         #region Helpers
         private async Task<bool> VerificarProfesorExiste(Guid Id)
         {

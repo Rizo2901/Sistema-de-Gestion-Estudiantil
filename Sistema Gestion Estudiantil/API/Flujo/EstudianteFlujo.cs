@@ -48,5 +48,10 @@ namespace Flujo
         {
             return await _estudianteDA.ObtenerEstudiantesResumen();
         }
+
+        public async Task<int> ObtenerTotalEstudiantesActivos()
+        {
+            return await _estudianteDA.ObtenerTotalEstudiantesActivos();
+        }
     }
 }
