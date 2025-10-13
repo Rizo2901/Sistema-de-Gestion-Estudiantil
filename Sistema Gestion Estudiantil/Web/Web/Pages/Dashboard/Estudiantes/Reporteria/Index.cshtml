@@ -1,0 +1,428 @@
+﻿@page
+@model Web.Pages.Dashboard.Estudiantes.Reporteria.IndexModel
+@using System.Text.Json
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Dashboard de Reportería";
+    var columnasDisponibles = (Model.ColumnasDisponibles as IEnumerable<SelectListItem>)?.ToList() ?? new List<SelectListItem>();
+
+    var columnasSeleccionadas = Model.Filtros?.ColumnasSeleccionadas ?? new List<string>();
+    var columnaAgrupable = "";
+    var agrupacion = new List<object>();
+    var agrupacionJson = "[]";
+    var columnaAgrupableJson = "\"\"";
+
+    if (Model.Resultado?.Any() == true && columnasSeleccionadas.Any())
+    {
+        columnaAgrupable = columnasSeleccionadas
+            .FirstOrDefault(c =>
+                Model.Resultado
+                    .Select(r => r.GetType().GetProperty(c)?.GetValue(r, null)?.ToString())
+                    .Distinct().Count() <= 20) ?? "";
+
+        agrupacion = string.IsNullOrEmpty(columnaAgrupable)
+            ? new List<object>()
+            : Model.Resultado
+                .GroupBy(r => r.GetType().GetProperty(columnaAgrupable)?.GetValue(r, null)?.ToString() ?? "Sin Asignar")
+                .Select(g => new { Clave = g.Key, Total = g.Count() })
+                .Cast<object>()
+                .ToList();
+
+        agrupacionJson = JsonSerializer.Serialize(agrupacion);
+        columnaAgrupableJson = JsonSerializer.Serialize(columnaAgrupable);
+    }
+}
+
+
+
+<style>
+    .dashboard-container {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0 10px rgba(0,0,0,0.06);
+    }
+
+    h2.page-title {
+        font-weight: 800;
+        color: #0d6efd;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section .form-control, .form-section .form-select {
+        border: 2px solid #dee2e6;
+        border-radius: 0.5rem;
+        transition: 0.18s;
+        background: #fff;
+    }
+
+        .form-section .form-control:focus, .form-section .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.18rem rgba(13,110,253,0.12);
+            outline: none;
+        }
+
+    .sortable-zone {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .sortable-list {
+        flex: 1;
+        min-width: 280px;
+        background: #fff;
+        border: 2px dashed #0d6efd;
+        border-radius: 10px;
+        padding: 0.75rem;
+        max-height: 320px;
+        overflow-y: auto;
+    }
+
+        .sortable-list h6 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #0d6efd;
+            text-align: center;
+        }
+
+        .sortable-list .list-group-item {
+            cursor: grab;
+            user-select: none;
+            transition: transform .12s, background-color .12s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: .5rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+            .sortable-list .list-group-item:hover {
+                background: #e9f3ff;
+            }
+
+    .handle {
+        cursor: move;
+        color: #0d6efd;
+        font-weight: 700;
+        font-size: 1.05rem;
+        padding-left: 8px;
+    }
+
+    .ghost {
+        opacity: .45;
+        background: #f1f6ff !important;
+    }
+
+    .btn-primary {
+        font-weight: 700;
+        padding: .6rem 1.15rem;
+        border-radius: .55rem;
+    }
+
+    .table thead th {
+        background: #0d6efd;
+        color: #fff;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #graficoDinamico {
+        max-width: 100%;
+        height: 360px;
+    }
+
+    @@media (max-width:768px) {
+        .form-section .col-md-3 {
+            margin-bottom: .6rem;
+        }
+
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        #graficoDinamico {
+            height: 260px;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <h2 class="page-title">📊 Dashboard de Reportería Estudiantil</h2>
+
+    <form method="post" asp-page-handler="Generar" id="formReportes">
+        <div class="form-section mb-3">
+            <div class="row g-3">
+                <!-- Filtros institucionales -->
+                <div class="col-12 col-md-3">
+                    <label>Alergia</label>
+                    <select asp-for="Filtros.Alergia" asp-items="Model.AlergiasDisponibles" class="form-select border-primary">
+                        <option value="">-- Seleccione una alergia --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Categoría Alergia</label>
+                    <select asp-for="Filtros.CategoriaAlergia" asp-items="Model.CategoriasAlergiaDisponibles" class="form-select border-primary">
+                        <option value="">-- Seleccione una categoría --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Discapacidad</label>
+                    <select asp-for="Filtros.Discapacidad" asp-items="Model.DiscapacidadesDisponibles" class="form-select">
+                        <option value="">-- Todas --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Categoría Discapacidad</label>
+                    <select asp-for="Filtros.CategoriaDiscapacidad" asp-items="Model.CategoriasDiscapacidadDisponibles" class="form-select">
+                        <option value="">-- Todas --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Condición Especial</label>
+                    <input asp-for="Filtros.CondicionEspecial" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Categoría Condición Especial</label>
+                    <select asp-for="Filtros.CategoriaCondicionEspecial" asp-items="Model.CategoriasCondicionDisponibles" class="form-select">
+                        <option value="">-- Todas --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Enfermedad</label>
+                    <select asp-for="Filtros.Enfermedad" asp-items="Model.EnfermedadesDisponibles" class="form-select">
+                        <option value="">-- Todas --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Medicamento</label>
+                    <select asp-for="Filtros.Medicamento" asp-items="Model.MedicamentosDisponibles" class="form-select">
+                        <option value="">-- Todos --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Tipo Adaptación</label>
+                    <select asp-for="Filtros.TipoAdaptacion" asp-items="Model.AdaptacionesDisponibles" class="form-select">
+                        <option value="">-- Todas --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Tipo Documento</label>
+                    <select asp-for="Filtros.TipoDocumento" asp-items="Model.DocumentosDisponibles" class="form-select">
+                        <option value="">-- Todos --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Categoría Situación Familiar</label>
+                    <select asp-for="Filtros.CategoriaSituacionFamiliar" asp-items="Model.CategoriasSituacionDisponibles" class="form-select">
+                        <option value="">-- Todas --</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Motivo Reunión</label>
+                    <input asp-for="Filtros.MotivoReunion" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Sección</label>
+                    <input asp-for="Filtros.Seccion" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Estado Asistencia</label>
+                    <select asp-for="Filtros.EstadoAsistencia" class="form-select">
+                        <option value="">-- Todos --</option>
+                        <option value="Presente">Presente</option>
+                        <option value="Ausente">Ausente</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Fecha Desde</label>
+                    <input asp-for="Filtros.FechaDesde" type="date" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Fecha Hasta</label>
+                    <input asp-for="Filtros.FechaHasta" type="date" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label>Calificación &lt;</label>
+                    <input asp-for="Filtros.CalificacionLimite" type="number" step="0.01" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h6>Columnas disponibles</h6>
+                    <ul id="columnasDisponibles" class="list-group">
+                        @foreach (var columna in columnasDisponibles)
+                        {
+                            var valor = !string.IsNullOrEmpty(columna.Value) ? columna.Value : (columna.Text ?? "");
+                            <li class="list-group-item d-flex justify-content-between align-items-center handle" data-value="@valor">
+                                <span>@columna.Text</span>
+                                <span class="text-muted">☰</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Columnas visibles</h6>
+                    <ul id="columnasVisibles" class="list-group">
+                        @foreach (var col in Model.Filtros.ColumnasSeleccionadas ?? new List<string>())
+                        {
+                            var texto = columnasDisponibles.FirstOrDefault(c => c.Value == col)?.Text ?? col;
+                            <li class="list-group-item d-flex justify-content-between align-items-center handle" data-value="@col">
+                                <span>@texto</span>
+                                <span class="text-muted">☰</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 🔒 Campo oculto para enviar columnas visibles ordenadas -->
+            <input type="hidden" id="columnasSeleccionadasOrdenadas" name="Filtros.ColumnasSeleccionadas" />
+
+            <!-- Exportación -->
+            <div class="mt-3">
+                <label>Exportar como</label>
+                <select asp-for="Filtros.ExportarComo" class="form-select">
+                    <option value="">Ver en pantalla</option>
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+
+            <!-- Botón -->
+            <div class="mt-3 text-center">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-bar-chart-fill me-2"></i> Ver Reporte
+                </button>
+            </div>
+        </div>
+    </form>
+
+@* Vista previa PDF si se generó *@
+@if (string.IsNullOrEmpty(Model.Filtros.ExportarComo))
+{
+    if (Model.PdfBase64 != null)
+    {
+            <div class="mt-4">
+                <h5 class="text-center text-primary fw-bold">Vista previa del reporte PDF</h5>
+                <embed src="data:application/pdf;base64,@Model.PdfBase64" type="application/pdf" width="100%" height="800px" />
+            </div>
+    }
+}
+
+@* Tabla dinámica si hay resultados *@
+@if (Model.Resultado?.Any() == true && Model.Filtros.ColumnasSeleccionadas?.Any() == true)
+{
+        <div class="card mt-4 mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-center text-primary fw-bold">S.G.E Escuela Carolina Dent</h5>
+                <p><strong>Fecha:</strong> @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                <p><strong>Total de registros:</strong> @Model.Resultado.Count</p>
+                <p><strong>Columnas seleccionadas:</strong> @string.Join(", ", Model.Filtros.ColumnasSeleccionadas)</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-secondary">
+                    <tr>
+                        @foreach (var col in Model.Filtros.ColumnasSeleccionadas)
+                        {
+                            var texto = Model.ColumnasDisponibles.FirstOrDefault(c => c.Value == col)?.Text
+                            ?? Model.ColumnasDisponibles.FirstOrDefault(c => c.Text == col)?.Text
+                            ?? col;
+                            <th>@texto</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Resultado)
+                    {
+                        <tr>
+                            @foreach (var col in Model.Filtros.ColumnasSeleccionadas)
+                            {
+                                var prop = item.GetType().GetProperty(col)
+                                ?? item.GetType().GetProperties()
+                                .FirstOrDefault(p => string.Equals(p.Name, col, StringComparison.OrdinalIgnoreCase));
+                                var valor = prop?.GetValue(item, null);
+                                <td>@(valor ?? "Sin Asignar")</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    @* Gráfico agrupado si corresponde *@
+    @if (!string.IsNullOrEmpty(columnaAgrupable) && agrupacion.Any())
+    {
+            <div class="card mt-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-semibold text-center mb-3">Distribución por @columnaAgrupable</h5>
+                    <canvas id="graficoDinamico"></canvas>
+                </div>
+            </div>
+    }
+}
+else if (string.IsNullOrEmpty(Model.Filtros.ExportarComo) && Model.Resultado?.Any() != true)
+{
+        <div class="alert alert-warning mt-4 text-center">
+            No se encontraron registros con los filtros seleccionados.
+        </div>
+}
+
+@section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+        <script>
+            (function () {
+                const disponibles = document.getElementById('columnasDisponibles');
+                const visibles = document.getElementById('columnasVisibles');
+                const inputOrden = document.getElementById('columnasSeleccionadasOrdenadas');
+                const form = document.getElementById('formReportes');
+
+                if (!disponibles || !visibles || !inputOrden) return;
+
+                new Sortable(disponibles, {
+                    group: 'columnas',
+                    animation: 160,
+                    handle: '.handle',
+                    ghostClass: 'ghost'
+                });
+
+                new Sortable(visibles, {
+                    group: 'columnas',
+                    animation: 160,
+                    handle: '.handle',
+                    ghostClass: 'ghost',
+                    onSort: actualizarInputOrden,
+                    onAdd: actualizarInputOrden,
+                    onRemove: actualizarInputOrden
+                });
+
+                            function actualizarInputOrden() {
+                // Eliminar inputs previos si existen
+                Array.from(form.querySelectorAll('input[name^="Filtros.ColumnasSeleccionadas"]')).forEach(e => e.remove());
+
+                const orden = Array.from(visibles.querySelectorAll('[data-value]'))
+                    .map(el => el.getAttribute('data-value'));
+
+                orden.forEach((val, i) => {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = `Filtros.ColumnasSeleccionadas[${i}]`;
+                    input.value = val;
+                    form.appendChild(input);
+                });
+            }
+
+                form.addEventListener('submit', actualizarInputOrden);
+            })();
+        </script>
+}
+</div>

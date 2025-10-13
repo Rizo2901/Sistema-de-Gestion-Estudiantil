@@ -30,7 +30,7 @@ namespace API.Controllers
         }
 
 
-        [HttpPut("{Id}")]
+        [HttpPut("{IdAtencionMedica}")]
         public async Task<IActionResult> EditarAtencionMedica([FromRoute]Guid IdAtencionMedica, [FromBody]AtencionMedicaRequest atencion)
         {
             if (!await VerificarAtencionMedicaExiste(IdAtencionMedica))
@@ -45,7 +45,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{IdAtencionMedica}")]
         public async Task<IActionResult> EliminarAtencionMedica([FromRoute]Guid IdAtencionMedica)
         {
             
@@ -69,6 +69,17 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("obtenerAtencionesAgrupadas")]
+        public async Task<IActionResult> ObtenerAtencionesMedicasAgrupadas()
+        {
+            var result = await _atencionMedicaFlujo.ObtenerAtencionesMedicasAgrupadas();
+            if(result == null || !result.Any())
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
         [HttpGet("obtenerPorEstudiante{IdEstudiante}")]
         public async Task<IActionResult> ObtenerAtencionesMedicasPorEstudiante([FromRoute]Guid IdEstudiante)
         {
@@ -80,7 +91,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{IdAtencionMedica}")]
         public async Task<IActionResult> ObtenerAtencionMedicaPorId([FromRoute]Guid IdAtencionMedica)
         {
 

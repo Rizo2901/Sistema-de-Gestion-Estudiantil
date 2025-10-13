@@ -41,7 +41,6 @@ namespace DA
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdAtencionMedica = IdAtencionMedica,
-                IdEstudiante = atencion.IdEstudiante,
                 Fecha = atencion.Fecha,
                 Diagnostico = atencion.Diagnostico,
                 Tratamiento = atencion.Tratamiento
@@ -77,7 +76,7 @@ namespace DA
 
         public async Task<AtencionMedicaResponse> ObtenerAtencionMedicaPorId(Guid IdAtencionMedica)
         {
-            string query = @"SP_ObtenerAtencionMedicaPorId";
+            string query = @"SP_ObtenerAtencionMedica";
             var result = await _conn.QuerySingleOrDefaultAsync<AtencionMedicaResponse>(query, new
             {
                 IdAtencionMedica = IdAtencionMedica

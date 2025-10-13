@@ -18,6 +18,7 @@ namespace Abstracciones.Interfaces.API
         Task<IActionResult> ObtenerAtencionMedicaPorId(Guid IdAtencionMedica);
         Task<IActionResult> ObtenerAtencionesMedicasPorEstudiante(Guid IdEstudiante);
         Task<IActionResult> ObtenerAtencionesMedicas();
+        Task<IActionResult> ObtenerAtencionesMedicasAgrupadas();
 
 
     }

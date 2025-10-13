@@ -1,0 +1,316 @@
+﻿@page
+@model Web.Pages.Dashboard.AdaptacionesCurriculares.IndexModel
+@{
+    ViewData["Title"] = "Adaptaciones Curriculares";
+    Layout = "_Layout";
+}
+
+@if (Model.AdaptacionCurriculares == null || !Model.AdaptacionCurriculares.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay adaptaciones curriculares registradas.
+    </div>
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Crear Adaptación
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <!-- Botón Crear Adaptación -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn btn-dark w-100 w-md-auto shadow-sm rounded-3" data-bs-toggle="modal" data-bs-target="#modalCrear">
+                    <i class="bi bi-plus-lg me-1"></i> Crear Adaptación
+                </button>
+            </div>
+        </div>
+
+        <!-- Título principal -->
+        <h2 class="mb-4 text-center text-md-start fw-bold text-secondary-emphasis">
+            Adaptaciones Curriculares por Estudiante
+        </h2>
+
+        <!-- Filtros -->
+        <div class="card shadow-lg border-0 rounded-4 mb-4">
+            <div class="card-header bg-dark text-white rounded-top-4">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-funnel-fill me-2"></i>Filtros
+                </h5>
+            </div>
+            <div class="card-body bg-white rounded-bottom-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroNombre" class="form-label fw-semibold text-dark">Nombre</label>
+                        <input type="text" id="filtroNombre" class="form-control shadow-sm border border-secondary" placeholder="Buscar por nombre...">
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroCedula" class="form-label fw-semibold text-dark">Cédula</label>
+                        <input type="text" id="filtroCedula" class="form-control shadow-sm border border-secondary" placeholder="Buscar por cédula...">
+                    </div>
+                    <!-- Filtro adicional por estado -->
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroEstado" class="form-label fw-semibold text-dark">Estado</label>
+                        <select id="filtroEstado" class="form-select shadow-sm border border-secondary">
+                            <option value="">Todos</option>
+                            <option value="Activa">Activa</option>
+                            <option value="Finalizada">Finalizada</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de estudiantes -->
+        <div class="d-flex flex-column gap-3">
+            @foreach (var est in Model.AdaptacionCurriculares)
+            {
+                <div class="card shadow-sm border-0 rounded-3 mx-2 estudiante-card">
+                    <div class="card-header bg-light py-2 px-3 rounded-top-3 d-flex justify-content-between align-items-center"
+                         role="button"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#adaptaciones_@est.IdEstudiante"
+                         aria-expanded="false"
+                         aria-controls="adaptaciones_@est.IdEstudiante"
+                         style="cursor: pointer;">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <span class="text-muted">Nombre completo:</span>   @est.NombreCompleto — <span class="text-muted">Cédula:</span> <span class="estudiante-cedula">@est.Cedula</span>
+                            </h6>
+                            <small class="text-muted">Total adaptaciones: @est.Adaptaciones?.Count() </small>
+                        </div>
+                    </div>
+
+                    <!-- Adaptaciones -->
+                    <div class="collapse" id="adaptaciones_@est.IdEstudiante">
+                        <div class="card-body bg-white rounded-bottom-3">
+                            @if (est.Adaptaciones?.Any() == true)
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var adaptacion in est.Adaptaciones)
+                                    {
+                                        <li class="list-group-item px-3 py-2">
+                                            <div class="row small">
+                                                <div class="col-6">
+                                                    <strong>Tipo:</strong> @adaptacion.Tipo <br />
+                                                    <strong>Área Afectada:</strong> @adaptacion.AreaAfectada
+                                                </div>
+                                                <div class="col-6">
+                                                    <strong>Fecha Inicio:</strong> @adaptacion.FechaInicio.ToShortDateString() <br />
+                                                    <strong>Fecha Fin:</strong> @adaptacion.FechaFin.ToShortDateString() <br />
+                                                    <strong>Estado:</strong> @adaptacion.Estado
+                                                </div>
+                                                <div class="col-12 mt-2">
+                                                    <strong>Observaciones:</strong> @adaptacion.Observaciones
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 d-flex justify-content-end gap-2">
+                                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalEditar_@adaptacion.IdAdaptacion" title="Editar">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar_@adaptacion.IdAdaptacion" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </li>
+
+
+
+
+                                        <!-- Modal Editar -->
+                                        <div class="modal fade" id="modalEditar_@adaptacion.IdAdaptacion" tabindex="-1" aria-labelledby="modalEditarLabel_@adaptacion.IdAdaptacion" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content rounded-4 shadow">
+                                                    <form method="post" asp-page-handler="Editar">
+                                                        <div class="modal-header border-bottom-0">
+                                                            <h5 class="modal-title fw-bold" id="modalEditarLabel_@adaptacion.IdAdaptacion">Editar Adaptación</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <!-- Campos ocultos -->
+                                                            <input type="text" name="IdAdaptacion" value="@adaptacion.IdAdaptacion" />
+                                                            <input type="text" name="IdEstudiante" value="@adaptacion.IdEstudiante" />
+
+                                                            <!-- Tipo -->
+                                                            <div class="mb-3">
+                                                                <label for="Tipo_@adaptacion.IdAdaptacion" class="form-label fw-semibold">Tipo</label>
+                                                                <input type="text" class="form-control" id="Tipo_@adaptacion.IdAdaptacion" name="Tipo" value="@adaptacion.Tipo" required />
+                                                            </div>
+
+                                                            <!-- Área Afectada -->
+                                                            <div class="mb-3">
+                                                                <label for="AreaAfectada_@adaptacion.IdAdaptacion" class="form-label fw-semibold">Área Afectada</label>
+                                                                <input type="text" class="form-control" id="AreaAfectada_@adaptacion.IdAdaptacion" name="AreaAfectada" value="@adaptacion.AreaAfectada" required />
+                                                            </div>
+
+                                                            <!-- Fecha Inicio -->
+                                                            <div class="mb-3">
+                                                                <label for="FechaInicio_@adaptacion.IdAdaptacion" class="form-label fw-semibold">Fecha Inicio</label>
+                                                                <input type="date" class="form-control" id="FechaInicio_@adaptacion.IdAdaptacion" name="FechaInicio" value="@adaptacion.FechaInicio.ToString("yyyy-MM-dd")" required />
+                                                            </div>
+
+                                                            <!-- Fecha Fin -->
+                                                            <div class="mb-3">
+                                                                <label for="FechaFin_@adaptacion.IdAdaptacion" class="form-label fw-semibold">Fecha Fin</label>
+                                                                <input type="date" class="form-control" id="FechaFin_@adaptacion.IdAdaptacion" name="FechaFin" value="@adaptacion.FechaFin.ToString("yyyy-MM-dd")" required />
+                                                            </div>
+
+                                                            <!-- Observaciones -->
+                                                            <div class="mb-3">
+                                                                <label for="Observaciones_@adaptacion.IdAdaptacion" class="form-label fw-semibold">Observaciones</label>
+                                                                <textarea class="form-control" id="Observaciones_@adaptacion.IdAdaptacion" name="Observaciones" rows="3">@adaptacion.Observaciones</textarea>
+                                                            </div>
+
+                                                            <!-- Estado -->
+                                                            <div class="mb-3">
+                                                                <label for="Estado_@adaptacion.IdAdaptacion" class="form-label fw-semibold">Estado</label>
+                                                                <select class="form-select" id="Estado_@adaptacion.IdAdaptacion" name="Estado" required>
+                                                                    <option value="Activa" selected="@("Activa" == adaptacion.Estado)">Activa</option>
+                                                                    <option value="Finalizada" selected="@("Finalizada" == adaptacion.Estado)">Finalizada</option>
+                                                                    <option value="Pendiente" selected="@("Pendiente" == adaptacion.Estado)">Pendiente</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    <!-- Modal Eliminar -->
+                                    <div class="modal fade" id="modalEliminar_@adaptacion.IdAdaptacion" tabindex="-1">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content rounded-4 shadow">
+                                                <form method="post" asp-page-handler="Eliminar">
+                                                    <div class="modal-header border-bottom-0">
+                                                        <h5 class="modal-title">Confirmar eliminación</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>¿Estás seguro que deseas eliminar la adaptación <strong>@adaptacion.Tipo</strong>?</p>
+                                                        <input type="hidden" name="IdAdaptacion" value="@adaptacion.IdAdaptacion" />
+                                                    </div>
+                                                    <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">Este estudiante no tiene adaptaciones registradas.</div>
+                        }
+                    </div>
+                </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+     
+
+<!-- Modal Crear -->
+<div class="modal fade" id="modalCrear" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <form method="post" asp-page-handler="Crear">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title">Crear Adaptación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <input type="text" class="form-control" name="Tipo" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Área Afectada</label>
+                        <input type="text" class="form-control" name="AreaAfectada" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" class="form-control" name="FechaInicio" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha Fin</label>
+                        <input type="date" class="form-control" name="FechaFin" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="Observaciones"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <input type="text" class="form-control" name="Estado" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estudiante</label>
+                        <select asp-for="estudianteSeleccionado" asp-items="Model.Estudiantes" class="form-control">
+                            <option value="">Seleccione un estudiante</option>
+                        </select>
+                        <span asp-validation-for="estudianteSeleccionado" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const filtroNombre = document.getElementById("filtroNombre");
+            const filtroCedula = document.getElementById("filtroCedula");
+
+            if (filtroNombre && filtroCedula) {
+                const tarjetasEstudiantes = document.querySelectorAll(".estudiante-card");
+
+                function aplicarFiltros() {
+                    const nombre = filtroNombre.value.toLowerCase();
+                    const cedula = filtroCedula.value.toLowerCase();
+
+                    tarjetasEstudiantes.forEach(card => {
+                        const nombreText = card.querySelector(".estudiante-nombre")?.textContent.toLowerCase() || "";
+                        const cedulaText = card.querySelector(".estudiante-cedula")?.textContent.toLowerCase() || "";
+
+                        const coincideNombre = nombreText.includes(nombre);
+                        const coincideCedula = cedulaText.includes(cedula);
+
+                        card.style.display = (coincideNombre && coincideCedula) ? "" : "none";
+                    });
+                }
+
+                [filtroNombre, filtroCedula].forEach(input => {
+                    input.addEventListener("input", aplicarFiltros);
+                });
+            } else {
+                console.warn("[Filtros] No se encontraron los campos de filtro en esta vista.");
+            }
+        });
+    </script>
+
+
+}

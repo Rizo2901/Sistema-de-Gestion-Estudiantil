@@ -1,4 +1,5 @@
 ﻿using Abstracciones.Modelos;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,7 @@ namespace Abstracciones.Interfaces.Flujo
         Task<IEnumerable<CalificacionResponse>> ObtenerCalificaciones();
 
         Task<IEnumerable<CalificacionResponse>> ObtenerCalificacionesPorEstudiante(Guid IdEstudiante);
+
+        Task<List<EstudianteConCalificaciones>> ObtenerCalificacionesPorEstudiantes();
     }
 }

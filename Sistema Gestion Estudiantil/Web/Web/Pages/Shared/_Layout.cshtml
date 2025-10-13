@@ -8,9 +8,12 @@
     
 }
 @{
+    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString()?.ToLower();
+    bool mostrarMenuDashboard = paginaActual != null && paginaActual.StartsWith("/dashboard");
+    bool esCategoria = paginaActual != null && paginaActual.StartsWith("/dashboard/categorias/");
 
-    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString()?.ToLower(); bool mostrarMenuDashboard = paginaActual != null && paginaActual.StartsWith("/dashboard");
-} 
+    string activeClass(string page) => paginaActual == page.ToLower() ? "fw-bold text-dark" : "text-white";
+}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -150,39 +153,52 @@
                                 </a>
                             </li>
 
+
                             @if (perfil?.TipoEntidad == "Administrador")
                             {
                                 <!-- Opciones generales para administrador -->
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Estudiantes/Index"><i class="bi bi-person-lines-fill me-2"></i>Estudiantes</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Profesores/Index"><i class="bi bi-person-lines-fill me-2"></i>Profesores</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Roles/Index"><i class="bi bi-person-gear me-2"></i>Roles</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Usuarios"><i class="bi bi-people-fill me-2"></i>Usuarios</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/estudiantes/index"))" asp-page="/Dashboard/Estudiantes/Index"><i class="bi bi-person-lines-fill me-2"></i>Estudiantes</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/estudiantes/reporteria/index"))" asp-page="/Dashboard/Estudiantes/Reporteria/Index"><i class="bi bi-heart-pulse me-2"></i>Reporteria</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/calificaciones/index"))" asp-page="/Dashboard/Calificaciones/Index"><i class="bi bi-heart-pulse me-2"></i>Calificaciones</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/atencionesmedicas/index"))" asp-page="/Dashboard/AtencionesMedicas/Index"><i class="bi bi-heart-pulse me-2"></i>AtencionesMedicas</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/profesores/index"))" asp-page="/Dashboard/Profesores/Index"><i class="bi bi-person-lines-fill me-2"></i>Profesores</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/roles/index"))" asp-page="/Dashboard/Roles/Index"><i class="bi bi-person-gear me-2"></i>Roles</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/usuarios"))" asp-page="/Dashboard/Usuarios"><i class="bi bi-people-fill me-2"></i>Usuarios</a></li>
+
+                                <!-- Categorías -->
                                 <li class="nav-item">
                                     <a class="nav-link text-white d-flex justify-content-between align-items-center"
-                                       data-bs-toggle="collapse" href="#submenuCategorias" role="button"
-                                       aria-expanded="false" aria-controls="submenuCategorias">
+                                       data-bs-toggle="collapse"
+                                       href="#submenuCategorias"
+                                       role="button"
+                                       aria-expanded="@(esCategoria.ToString().ToLower())"
+                                       aria-controls="submenuCategorias">
                                         <span><i class="bi bi-tags me-2"></i>Categorías</span>
-                                        <i class="bi bi-chevron-down"></i>
+                                        <i class="bi @(esCategoria ? "bi-chevron-up" : "bi-chevron-down")"></i>
                                     </a>
-                                    <div class="collapse" id="submenuCategorias">
+                                    <div class="collapse @(esCategoria ? "show" : "")" id="submenuCategorias">
                                         <ul class="nav flex-column ms-3">
                                             <li class="nav-item">
-                                                <a class="nav-link text-white" asp-page="/Dashboard/Categorias/CategoriasAlergias/Index">
+                                                <a class="nav-link @(activeClass("/dashboard/categorias/categoriasalergias/index"))"
+                                                   asp-page="/Dashboard/Categorias/CategoriasAlergias/Index">
                                                     <i class="bi bi-caret-right-fill me-2"></i>Categorías Alergias
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link text-white" asp-page="/Dashboard/Categorias/CategoriasDiscapacidad/Index">
+                                                <a class="nav-link @(activeClass("/dashboard/categorias/categoriasdiscapacidades/index"))"
+                                                   asp-page="/Dashboard/Categorias/CategoriasDiscapacidades/Index">
                                                     <i class="bi bi-caret-right-fill me-2"></i>Categorías Discapacidad
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link text-white" asp-page="/Dashboard/Categorias/CategoriasCondicionesEspeciales/Index">
+                                                <a class="nav-link @(activeClass("/dashboard/categorias/categoriascondicionesespeciales/index"))"
+                                                   asp-page="/Dashboard/Categorias/CategoriasCondicionesEspeciales/Index">
                                                     <i class="bi bi-caret-right-fill me-2"></i>Categorías Condiciones Especiales
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link text-white" asp-page="/Dashboard/Categorias/CategoriaSituacionFamiliar/Index">
+                                                <a class="nav-link @(activeClass("/dashboard/categorias/categoriassituacionesfamiliares/index"))"
+                                                   asp-page="/Dashboard/Categorias/CategoriasSituacionesFamiliares/Index">
                                                     <i class="bi bi-caret-right-fill me-2"></i>Categoría Situación Familiar
                                                 </a>
                                             </li>
@@ -190,36 +206,37 @@
                                     </div>
                                 </li>
 
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/AtencionesMedicas"><i class="bi bi-heart-pulse me-2"></i>Atenciones médicas</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Secciones/Index"><i class="bi bi-diagram-3 me-2"></i>Secciones</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Materias/Index"><i class="bi bi-card-list me-2"></i>Materias</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Horarios/Index"><i class="bi bi-card-list me-2"></i>Horarios</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Documentos/Index"><i class="bi bi-file-earmark me-2"></i>Documentos</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/CondicionesEspeciales/Index"><i class="bi bi-person-lines-fill me-2"></i>Condiciones Especiales</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Familiares/Index"><i class="bi bi-building me-2"></i>Padres de familia</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Reuniones familiares</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Reuniones administrativas</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Actividades/Index"><i class="bi bi-kanban me-2"></i>Actividades</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/atencionesmedicas"))" asp-page="/Dashboard/AtencionesMedicas"><i class="bi bi-heart-pulse me-2"></i>Atenciones médicas</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/adaptacionescurriculares/index"))" asp-page="/Dashboard/AdaptacionesCurriculares/Index"><i class="bi bi-heart-pulse me-2"></i>Adaptaciones Curriculares</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/secciones/index"))" asp-page="/Dashboard/Secciones/Index"><i class="bi bi-diagram-3 me-2"></i>Secciones</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/materias/index"))" asp-page="/Dashboard/Materias/Index"><i class="bi bi-card-list me-2"></i>Materias</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/horarios/index"))" asp-page="/Dashboard/Horarios/Index"><i class="bi bi-card-list me-2"></i>Horarios</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/documentos/index"))" asp-page="/Dashboard/Documentos/Index"><i class="bi bi-file-earmark me-2"></i>Documentos</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/condicionesespeciales/index"))" asp-page="/Dashboard/CondicionesEspeciales/Index"><i class="bi bi-person-lines-fill me-2"></i>Condiciones Especiales</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/familiares/index"))" asp-page="/Dashboard/Familiares/Index"><i class="bi bi-building me-2"></i>Padres de familia</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/reunionesfamiliares/index"))" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Reuniones familiares</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/reunionesadministrativas/index"))" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Reuniones administrativas</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/actividades/index"))" asp-page="/Dashboard/Actividades/Index"><i class="bi bi-kanban me-2"></i>Actividades</a></li>
                             }
                             else if (perfil?.TipoEntidad == "Estudiante")
                             {
                                 <!-- Opciones específicas para estudiante -->
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisSecciones"><i class="bi bi-person-badge me-2"></i>Mi sección</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisHorarios"><i class="bi bi-clock-history me-2"></i>Mis horarios</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisMaterias"><i class="bi bi-card-list me-2"></i>Mis materias</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisNotas"><i class="bi bi-journal-check me-2"></i>Mis notas</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/Actividades/Index"><i class="bi bi-kanban me-2"></i>Actividades</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisDocumentos"><i class="bi bi-file-earmark me-2"></i>Mis documentos</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Mis reuniones familiares</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Mis reuniones administrativas</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/missecciones"))" asp-page="/Dashboard/MisSecciones"><i class="bi bi-person-badge me-2"></i>Mi sección</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/mishorarios"))" asp-page="/Dashboard/MisHorarios"><i class="bi bi-clock-history me-2"></i>Mis horarios</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/mismaterias"))" asp-page="/Dashboard/MisMaterias"><i class="bi bi-card-list me-2"></i>Mis materias</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/misnotas"))" asp-page="/Dashboard/MisNotas"><i class="bi bi-journal-check me-2"></i>Mis notas</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/actividades/index"))" asp-page="/Dashboard/Actividades/Index"><i class="bi bi-kanban me-2"></i>Actividades</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/misdocumentos"))" asp-page="/Dashboard/MisDocumentos"><i class="bi bi-file-earmark me-2"></i>Mis documentos</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/reunionesfamiliares/index"))" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Mis reuniones familiares</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/reunionesadministrativas/index"))" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Mis reuniones administrativas</a></li>
                             }
                             else if (perfil?.TipoEntidad == "Profesor")
                             {
                                 <!-- Opciones específicas para profesor -->
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisSecciones"><i class="bi bi-person-badge me-2"></i>Mis secciones</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/MisMaterias"><i class="bi bi-card-list me-2"></i>Mis materias</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Reuniones familiares</a></li>
-                                <li class="nav-item"><a class="nav-link text-white" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Reuniones administrativas</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/missecciones"))" asp-page="/Dashboard/MisSecciones"><i class="bi bi-person-badge me-2"></i>Mis secciones</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/mismaterias"))" asp-page="/Dashboard/MisMaterias"><i class="bi bi-card-list me-2"></i>Mis materias</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/reunionesfamiliares/index"))" asp-page="/Dashboard/ReunionesFamiliares/Index"><i class="bi bi-people me-2"></i>Reuniones familiares</a></li>
+                                <li class="nav-item"><a class="nav-link @(activeClass("/dashboard/reunionesadministrativas/index"))" asp-page="/Dashboard/ReunionesAdministrativas/Index"><i class="bi bi-building me-2"></i>Reuniones administrativas</a></li>
                             }
                         </ul>
                     </nav>

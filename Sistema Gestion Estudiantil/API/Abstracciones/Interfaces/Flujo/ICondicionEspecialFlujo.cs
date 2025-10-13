@@ -15,5 +15,6 @@ namespace Abstracciones.Interfaces.Flujo
         Task<Guid> CrearCondicionEspecial(CondicionesEspecialesRequest condicionEspecial);
         Task<Guid> EditarCondicionEspecial(Guid Id, CondicionesEspecialesRequest condicionEspecial);
         Task<Guid> EliminarCondicionEspecial(Guid Id);
+
     }
 }

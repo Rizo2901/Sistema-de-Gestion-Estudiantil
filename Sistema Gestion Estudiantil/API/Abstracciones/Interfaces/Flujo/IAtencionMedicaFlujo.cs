@@ -17,5 +17,6 @@ namespace Abstracciones.Interfaces.Flujo
         Task<AtencionMedicaResponse> ObtenerAtencionMedicaPorId(Guid IdAtencionMedica);
         Task<IEnumerable<AtencionMedicaResponse>> ObtenerAtencionesMedicasPorEstudiante(Guid IdEstudiante);
         Task<IEnumerable<AtencionMedicaResponse>> ObtenerAtencionesMedicas();
+        Task<IList<EstudianteConAtencionesMedicas>> ObtenerAtencionesMedicasAgrupadas();
     }
 }

@@ -17,5 +17,7 @@ namespace Abstracciones.Interfaces.API
         Task<IActionResult> EliminarCalificacion(Guid IdCalificacion);
         Task<IActionResult> ObtenerCalificacionesPorEstudiante(Guid IdEstudiante);
 
+        Task<IActionResult> ObtenerCalificacionesPorEstudiantes();
+
     }
 }

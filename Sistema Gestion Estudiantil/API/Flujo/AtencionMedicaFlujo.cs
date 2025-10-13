@@ -38,6 +38,47 @@ namespace Flujo
             return await _antencionMedica.ObtenerAtencionesMedicas();
         }
 
+        public async Task<IList<EstudianteConAtencionesMedicas>> ObtenerAtencionesMedicasAgrupadas()
+        {
+            var atencionesPlanas = await _antencionMedica.ObtenerAtencionesMedicas();
+
+            var agrupado = atencionesPlanas
+                      .GroupBy(c => new
+                      {
+                          c.IdEstudiante,
+                          c.Cedula,
+                          c.Nombre,
+                          c.Apellido1,
+                          c.Apellido2
+                      })
+                .Select(g => new EstudianteConAtencionesMedicas
+                {
+                    IdEstudiante = g.Key.IdEstudiante,
+                    Cedula = g.Key.Cedula?.Trim(),
+                    Nombre = g.Key.Nombre?.Trim(),
+                    Apellido1 = g.Key.Apellido1?.Trim(),
+                    Apellido2 = g.Key.Apellido2?.Trim(),
+                    AtencionesMedicas = g
+                        .Where(a => a.IdAtencionMedica != Guid.Empty)
+                        .Select(a => new AtencionMedicaResponse
+                        {
+                            IdAtencionMedica = a.IdAtencionMedica,
+                            IdEstudiante = a.IdEstudiante,
+                            NombreCompleto = $"{a.Nombre?.Trim()} {a.Apellido1?.Trim()} {a.Apellido2?.Trim()}".Trim(),
+                            Diagnostico = a.Diagnostico,
+                            Tratamiento = a.Tratamiento,    
+                            Fecha = a.Fecha
+                        })
+                        .OrderBy(c => c.Fecha)
+                        .ToList()
+                })
+                .OrderBy(e => e.Apellido1)
+                .ThenBy(e => e.Apellido2)
+                .ToList();
+
+            return agrupado;
+        }
+
         public async Task<IEnumerable<AtencionMedicaResponse>> ObtenerAtencionesMedicasPorEstudiante(Guid IdEstudiante)
         {
            return await _antencionMedica.ObtenerAtencionesMedicasPorEstudiante(IdEstudiante);

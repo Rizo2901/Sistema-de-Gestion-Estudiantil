@@ -67,16 +67,27 @@ namespace Flujo
         }
 
         // ================= PDF con FastReport
-
         private byte[] GenerarPdf(List<ReporteEstudiantilResponse> datos, List<string> columnas)
         {
+            // Validación defensiva
+            if (columnas == null || columnas.Count == 0)
+                throw new ArgumentException("No se seleccionaron columnas para el reporte.");
+
+            columnas = columnas
+                .Where(c => typeof(ReporteEstudiantilResponse).GetProperty(c) != null)
+                .Distinct()
+                .ToList();
+
+            if (columnas.Count == 0)
+                throw new ArgumentException("No hay columnas válidas para renderizar.");
+
             var documento = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Margin(20);
 
-                    // 🎨 Encabezado institucional ancho completo
+                    // Encabezado institucional
                     page.Header().Element(header =>
                     {
                         header.Background("#b12b38")
@@ -85,24 +96,33 @@ namespace Flujo
                               .Row(row =>
                               {
                                   row.RelativeColumn().Text("S.G.E Escuela Carolina Dent")
-                              .FontSize(18).FontColor(Colors.White).Bold();
+                                      .FontSize(18).FontColor(Colors.White).Bold();
 
                                   row.ConstantColumn(120).AlignRight().Text($"Fecha: {DateTime.Now:dd/MM/yyyy}")
-                              .FontSize(10).FontColor(Colors.White);
+                                      .FontSize(10).FontColor(Colors.White);
                               });
                     });
 
-                    // 📊 Tabla de datos con líneas separadoras
+                    // Contenido principal
                     page.Content().Element(content =>
                     {
                         content.Column(col =>
                         {
-                            col.Item().Table(table =>
+                            // Forzar ancho total de tabla
+                            col.Item().Width(540).Table(table =>
                             {
+                                // Layout defensivo
                                 table.ColumnsDefinition(columnsDef =>
                                 {
-                                    foreach (var _ in columnas)
-                                        columnsDef.RelativeColumn();
+                                    if (columnas.Count == 1)
+                                    {
+                                        columnsDef.ConstantColumn(540); // ancho total si hay solo una columna
+                                    }
+                                    else
+                                    {
+                                        foreach (var _ in columnas)
+                                            columnsDef.RelativeColumn(); // distribución proporcional
+                                    }
                                 });
 
                                 // Encabezados
@@ -116,12 +136,22 @@ namespace Flujo
                                     }
                                 });
 
-                                // Filas con línea inferior
+                                // Filas
                                 foreach (var item in datos)
                                 {
                                     foreach (var col in columnas)
                                     {
-                                        var valor = item.GetType().GetProperty(col)?.GetValue(item)?.ToString() ?? "";
+                                        var prop = item.GetType().GetProperty(col)
+                                            ?? item.GetType().GetProperties()
+                                            .FirstOrDefault(p => string.Equals(p.Name, col, StringComparison.OrdinalIgnoreCase));
+
+                                        var valor = prop?.GetValue(item)?.ToString()?.Trim();
+
+                                        if (string.IsNullOrWhiteSpace(valor))
+                                            valor = "Sin Asignar";
+
+                                        if (valor.Length > 300)
+                                            valor = valor.Substring(0, 300) + "...";
 
                                         table.Cell().PaddingVertical(5).PaddingHorizontal(3)
                                             .BorderBottom(1).BorderColor(Colors.Grey.Lighten2)
@@ -130,14 +160,14 @@ namespace Flujo
                                 }
                             });
 
-                            // 🧮 Total de registros
+                            // Total de registros
                             col.Item().PaddingTop(15).Text(
                                 $"Total de registros: {datos.Count}"
                             ).FontSize(12).Bold().FontColor(Colors.Black);
                         });
                     });
 
-                    // 📝 Pie institucional
+                    // Pie institucional
                     page.Footer().AlignCenter().Text("Reporte generado automáticamente por el sistema S.G.E")
                         .FontSize(9).FontColor(Colors.Grey.Darken2);
                 });
@@ -145,9 +175,6 @@ namespace Flujo
 
             return documento.GeneratePdf();
         }
-
-
-
         // ================= Excel con EPPlus
         private byte[] GenerarExcel(List<ReporteEstudiantilResponse> datos, List<string> columnas)
         {
@@ -224,6 +251,67 @@ namespace Flujo
             }
 
             return dt;
+        }
+
+        public async Task<List<ReporteEstudiantilResponse>> ObtenerVistaEstudiantilAsync(ReporteEstudiantilRequest filtros)
+        {
+            var datos = await _reporteDA.ObtenerDatosReporte(filtros);
+            var datosFiltrados = datos.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(filtros.Alergia))
+                datosFiltrados = datosFiltrados.Where(x => x.Alergia == filtros.Alergia);
+
+            if (!string.IsNullOrEmpty(filtros.CategoriaAlergia))
+                datosFiltrados = datosFiltrados.Where(x => x.CategoriaAlergia == filtros.CategoriaAlergia);
+
+            if (!string.IsNullOrEmpty(filtros.Discapacidad))
+                datosFiltrados = datosFiltrados.Where(x => x.Discapacidad == filtros.Discapacidad);
+
+            if (!string.IsNullOrEmpty(filtros.CategoriaDiscapacidad))
+                datosFiltrados = datosFiltrados.Where(x => x.CategoriaDiscapacidad == filtros.CategoriaDiscapacidad);
+
+            if (!string.IsNullOrEmpty(filtros.CondicionEspecial))
+                datosFiltrados = datosFiltrados.Where(x => x.CondicionEspecial == filtros.CondicionEspecial);
+
+            if (!string.IsNullOrEmpty(filtros.CategoriaCondicionEspecial))
+                datosFiltrados = datosFiltrados.Where(x => x.CategoriaCondicionEspecial == filtros.CategoriaCondicionEspecial);
+
+            if (!string.IsNullOrEmpty(filtros.Enfermedad))
+                datosFiltrados = datosFiltrados.Where(x => x.Enfermedad == filtros.Enfermedad);
+
+            if (!string.IsNullOrEmpty(filtros.Medicamento))
+                datosFiltrados = datosFiltrados.Where(x => x.Medicamento == filtros.Medicamento);
+
+            if (!string.IsNullOrEmpty(filtros.Seccion))
+                datosFiltrados = datosFiltrados.Where(x => x.Seccion == filtros.Seccion);
+
+            if (!string.IsNullOrEmpty(filtros.CategoriaSituacionFamiliar))
+                datosFiltrados = datosFiltrados.Where(x => x.CategoriaSituacionFamiliar == filtros.CategoriaSituacionFamiliar);
+
+            if (!string.IsNullOrEmpty(filtros.EstadoAsistencia))
+                datosFiltrados = datosFiltrados.Where(x => x.EstadoAsistencia == filtros.EstadoAsistencia);
+
+            if (!string.IsNullOrEmpty(filtros.TipoDocumento))
+                datosFiltrados = datosFiltrados.Where(x => x.TipoDocumento == filtros.TipoDocumento);
+
+            if (!string.IsNullOrEmpty(filtros.TipoAdaptacion))
+                datosFiltrados = datosFiltrados.Where(x => x.TipoAdaptacion == filtros.TipoAdaptacion);
+
+            if (!string.IsNullOrEmpty(filtros.MotivoReunion))
+                datosFiltrados = datosFiltrados.Where(x => x.MotivoReunion == filtros.MotivoReunion);
+
+            if (filtros.FechaDesde.HasValue)
+                datosFiltrados = datosFiltrados.Where(x =>
+                    (x.FechaRegistroSituacionFamiliar ?? x.FechaDiagnosticoCondicion ?? x.FechaAdaptacion ?? x.FechaReunion ?? x.FechaAsistencia ?? x.FechaAccionComportamiento ?? x.FechaAtencionMedica) >= filtros.FechaDesde.Value);
+
+            if (filtros.FechaHasta.HasValue)
+                datosFiltrados = datosFiltrados.Where(x =>
+                    (x.FechaRegistroSituacionFamiliar ?? x.FechaDiagnosticoCondicion ?? x.FechaAdaptacion ?? x.FechaReunion ?? x.FechaAsistencia ?? x.FechaAccionComportamiento ?? x.FechaAtencionMedica) <= filtros.FechaHasta.Value);
+
+            if (filtros.CalificacionLimite.HasValue)
+                datosFiltrados = datosFiltrados.Where(x => x.Calificacion.HasValue && x.Calificacion.Value < (decimal)filtros.CalificacionLimite.Value);
+
+            return datosFiltrados.ToList();
         }
     }
 }

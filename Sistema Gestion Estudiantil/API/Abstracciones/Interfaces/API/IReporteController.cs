@@ -9,5 +9,6 @@ namespace Abstracciones.Interfaces.API
     {
 
         Task<IActionResult> ReporteUniversal(ReporteEstudiantilRequest filtros);
+        Task<IActionResult> ObtenerVistaEstudiantilAsync(ReporteEstudiantilRequest filtros);
     }
 }

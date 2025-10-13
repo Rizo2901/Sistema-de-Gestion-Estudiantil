@@ -31,7 +31,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{Id}")]
+        [HttpPut("{IdCalificacion}")]
         public async Task<IActionResult> EditarCalificacion([FromRoute]Guid IdCalificacion, [FromBody]CalificacionRequest calificacion)
         {
             if (!VerificarCalificacionExiste(IdCalificacion).Result)
@@ -39,10 +39,10 @@ namespace API.Controllers
                 return NotFound("La calificacion no existe");
             }
             var result = await _calificacionFlujo.EditarCalificacion(IdCalificacion, calificacion);
-            return Ok(new { mensaje = "Calificación eliminada correctamente", id = result });
+            return Ok(new { mensaje = "Calificación editada correctamente", id = result });
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{IdCalificacion}")]
         public async Task<IActionResult> EliminarCalificacion([FromRoute]Guid IdCalificacion)
         {
             if (!VerificarCalificacionExiste(IdCalificacion).Result)
@@ -53,7 +53,7 @@ namespace API.Controllers
             return Ok(new { mensaje = "Calificación eliminada correctamente", id = result });
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{IdCalificacion}")]
         public async Task<IActionResult> ObtenerCalificacion([FromRoute]Guid IdCalificacion)
         {
             if (!VerificarCalificacionExiste(IdCalificacion).Result)
@@ -84,6 +84,18 @@ namespace API.Controllers
             if (result == null || !result.Any())
             {
                 return NotFound("No se encontraron calificaciones para el estudiante especificado");
+            }
+            return Ok(result);
+        }
+
+        [HttpGet("calificacionesPorEstudiantes")]
+        public async Task<IActionResult> ObtenerCalificacionesPorEstudiantes()
+        {
+           var result = await  _calificacionFlujo.ObtenerCalificacionesPorEstudiantes();
+            if (result == null )
+            {
+                _logger.LogWarning("No se encontraron calificaciones ");
+                return NotFound("No se encontraron calificaciones");
             }
             return Ok(result);
         }

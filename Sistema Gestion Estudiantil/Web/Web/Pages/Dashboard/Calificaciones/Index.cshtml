@@ -1,0 +1,306 @@
+﻿@page
+@model Web.Pages.Dashboard.Calificaciones.IndexModel
+@{
+    ViewData["Title"] = "Calificaciones";
+    Layout = "_Layout";
+}
+
+@if (Model.EstudiantesConCalificaciones == null || !Model.EstudiantesConCalificaciones.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay calificaciones registradas.
+    </div>
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Registrar Calificación
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <!-- Botón Crear -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn btn-dark w-100 w-md-auto shadow-sm rounded-3" data-bs-toggle="modal" data-bs-target="#modalCrear">
+                    <i class="bi bi-plus-lg me-1"></i> Registrar Calificación
+                </button>
+            </div>
+        </div>
+
+        <!-- Título -->
+        <h2 class="mb-4 text-center text-md-start fw-bold text-secondary-emphasis">
+            Calificaciones por Estudiante
+        </h2>
+
+        <!-- Filtros -->
+        <div class="card shadow-lg border-0 rounded-4 mb-4">
+            <div class="card-header bg-dark text-white rounded-top-4">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-funnel-fill me-2"></i>Filtros
+                </h5>
+            </div>
+            <div class="card-body bg-white rounded-bottom-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroNombre" class="form-label fw-semibold text-dark">Nombre</label>
+                        <input type="text" id="filtroNombre" class="form-control shadow-sm border border-secondary" placeholder="Buscar por nombre...">
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroCedula" class="form-label fw-semibold text-dark">Cédula</label>
+                        <input type="text" id="filtroCedula" class="form-control shadow-sm border border-secondary" placeholder="Buscar por cédula...">
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroMateria" class="form-label fw-semibold text-dark">Materia</label>
+                        <select id="filtroMateria" class="form-select shadow-sm border border-secondary">
+                            <option value="">Todas</option>
+                            @foreach (var materia in Model.Materias)
+                            {
+                                <option value="@materia.Text">@materia.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista por estudiante -->
+        <div class="d-flex flex-column gap-3">
+            @foreach (var est in Model.EstudiantesConCalificaciones)
+            {
+                <div class="card shadow-sm border-0 rounded-3 mx-2 estudiante-card">
+                    <div class="card-header bg-light py-2 px-3 rounded-top-3 d-flex justify-content-between align-items-center"
+                         role="button"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#calificaciones_@est.IdEstudiante"
+                         aria-expanded="false"
+                         aria-controls="calificaciones_@est.IdEstudiante"
+                         style="cursor: pointer;">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <span class="text-muted">Nombre completo:</span> <span class="estudiante-nombre">@est.Nombre</span> —
+                                <span class="text-muted">Cédula:</span> <span class="estudiante-cedula">@est.Cedula</span>
+                            </h6>
+                            <small class="text-muted">Total calificaciones: @est.Calificaciones?.Count()</small>
+                        </div>
+                    </div>
+
+                    <!-- Calificaciones -->
+                    <div class="collapse" id="calificaciones_@est.IdEstudiante">
+                        <div class="card-body bg-white rounded-bottom-3">
+                            @if (est.Calificaciones?.Any() == true)
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var cal in est.Calificaciones)
+                                    {
+                                        <li class="list-group-item px-3 py-2">
+                                            <div class="row small">
+                                                <div class="col-6">
+                                                    <strong>Materia:</strong> @cal.NombreMateria <br />
+                                                    <strong>Calificación:</strong> @cal.Calificacion
+                                                </div>
+                                                <div class="col-6">
+                                                    <strong>Fecha:</strong> @cal.Fecha.ToShortDateString()
+                                                </div>
+                                                <div class="col-12 mt-2">
+                                                    <strong>Comentario:</strong> @cal.Comentario
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-2 d-flex justify-content-end gap-2">
+                                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalEditar_@cal.IdCalificacion" title="Editar">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar_@cal.IdCalificacion" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </li>
+<!-- Modal Editar -->
+<div class="modal fade" id="modalEditar_@cal.IdCalificacion" tabindex="-1" aria-labelledby="modalEditarLabel_@cal.IdCalificacion" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <form method="post" asp-page-handler="Editar">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title fw-bold">Editar Calificación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="IdCalificacion" value="@cal.IdCalificacion" />
+                    <input type="hidden" name="IdEstudiante" value="@cal.IdEstudiante" />
+
+                    <!-- Materia (sin cambios) -->
+                     <div class="mb-3">
+                                                               <select name="IdMateria" class="form-select">
+                            <option value="">Seleccione una materia</option>
+                            @foreach (var materia in Model.Materias)
+                            {
+@:                              <option value="@materia.Value" @(cal.IdMateria != Guid.Empty && cal.IdMateria.ToString() == materia.Value ? "selected" : "")>
+@:                                  @materia.Text
+@:                              </option>
+                            }
+                        </select>
+                                                            </div>
+
+                    <!-- Calificación -->
+                    <div class="mb-3">
+                        <label class="form-label">Calificación</label>
+                        <input type="number" step="0.01" class="form-control" name="Calificacion" value="@cal.Calificacion" required />
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" class="form-control" name="Fecha" value="@cal.Fecha.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <!-- Comentario -->
+                    <div class="mb-3">
+                        <label for="Comentario_@cal.IdCalificacion" class="form-label">Comentario</label>
+                        <textarea class="form-control" id="Comentario_@cal.IdCalificacion" name="Comentario" required>@cal.Comentario</textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+                                        <!-- Modal Eliminar -->
+                                        <div class="modal fade" id="modalEliminar_@cal.IdCalificacion" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content rounded-4 shadow">
+                                                    <form method="post" asp-page-handler="Eliminar">
+                                                        <div class="modal-header border-bottom-0">
+                                                            <h5 class="modal-title">Confirmar eliminación</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>¿Deseas eliminar la calificación de <strong>@cal.NombreMateria</strong>?</p>
+                                                            <input type="hidden" name="IdCalificacion" value="@cal.IdCalificacion" />
+                                                        </div>
+                                                        <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">Este estudiante no tiene calificaciones registradas.</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+<!-- Modal Crear -->
+<div class="modal fade" id="modalCrear" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <form method="post" asp-page-handler="Crear">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title">Registrar Calificación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Estudiante -->
+                    <div class="mb-3">
+                        <label class="form-label">Estudiante</label>
+                          <select asp-for="estudianteSeleccionado" asp-items="Model.Estudiantes" class="form-select">
+                                            <option value="">Seleccione el estudiante</option>
+                                        </select>
+                                        <span asp-validation-for="estudianteSeleccionado" class="text-danger"></span>
+                    </div>
+
+                    <!-- Materia -->
+                    <div class="mb-3">
+                        <label class="form-label">Materia</label>
+                           <select asp-for="materiaSeleccionada" asp-items="Model.Materias" class="form-select">
+                                            <option value="">Seleccione la materia</option>
+                                        </select>
+                                        <span asp-validation-for="materiaSeleccionada" class="text-danger"></span>
+                        
+                    </div>
+
+                    <!-- Calificación -->
+                    <div class="mb-3">
+                        <label class="form-label">Calificación</label>
+                        <input asp-for="calificacion.Calificacion" type="number" step="0.01" class="form-control" required />
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input asp-for="calificacion.Fecha" type="date" class="form-control" required />
+                    </div>
+
+                    <!-- Comentario -->
+                    <div class="mb-3">
+                        <label class="form-label">Comentario</label>
+                        <textarea asp-for="calificacion.Comentario" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const filtroNombre = document.getElementById("filtroNombre");
+            const filtroCedula = document.getElementById("filtroCedula");
+            const filtroMateria = document.getElementById("filtroMateria");
+
+            if (filtroNombre && filtroCedula && filtroMateria) {
+                const tarjetasEstudiantes = document.querySelectorAll(".estudiante-card");
+
+                function aplicarFiltros() {
+                    const nombre = filtroNombre.value.toLowerCase();
+                    const cedula = filtroCedula.value.toLowerCase();
+                    const materia = filtroMateria.value.toLowerCase();
+
+                    tarjetasEstudiantes.forEach(card => {
+                        const nombreText = card.querySelector(".estudiante-nombre")?.textContent.toLowerCase() || "";
+                        const cedulaText = card.querySelector(".estudiante-cedula")?.textContent.toLowerCase() || "";
+                        const materiasText = card.textContent.toLowerCase();
+
+                        const coincideNombre = nombreText.includes(nombre);
+                        const coincideCedula = cedulaText.includes(cedula);
+                        const coincideMateria = materia === "" || materiasText.includes(materia);
+
+                        card.style.display = (coincideNombre && coincideCedula && coincideMateria) ? "" : "none";
+                    });
+                }
+
+                [filtroNombre, filtroCedula, filtroMateria].forEach(input => {
+                    input.addEventListener("input", aplicarFiltros);
+                    input.addEventListener("change", aplicarFiltros);
+                });
+            } else {
+                console.warn("[Filtros] No se encontraron los campos de filtro en esta vista.");
+            }
+        });
+    </script>
+}

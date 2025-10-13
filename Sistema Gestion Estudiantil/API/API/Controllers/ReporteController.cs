@@ -1,11 +1,12 @@
-﻿using Abstracciones.Interfaces.Flujo;
+﻿using Abstracciones.Interfaces.API;
+using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
 using Abstracciones.Modelos.Abstracciones.Modelos;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ReporteController : ControllerBase
+public class ReporteController : ControllerBase, IReporteController
 {
     private readonly IReporteFlujo _reporteFlujo;
 
@@ -15,7 +16,7 @@ public class ReporteController : ControllerBase
     }
 
     [HttpPost("universal")]
-    public async Task<IActionResult> GenerarUniversal([FromBody] ReporteEstudiantilRequest request)
+    public async Task<IActionResult> ReporteUniversal([FromBody] ReporteEstudiantilRequest request)
     {
         var archivo = await _reporteFlujo.GenerarReporteUniversal(request);
 
@@ -42,4 +43,20 @@ public class ReporteController : ControllerBase
 
         return File((byte[])archivo, contentType, nombreArchivo);
     }
+
+    [HttpPost("Vista")]
+    public async Task<IActionResult> ObtenerVistaEstudiantilAsync([FromBody] ReporteEstudiantilRequest filtros)
+    {
+        try
+        {
+            var resultado = await _reporteFlujo.ObtenerVistaEstudiantilAsync(filtros);
+            return Ok(resultado);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al obtener datos: {ex.Message}");
+        }
+    }
+
+
 }

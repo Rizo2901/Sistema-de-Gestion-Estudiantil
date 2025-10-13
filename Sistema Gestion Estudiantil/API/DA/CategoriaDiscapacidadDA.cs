@@ -36,7 +36,7 @@ namespace DA
             string query = @"CategoriaDiscapacidad.SP_EditarCategoriaDiscapacidad";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
-                IdCategoriaDiscapacidad = Id,
+                IdCategoria = Id,
                 Nombre = categoriaDiscapacidad.Nombre,
                 Descripcion = categoriaDiscapacidad.Descripcion
             });
@@ -48,7 +48,7 @@ namespace DA
             string query = @"CategoriaDiscapacidad.SP_EliminarCategoriaDiscapacidad";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
-                IdCategoriaDiscapacidad = Id
+                IdCategoria = Id
             });
             return result;
         }

@@ -26,7 +26,7 @@ namespace DA
 
         public async Task<Guid> CrearAdaptacionCurricular(AdaptacionCurricularRequest adaptacionCurricular)
         {
-            string query = @"AdaptatcionCurricular.Sp_CrearAdaptacionCurricular";
+            string query = @"AdaptacionCurricular.Sp_CrearAdaptacionCurricular";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdEstudiante = adaptacionCurricular.IdEstudiante,
@@ -43,7 +43,7 @@ namespace DA
 
         public async Task<Guid> EditarAdaptacionCurricular(Guid Id, AdaptacionCurricularRequest adaptacionCurricular)
         {
-            string query = @"AdaptatcionCurricular.Sp_EditarAdaptacionCurricular";
+            string query = @"AdaptacionCurricular.Sp_EditarAdaptacionCurricular";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdAdaptacion = Id,
@@ -61,7 +61,7 @@ namespace DA
 
         public async Task<Guid> EliminarAdaptacionCurricular(Guid Id)
         {
-            string query = @"AdaptatcionCurricular.Sp_EliminarAdaptacionCurricular";
+            string query = @"AdaptacionCurricular.Sp_EliminarAdaptacionCurricular";
             var result = await _conn.ExecuteScalarAsync<Guid>(query, new
             {
                 IdAdaptacion = Id,
@@ -71,7 +71,7 @@ namespace DA
 
         public async Task<AdaptacionCurricularResponse> ObtenerAdaptacionCurricularPorId(Guid Id)
         {
-            string query = @"AdaptatcionCurricular.Sp_ObtenerAdaptacionCurricularPorId";
+            string query = @"AdaptacionCurricular.Sp_ObtenerAdaptacionCurricularPorId";
             var result = await _conn.QueryAsync<AdaptacionCurricularResponse>(query, new
             {
                 IdAdaptacion = Id,
@@ -81,14 +81,14 @@ namespace DA
 
         public async Task<IEnumerable<AdaptacionCurricularResponse>> ObtenerAdaptacionesCurriculares()
         {
-            string query = @"AdaptatcionCurricular.Sp_ObtenerAdaptacionCurriculares";
+            string query = @"AdaptacionCurricular.SP_ObtenerAdaptacionesCurriculares";
             var result = await _conn.QueryAsync<AdaptacionCurricularResponse>(query);
             return result;
         }
 
         public async Task<IEnumerable<AdaptacionCurricularResponse>> ObtenerAdaptacionesPorEstudiante(Guid IdEstudiante)
         {
-            string query = @"AdaptatcionCurricular.Sp_ObtenerAdaptacionCurricularPorEstudiante";
+            string query = @"AdaptacionCurricular.Sp_ObtenerAdaptacionCurricularPorEstudiante";
             var result = await _conn.QueryAsync<AdaptacionCurricularResponse>(query, new
             {
                 IdEstudiante = IdEstudiante
@@ -98,7 +98,7 @@ namespace DA
 
         public async Task<IEnumerable<EstudianteConAdaptacionesResponse>> ObtenerAdaptacionesPorEstudiantes()
         {
-            string query = @"EstudianteAlergia.SP_ObtenerAdaptacionesPorEstudiantes";
+            string query = @"AdaptacionCurricular.SP_ObtenerAdaptacionesPorEstudiantes";
 
             var rawResult = await _conn.QueryAsync<EstudianteConAdaptacionesRaw>(query);
 

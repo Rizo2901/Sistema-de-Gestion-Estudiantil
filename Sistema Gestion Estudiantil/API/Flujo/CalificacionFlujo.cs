@@ -46,5 +46,49 @@ namespace Flujo
         {
             return await _calificacionDA.ObtenerCalificacionesPorEstudiante(IdEstudiante);
         }
+
+        public async Task<List<EstudianteConCalificaciones>> ObtenerCalificacionesPorEstudiantes()
+        {
+            var calificacionesPlanas = await _calificacionDA.ObtenerCalificaciones();
+
+            var agrupado = calificacionesPlanas
+                .GroupBy(c => new
+                {
+                    c.IdEstudiante,
+                    c.Cedula,
+                    c.Nombre,
+                    c.Apellido1,
+                    c.Apellido2
+                })
+                .Select(g => new EstudianteConCalificaciones
+                {
+                    IdEstudiante = g.Key.IdEstudiante,
+                    Cedula = g.Key.Cedula?.Trim(),
+                    Nombre = g.Key.Nombre?.Trim(),
+                    Apellido1 = g.Key.Apellido1?.Trim(),
+                    Apellido2 = g.Key.Apellido2?.Trim(),
+                    Calificaciones = g
+                        .Where(c => c.IdCalificacion != Guid.Empty)
+                        .Select(c => new CalificacionResponse
+                        {
+                            IdCalificacion = c.IdCalificacion,
+                            IdEstudiante = c.IdEstudiante,
+                            IdMateria = c.IdMateria,
+                            NombreMateria = c.NombreMateria?.Trim(),
+                            NombreCompleto = $"{c.Nombre?.Trim()} {c.Apellido1?.Trim()} {c.Apellido2?.Trim()}".Trim(),
+                            Calificacion = c.Calificacion,
+                            Comentario = c.Comentario?.Trim(),
+                            Fecha = c.Fecha
+                        })
+                        .OrderBy(c => c.Fecha)
+                        .ToList()
+                })
+                .OrderBy(e => e.Apellido1)
+                .ThenBy(e => e.Apellido2)
+                .ToList();
+
+            return agrupado;
+        }
+
     }
 }

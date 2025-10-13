@@ -1,5 +1,5 @@
 ﻿-- UPDATE
-CREATE PROCEDURE SP_EditarAtencionMedica
+CREATE PROCEDURE [dbo].[SP_EditarAtencionMedica]
     @IdAtencionMedica UNIQUEIDENTIFIER,
     @Fecha DATE,
     @Diagnostico TEXT,
@@ -10,5 +10,7 @@ BEGIN
     SET Fecha = @Fecha,
         Diagnostico = @Diagnostico,
         Tratamiento = @Tratamiento
-    WHERE IdAtencionMedica = @IdAtencionMedica
+    WHERE IdAtencionMedica = @IdAtencionMedica;
+
+    SELECT @IdAtencionMedica;
 END

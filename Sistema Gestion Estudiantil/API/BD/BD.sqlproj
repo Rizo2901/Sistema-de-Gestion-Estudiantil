@@ -400,6 +400,7 @@
     <Build Include="CondicionEspecial\Stored Procedures\SP_ObtenerCondicionEspecialPorId.sql" />
     <Build Include="Estudiante\Stored Procedures\Sp_ObtenerTotalEstudiantesActivos.sql" />
     <Build Include="dbo\Stored Procedures\Sp_ObtenerProfesoresTotal.sql" />
+    <Build Include="dbo\Stored Procedures\SP_ObtenerCalificacionesPorEstudiante.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BD.publish.xml" />

@@ -32,22 +32,51 @@ namespace Web.Pages.Dashboard.Categorias.CategoriasCondicionesEspeciales
 
         public async Task<IActionResult> OnPostCrear(CategoriasCondicionEspecialRequest categoria)
         {
-            var datos = new
+            try
             {
-                Nombre = categoria.Nombre,
-                Descripcion = categoria.Descripcion
-            };
+                var datos = new
+                {
+                    Nombre = categoria.Nombre,
+                    Descripcion = categoria.Descripcion
+                };
 
-            string jsonCategoria = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
+                string jsonCategoria = JsonSerializer.Serialize(datos, new JsonSerializerOptions { WriteIndented = true });
 
-            string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearCategoriaCondicionEspecial");
-            using var cliente = new HttpClient();
-            var contenido = new StringContent(jsonCategoria, Encoding.UTF8, "application/json");
+                string endPoint = _confg.ObtenerMetodo("ApiEndPoints", "CrearCategoriaCondicionEspecial");
+                Console.WriteLine($"[DEBUG] Endpoint construido: {endPoint}");
+                Console.WriteLine($"[DEBUG] JSON enviado:\n{jsonCategoria}");
 
-            var respuesta = await cliente.PostAsync(endPoint, contenido);
-            respuesta.EnsureSuccessStatusCode();
+                using var cliente = new HttpClient
+                {
+                    BaseAddress = new Uri("https://localhost:7149/api/")
+                };
 
-            return RedirectToPage();
+                var contenido = new StringContent(jsonCategoria, Encoding.UTF8, "application/json");
+
+                var respuesta = await cliente.PostAsync(endPoint, contenido);
+                Console.WriteLine($"[DEBUG] Código de respuesta: {respuesta.StatusCode}");
+
+                respuesta.EnsureSuccessStatusCode();
+
+                var resultado = await respuesta.Content.ReadAsStringAsync();
+                Console.WriteLine($"[DEBUG] Respuesta del servidor:\n{resultado}");
+
+                using var json = JsonDocument.Parse(resultado);
+
+                return RedirectToPage();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"[ERROR] Falló la solicitud HTTP: {ex.Message}");
+                ModelState.AddModelError(string.Empty, $"Error al crear categoría: {ex.Message}");
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Excepción inesperada: {ex.Message}");
+                ModelState.AddModelError(string.Empty, $"Error inesperado: {ex.Message}");
+                return Page();
+            }
         }
 
         public async Task<IActionResult> OnPostEditar(Guid IdCategoria, CategoriasCondicionEspecialResponse categoria)

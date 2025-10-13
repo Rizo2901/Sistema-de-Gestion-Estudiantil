@@ -17,7 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Dashboard\AdaptacionCurriculares\" />
+    <Folder Include="Pages\Dashboard\Enfermedades\" />
+    <Folder Include="Pages\Dashboard\Alergias\" />
+    <Folder Include="Pages\Dashboard\SituacionFamiliar\" />
     <Folder Include="Pages\Dashboard\Usuarios\" />
   </ItemGroup>
 

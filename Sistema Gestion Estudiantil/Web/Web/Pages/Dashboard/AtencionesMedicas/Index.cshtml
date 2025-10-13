@@ -1,0 +1,272 @@
+﻿@page
+@model Web.Pages.Dashboard.AtencionesMedicas.IndexModel
+@{
+    ViewData["Title"] = "Atenciones Médicas";
+    Layout = "_Layout";
+}
+
+@if (Model.EstudianteConAtenciones == null || !Model.EstudianteConAtenciones.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        ⚠️ No hay atenciones médicas registradas.
+    </div>
+    <div class="container-fluid px-0">
+        <div class="row mb-3">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn text-white w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#ModalCrear" style="background-color: #343a40">
+                    <i class="bi bi-plus-lg"></i> Registrar Atención Médica
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <!-- Botón Crear -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-3 d-flex justify-content-center justify-content-md-end">
+                <button class="btn btn-dark w-100 w-md-auto shadow-sm rounded-3" data-bs-toggle="modal" data-bs-target="#ModalCrear">
+                    <i class="bi bi-plus-lg me-1"></i> Registrar Atención Médica
+                </button>
+            </div>
+        </div>
+
+        <!-- Título -->
+        <h2 class="mb-4 text-center text-md-start fw-bold text-secondary-emphasis">
+            Atenciones Médicas por Estudiante
+        </h2>
+
+        <!-- Filtros -->
+        <div class="card shadow-lg border-0 rounded-4 mb-4">
+            <div class="card-header bg-dark text-white rounded-top-4">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-funnel-fill me-2"></i>Filtros
+                </h5>
+            </div>
+            <div class="card-body bg-white rounded-bottom-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroNombre" class="form-label fw-semibold text-dark">Nombre</label>
+                        <input type="text" id="filtroNombre" class="form-control shadow-sm border border-secondary" placeholder="Buscar por nombre...">
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="filtroCedula" class="form-label fw-semibold text-dark">Cédula</label>
+                        <input type="text" id="filtroCedula" class="form-control shadow-sm border border-secondary" placeholder="Buscar por cédula...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista por estudiante -->
+        <div class="d-flex flex-column gap-3">
+            @foreach (var est in Model.EstudianteConAtenciones)
+            {
+                <div class="card shadow-sm border-0 rounded-3 mx-2 estudiante-card">
+                    <div class="card-header bg-light py-2 px-3 rounded-top-3 d-flex justify-content-between align-items-center"
+                         role="button"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#atenciones_@est.IdEstudiante"
+                         aria-expanded="false"
+                         aria-controls="atenciones_@est.IdEstudiante"
+                         style="cursor: pointer;">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <span class="text-muted">Nombre completo:</span> <span class="estudiante-nombre">@($"{est.Nombre} {est.Apellido1} {est.Apellido2}")</span> —
+                                <span class="text-muted">Cédula:</span> <span class="estudiante-cedula">@est.Cedula</span>
+                            </h6>
+                            <small class="text-muted">Total atenciones: @est.AtencionesMedicas?.Count()</small>
+                        </div>
+                    </div>
+
+                    <!-- Atenciones Médicas -->
+                    <div class="collapse" id="atenciones_@est.IdEstudiante">
+                        <div class="card-body bg-white rounded-bottom-3">
+                            @if (est.AtencionesMedicas?.Any() == true)
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var atencion in est.AtencionesMedicas)
+                                    {
+                                        <li class="list-group-item px-3 py-2">
+                                            <div class="row small">
+                                                <div class="col-6">
+                                                    <strong>Fecha:</strong> @atencion.Fecha.ToShortDateString() <br />
+                                                    <strong>Diagnóstico:</strong> @atencion.Diagnostico
+                                                </div>
+                                                <div class="col-6">
+                                                    <strong>Tratamiento:</strong> @atencion.Tratamiento
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-2 d-flex justify-content-end gap-2">
+                                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalEditar_@atencion.IdAtencionMedica" title="Editar">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar_@atencion.IdAtencionMedica" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </li>
+
+    <div class="modal fade" id="modalEliminar_@atencion.IdAtencionMedica" tabindex="-1" aria-labelledby="modalEliminarLabel_@atencion.IdAtencionMedica" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <form method="post" asp-page-handler="Eliminar">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title" id="modalEliminarLabel_@atencion.IdAtencionMedica">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro que deseas eliminar esta atención médica?</p>
+                    <p><strong>Diagnóstico:</strong> @atencion.Diagnostico</p>
+                    <p><strong>Tratamiento:</strong> @atencion.Tratamiento</p>
+                    <input type="hidden" name="IdEstudiante" value="@atencion.IdEstudiante" />
+                    <input type="hidden" name="IdAtencionMedica" value="@atencion.IdAtencionMedica" />
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+                                        <div class="modal fade" id="modalEditar_@atencion.IdAtencionMedica" tabindex="-1" aria-labelledby="modalEditarLabel_@atencion.IdAtencionMedica" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content rounded-4 shadow">
+                                                    <form method="post" asp-page-handler="Editar">
+                                                        <div class="modal-header border-bottom-0">
+                                                            <h5 class="modal-title" id="modalEditarLabel_@atencion.IdAtencionMedica">Editar Atención Médica</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <input type="hidden" name="IdAtencionMedica" value="@atencion.IdAtencionMedica" />
+                                                            <input type="hidden" name="IdEstudiante" value="@atencion.IdEstudiante" />
+
+                                                            <div class="mb-3">
+                                                                <label for="Fecha_@atencion.IdAtencionMedica" class="form-label">Fecha</label>
+                                                                <input type="date" class="form-control" id="Fecha_@atencion.IdAtencionMedica" name="Fecha" value="@atencion.Fecha.ToString("yyyy-MM-dd")" />
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="Diagnostico_@atencion.IdAtencionMedica" class="form-label">Diagnóstico</label>
+                                                                <textarea class="form-control" id="Diagnostico_@atencion.IdAtencionMedica" name="Diagnostico">@atencion.Diagnostico</textarea>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="Tratamiento_@atencion.IdAtencionMedica" class="form-label">Tratamiento</label>
+                                                                <textarea class="form-control" id="Tratamiento_@atencion.IdAtencionMedica" name="Tratamiento">@atencion.Tratamiento</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">Este estudiante no tiene atenciones médicas registradas.</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="modal fade" id="ModalCrear" tabindex="-1" aria-labelledby="ModalCrearLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 shadow">
+                            <form method="post" asp-page-handler="Crear">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title">Registrar Atención Médica</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" id="IdAtencionMedica" name="IdAtencionMedica" value="@Guid.NewGuid()" />
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Seleccionar Estudiante</label>
+                                        <select asp-for="estudianteSeleccionado" asp-items="Model.Estudiantes" class="form-select">
+                                            <option value="">Seleccione el estudiante al que va registrarle una atención médica</option>
+                                        </select>
+                                        <span asp-validation-for="estudianteSeleccionado" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha</label>
+                                        <input type="date" class="form-control" id="Fecha" name="Fecha">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Diagnóstico</label>
+                                        <textarea class="form-control" id="Diagnostico" name="Diagnostico"></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Tratamiento</label>
+                                        <textarea class="form-control" id="Tratamiento" name="Tratamiento"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-top-0 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="submit" class="btn btn-success">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const filtroNombre = document.getElementById("filtroNombre");
+            const filtroCedula = document.getElementById("filtroCedula");
+
+            if (filtroNombre && filtroCedula) {
+                const tarjetasEstudiantes = document.querySelectorAll(".estudiante-card");
+
+                function aplicarFiltros() {
+                    const nombre = filtroNombre.value.toLowerCase();
+                    const cedula = filtroCedula.value.toLowerCase();
+
+                    tarjetasEstudiantes.forEach(card => {
+                        const nombreText = card.querySelector(".estudiante-nombre")?.textContent.toLowerCase() || "";
+                        const cedulaText = card.querySelector(".estudiante-cedula")?.textContent.toLowerCase() || "";
+
+                        const coincideNombre = nombreText.includes(nombre);
+                        const coincideCedula = cedulaText.includes(cedula);
+
+                        card.style.display = (coincideNombre && coincideCedula && coincideMateria) ? "" : "none";
+                    });
+                }
+
+                [filtroNombre, filtroCedula].forEach(input => {
+                    input.addEventListener("input", aplicarFiltros);
+                    input.addEventListener("change", aplicarFiltros);
+                });
+            } else {
+                console.warn("[Filtros] No se encontraron los campos de filtro en esta vista.");
+            }
+        });
+    </script>
+}

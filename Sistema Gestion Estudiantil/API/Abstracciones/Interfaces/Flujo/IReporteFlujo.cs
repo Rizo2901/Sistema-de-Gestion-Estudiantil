@@ -1,4 +1,5 @@
 ﻿using Abstracciones.Modelos;
+using Abstracciones.Modelos.Abstracciones.Modelos;
 
 
 namespace Abstracciones.Interfaces.Flujo
@@ -7,5 +8,6 @@ namespace Abstracciones.Interfaces.Flujo
     {
        
         Task<object> GenerarReporteUniversal(ReporteEstudiantilRequest filtros);
+        Task<List<ReporteEstudiantilResponse>> ObtenerVistaEstudiantilAsync(ReporteEstudiantilRequest filtros);
     }
 }
